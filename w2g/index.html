@@ -337,7 +337,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       Share
     </button>
-    <button class="pnav-btn" id="closeRoomBtn" onclick="closeRoom()" style="display:none;border-color:rgba(230,57,70,0.4);color:var(--accent)">
+    <button class="pnav-btn" id="closeRoomBtn" onclick="closeRoomPermanently()" style="display:none;border-color:rgba(230,57,70,0.4);color:var(--accent)">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       Close Room
     </button>
@@ -877,6 +877,15 @@ async function subscribeRoom(roomId){
     leaveRoom();
   });
 
+  // Kicked by host
+  roomChannel.on('broadcast',{event:'kicked'},({payload})=>{
+    if(isHost) return;
+    // Targeted kick (by name) or mass kick (room closed)
+    if(payload.target && payload.target !== guestName) return;
+    showToast(payload.reason || 'You were kicked by the host.');
+    leaveRoom();
+  });
+
   // Chat via broadcast (instant, no DB realtime needed)
   roomChannel.on('broadcast',{event:'chat'},({payload})=>{
     renderMessage(payload);
@@ -1045,10 +1054,16 @@ async function saveRoomPassword(){
 }
 async function closeRoomPermanently(){
   if(!confirm('Close this room? All guests will be kicked.')) return;
-  if(roomChannel) await roomChannel.send({type:'broadcast',event:'kicked',payload:{reason:'Room closed by host'}});
+  // Send both events for maximum compatibility
+  if(roomChannel){
+    await roomChannel.send({type:'broadcast',event:'room_closed',payload:{}});
+    await roomChannel.send({type:'broadcast',event:'kicked',payload:{reason:'Host closed the room.'}});
+  }
   const client=await getSB();
-  await client.from('party_rooms').update({is_closed:true,status:'ended'}).eq('id',currentRoom.id);
-  document.getElementById('hostSettingsModal').classList.remove('open');
+  await client.from('party_rooms').update({is_closed:true,status:'ended',updated_at:new Date().toISOString()}).eq('id',currentRoom.id);
+  // Small delay so broadcast reaches guests before host disconnects
+  await new Promise(r=>setTimeout(r,400));
+  try{document.getElementById('hostSettingsModal').classList.remove('open');}catch(e){}
   leaveRoom();
   showToast('Room closed.');
 }
@@ -1056,8 +1071,11 @@ async function closeRoomPermanently(){
 /* ── KICK ── */
 async function kickUser(name){
   if(!isHost||!roomChannel) return;
-  await roomChannel.send({type:'broadcast',event:'kicked',payload:{target:name}});
+  await roomChannel.send({type:'broadcast',event:'kicked',payload:{target:name,reason:'You were kicked by the host.'}});
   showToast(`${name} was kicked.`);
+  // Remove from local viewers display
+  delete viewers[name];
+  renderViewers();
 }
 
 function leaveRoom(){
