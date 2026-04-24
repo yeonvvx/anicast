@@ -539,24 +539,12 @@ async function submitRoom() {
 
   try {
     // Create W2G room via CORS proxy
-    // Try multiple CORS proxies for W2G POST
-    const W2G_URL = 'https://api.w2g.tv/rooms/create.json';
-    const proxies = [
-      'https://proxy.cors.sh/' + W2G_URL,
-      'https://corsproxy.io/?' + encodeURIComponent(W2G_URL),
-      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(W2G_URL),
-    ];
-    let r = null;
-    for(const proxyUrl of proxies){
-      try{
-        const tr = await fetch(proxyUrl, {
+    // Use Cloudflare Worker proxy
+    const r = await fetch('https://raspy-union-db25.yeonixsites.workers.dev', {
       method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ w2g_api_key: W2G_KEY, share: streamUrl, bg_color: '08080e', bg_opacity: '100' })
-        });
-        if(tr.ok){ r = tr; break; }
-      }catch{}
-    }
+      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+      body: JSON.stringify({ w2g_api_key: W2G_KEY, share: streamUrl, bg_color: '08080e', bg_opacity: '100' })
+    });
     if (!r.ok) throw new Error('W2G HTTP ' + r.status);
     const w2gData = await r.json();
     if (!w2gData.streamkey) throw new Error('No streamkey');
