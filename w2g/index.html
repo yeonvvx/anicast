@@ -664,8 +664,11 @@ async function changeEp(ep){
   document.querySelectorAll('.ep-pill').forEach(b=>b.classList.toggle('active',+b.textContent===ep));
   document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${ep}/${currentLang}`;
   document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+ep;
+  // Broadcast instantly to all guests
+  if(roomChannel) await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:ep,lang:currentLang}});
+  // Also update DB for persistence
   const client=await getSB();
-  await client.from('party_rooms').update({episode:ep,playback_time:0}).eq('id',currentRoom.id);
+  await client.from('party_rooms').update({episode:ep,playback_time:0,updated_at:new Date().toISOString()}).eq('id',currentRoom.id);
   addSystemMsg(`Host changed to Episode ${ep}`);
 }
 
@@ -675,8 +678,10 @@ async function changeEpLang(lang){
   document.getElementById('pBtnSub').classList.toggle('active',lang==='sub');
   document.getElementById('pBtnDub').classList.toggle('active',lang==='dub');
   document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${currentEp}/${lang}`;
+  // Broadcast instantly to all guests
+  if(roomChannel) await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang}});
   const client=await getSB();
-  await client.from('party_rooms').update({lang}).eq('id',currentRoom.id);
+  await client.from('party_rooms').update({lang,updated_at:new Date().toISOString()}).eq('id',currentRoom.id);
   addSystemMsg(`Host switched to ${lang.toUpperCase()}`);
 }
 
@@ -684,17 +689,38 @@ async function changeEpLang(lang){
 async function subscribeRoom(roomId){
   const client=await getSB();
   roomChannel=client.channel('room:'+roomId)
+    // Broadcast for instant host→guest sync (no DB config needed)
+    .on('broadcast',{event:'sync'},({payload})=>{
+      if(isHost) return;
+      if(payload.episode!==currentEp||payload.lang!==currentLang){
+        currentEp=payload.episode; currentLang=payload.lang;
+        document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${payload.episode}/${payload.lang}`;
+        document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+payload.episode;
+        addSystemMsg(`Host changed to Episode ${payload.episode} · ${payload.lang.toUpperCase()}`);
+      }
+    })
+    // Guest joining: ask host for current state
+    .on('broadcast',{event:'request_sync'},async()=>{
+      if(!isHost) return;
+      await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang:currentLang}});
+    })
+    // DB changes as fallback
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'party_rooms',filter:`id=eq.${roomId}`},payload=>{
       if(isHost) return;
       const room=payload.new;
       if(room.episode!==currentEp||room.lang!==currentLang){
         currentEp=room.episode; currentLang=room.lang;
-        document.getElementById('playerFrame').src=`${MEGAPLAY}/${room.anime_mal_id}/${room.episode}/${room.lang}`;
-        document.getElementById('pNavTitle').textContent=room.anime_title+' — EP '+room.episode;
+        document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${room.episode}/${room.lang}`;
+        document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+room.episode;
         addSystemMsg(`Host changed to Episode ${room.episode} · ${room.lang.toUpperCase()}`);
       }
     })
-    .subscribe();
+    .subscribe(async(status)=>{
+      if(status==='SUBSCRIBED' && !isHost){
+        // Request current state from host on join
+        await roomChannel.send({type:'broadcast',event:'request_sync',payload:{}});
+      }
+    });
 }
 
 async function subscribeChat(roomId){
