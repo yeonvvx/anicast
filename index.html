@@ -1233,6 +1233,7 @@ function quickNav(id,e){e.preventDefault();document.getElementById(id)?.scrollIn
 ───────────────────────────────────────────────── */
 async function init(){
   skelRow('trendRow'); skelRow('seasonRow');
+  renderUserBtn(); // Show guest button immediately, auth will update it
   initAuth();
 
   renderOngoing(audioLang);
