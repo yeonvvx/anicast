@@ -346,7 +346,7 @@ const MEGAPLAY='https://megaplay.buzz/stream/mal';
 let sb=null, currentUser=null, currentRoom=null;
 let isHost=false, modalLang='sub', modalStatus='live', modalAnime=null;
 let modalSearchTimer=null, allRooms=[], filterStatus='all', sortMode='newest';
-let roomChannel=null, chatChannel=null;
+let roomChannel=null, 
 let currentEp=1, currentLang='sub', viewers={};
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -665,7 +665,7 @@ async function changeEp(ep){
   document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${ep}/${currentLang}`;
   document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+ep;
   // Broadcast instantly to all guests
-  if(roomChannel) await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:ep,lang:currentLang}});
+  if(roomChannel) roomChannel.send({type:'broadcast',event:'sync',payload:{episode:ep,lang:currentLang}}).catch(()=>{});
   // Also update DB for persistence
   const client=await getSB();
   await client.from('party_rooms').update({episode:ep,playback_time:0,updated_at:new Date().toISOString()}).eq('id',currentRoom.id);
@@ -679,73 +679,82 @@ async function changeEpLang(lang){
   document.getElementById('pBtnDub').classList.toggle('active',lang==='dub');
   document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${currentEp}/${lang}`;
   // Broadcast instantly to all guests
-  if(roomChannel) await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang}});
+  if(roomChannel) roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang}}).catch(()=>{});
   const client=await getSB();
   await client.from('party_rooms').update({lang,updated_at:new Date().toISOString()}).eq('id',currentRoom.id);
   addSystemMsg(`Host switched to ${lang.toUpperCase()}`);
 }
 
 /* ── REALTIME ── */
+let guestName='';
+let chatPollInterval=null;
+let lastChatId=null;
+
 async function subscribeRoom(roomId){
   const client=await getSB();
-  roomChannel=client.channel('room:'+roomId)
-    // Broadcast for instant host→guest sync (no DB config needed)
-    .on('broadcast',{event:'sync'},({payload})=>{
-      if(isHost) return;
-      if(payload.episode!==currentEp||payload.lang!==currentLang){
-        currentEp=payload.episode; currentLang=payload.lang;
-        document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${payload.episode}/${payload.lang}`;
-        document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+payload.episode;
-        addSystemMsg(`Host changed to Episode ${payload.episode} · ${payload.lang.toUpperCase()}`);
-      }
-    })
-    // Guest joining: ask host for current state
-    .on('broadcast',{event:'request_sync'},async()=>{
-      if(!isHost) return;
-      await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang:currentLang}});
-    })
-    // DB changes as fallback
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'party_rooms',filter:`id=eq.${roomId}`},payload=>{
-      if(isHost) return;
-      const room=payload.new;
-      if(room.episode!==currentEp||room.lang!==currentLang){
-        currentEp=room.episode; currentLang=room.lang;
-        document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${room.episode}/${room.lang}`;
-        document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+room.episode;
-        addSystemMsg(`Host changed to Episode ${room.episode} · ${room.lang.toUpperCase()}`);
-      }
-    })
-    .subscribe(async(status)=>{
-      if(status==='SUBSCRIBED' && !isHost){
-        // Request current state from host on join
+  guestName=currentUser?getDisplayName(currentUser):'Guest_'+Math.random().toString(36).slice(2,5);
+  const avatar=currentUser?getAvatarUrl(currentUser):'';
+
+  // Single channel for everything
+  roomChannel=client.channel('party:'+roomId,{config:{broadcast:{self:false},presence:{key:guestName}}});
+
+  // Sync: host broadcasts episode/lang changes
+  roomChannel.on('broadcast',{event:'sync'},({payload})=>{
+    if(isHost) return;
+    const changed=payload.episode!==currentEp||payload.lang!==currentLang;
+    currentEp=payload.episode; currentLang=payload.lang;
+    if(changed){
+      document.getElementById('playerFrame').src=`${MEGAPLAY}/${currentRoom.anime_mal_id}/${payload.episode}/${payload.lang}`;
+      document.getElementById('pNavTitle').textContent=currentRoom.anime_title+' — EP '+payload.episode;
+      addSystemMsg(`Host → Episode ${payload.episode} · ${payload.lang.toUpperCase()}`);
+    }
+  });
+
+  // Guest requests current state when they join
+  roomChannel.on('broadcast',{event:'request_sync'},async()=>{
+    if(!isHost) return;
+    await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang:currentLang}});
+  });
+
+  // Chat via broadcast (instant, no DB realtime needed)
+  roomChannel.on('broadcast',{event:'chat'},({payload})=>{
+    renderMessage(payload);
+  });
+
+  // Presence for viewer list
+  roomChannel.on('presence',{event:'sync'},()=>{
+    const state=roomChannel.presenceState();
+    updateViewers(state);
+  });
+  roomChannel.on('presence',{event:'join'},({newPresences})=>{
+    newPresences.forEach(p=>{ if(p.name!==guestName) addSystemMsg(`${p.name} joined`); });
+  });
+  roomChannel.on('presence',{event:'leave'},({leftPresences})=>{
+    leftPresences.forEach(p=>addSystemMsg(`${p.name} left`));
+  });
+
+  roomChannel.subscribe(async(status)=>{
+    if(status==='SUBSCRIBED'){
+      // Track presence
+      await roomChannel.track({name:guestName,avatar,isHost});
+      // If guest, request current state from host
+      if(!isHost){
         await roomChannel.send({type:'broadcast',event:'request_sync',payload:{}});
       }
-    });
+    }
+  });
 }
 
 async function subscribeChat(roomId){
-  const client=await getSB();
-  chatChannel=client.channel('chat:'+roomId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'party_messages',filter:`room_id=eq.${roomId}`},payload=>renderMessage(payload.new))
-    .on('presence',{event:'sync'},()=>{
-      const state=chatChannel.presenceState();
-      updateViewers(state);
-    })
-    .on('presence',{event:'join'},({newPresences})=>newPresences.forEach(p=>addSystemMsg(`${p.name} joined`)))
-    .on('presence',{event:'leave'},({leftPresences})=>leftPresences.forEach(p=>addSystemMsg(`${p.name} left`)))
-    .subscribe(async status=>{
-      if(status==='SUBSCRIBED'){
-        const name=currentUser?getDisplayName(currentUser):'Guest_'+Math.random().toString(36).slice(2,5);
-        const avatar=currentUser?getAvatarUrl(currentUser):'';
-        await chatChannel.track({name,avatar,isHost});
-      }
-    });
+  // Chat is handled inside subscribeRoom via broadcast
+  // This function is kept for compatibility
 }
 
 function updateViewers(state){
   viewers={};
-  Object.values(state).forEach(presences=>presences.forEach(p=>{viewers[p.name]=p;}));
-  document.getElementById('pViewerCount').textContent=Object.keys(viewers).length||1;
+  Object.values(state).forEach(presences=>presences.forEach(p=>{if(p.name) viewers[p.name]=p;}));
+  const count=Object.keys(viewers).length;
+  document.getElementById('pViewerCount').textContent=count||1;
   renderViewers();
 }
 function renderViewers(){
@@ -761,9 +770,12 @@ function renderViewers(){
 
 /* ── CHAT ── */
 async function loadChatHistory(roomId){
-  const client=await getSB();
-  const{data}=await client.from('party_messages').select('*').eq('room_id',roomId).order('created_at',{ascending:true}).limit(50);
-  (data||[]).forEach(renderMessage);
+  try{
+    const client=await getSB();
+    const{data,error}=await client.from('party_messages').select('*').eq('room_id',roomId).order('created_at',{ascending:true}).limit(50);
+    if(error){ console.warn('Chat history error:',error); return; }
+    (data||[]).forEach(renderMessage);
+  }catch(e){ console.warn('Chat history failed:',e); }
 }
 function renderMessage(msg){
   const wrap=document.getElementById('chatMessages');
@@ -785,19 +797,30 @@ function addSystemMsg(text){
 async function sendMessage(){
   const input=document.getElementById('chatInput');
   const text=input.value.trim();
-  if(!text||!currentRoom) return;
+  if(!text||!currentRoom||!roomChannel) return;
   input.value='';
-  const client=await getSB();
-  const name=currentUser?getDisplayName(currentUser):'Guest_'+Math.random().toString(36).slice(2,5);
   const avatar=currentUser?getAvatarUrl(currentUser):'';
-  await client.from('party_messages').insert({room_id:currentRoom.id,user_id:currentUser?.id||null,username:name,avatar_url:avatar,message:text});
+  const payload={username:guestName,avatar_url:avatar,message:text,ts:Date.now()};
+  // Render own message immediately
+  renderMessage(payload);
+  // Broadcast to others
+  await roomChannel.send({type:'broadcast',event:'chat',payload});
+  // Also persist to DB
+  const client=await getSB();
+  client.from('party_messages').insert({
+    room_id:currentRoom.id,
+    user_id:currentUser?.id||null,
+    username:guestName,
+    avatar_url:avatar,
+    message:text
+  }).then(()=>{}).catch(()=>{});
 }
 
 /* ── LEAVE ── */
 function leaveRoom(){
   if(roomChannel) roomChannel.unsubscribe();
-  if(chatChannel) chatChannel.unsubscribe();
-  roomChannel=null; chatChannel=null;
+  
+  roomChannel=null; 
   window.history.replaceState({},'','/w2g');
   document.getElementById('playerOverlay').classList.remove('open');
   document.getElementById('browsePage').style.display='';
