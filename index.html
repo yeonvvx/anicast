@@ -405,6 +405,53 @@ footer a{color:var(--muted);text-decoration:none}
   .wp-embed-wrap{position:static;aspect-ratio:16/9}
   .wp-page{padding:1.5rem 1rem 3rem}
 }
+
+/* ── COMMENTS ── */
+.comments-section{margin-top:24px;border-top:0.5px solid rgba(255,255,255,0.07);padding-top:20px}
+.comments-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.comments-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px}
+.comments-ep-tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.comments-ep-tabs::-webkit-scrollbar{display:none}
+.cep-pill{flex-shrink:0;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--muted);font-family:inherit;transition:all 0.2s}
+.cep-pill.active,.cep-pill:hover{background:var(--accent-dim);border-color:var(--accent-border);color:var(--accent)}
+.comment-input-wrap{display:flex;gap:10px;margin-bottom:20px;align-items:flex-start}
+.comment-input-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3)}
+.comment-input-box{flex:1}
+.comment-textarea{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--text);font-family:inherit;outline:none;resize:none;min-height:72px;transition:border-color 0.2s;line-height:1.5}
+.comment-textarea:focus{border-color:var(--accent)}
+.comment-submit-row{display:flex;justify-content:flex-end;margin-top:8px}
+.comment-submit{background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:7px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s}
+.comment-submit:hover{background:#c7303c}
+.comment-submit:disabled{opacity:0.5;cursor:not-allowed}
+.comment-sign-in{font-size:12px;color:var(--muted);padding:12px 0;text-align:center}
+.comment-sign-in a{color:var(--accent);cursor:pointer}
+.comments-list{display:flex;flex-direction:column;gap:0}
+.comment-item{padding:14px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)}
+.comment-item:last-child{border-bottom:none}
+.comment-main{display:flex;gap:10px}
+.comment-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3)}
+.comment-body{flex:1;min-width:0}
+.comment-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.comment-name{font-size:12px;font-weight:700;color:var(--text)}
+.comment-name.is-host{color:var(--accent)}
+.comment-time{font-size:11px;color:var(--muted2)}
+.comment-text{font-size:13px;line-height:1.7;color:rgba(240,240,248,0.85);word-break:break-word}
+.comment-actions{display:flex;align-items:center;gap:12px;margin-top:8px}
+.caction{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:inherit;transition:color 0.2s;padding:0}
+.caction:hover{color:var(--text)}
+.caction.liked{color:var(--accent)}
+.reply-form{margin-top:10px;display:none;flex;gap:8px;align-items:flex-start}
+.reply-form.show{display:flex}
+.reply-textarea{flex:1;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:8px 12px;font-size:12px;color:var(--text);font-family:inherit;outline:none;resize:none;min-height:56px;transition:border-color 0.2s}
+.reply-textarea:focus{border-color:var(--accent)}
+.reply-submit{background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;align-self:flex-end}
+.replies{margin-left:40px;border-left:0.5px solid rgba(255,255,255,0.07);padding-left:14px;margin-top:10px;display:flex;flex-direction:column;gap:0}
+.reply-item{padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)}
+.reply-item:last-child{border-bottom:none}
+.comments-load-more{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:var(--radius);padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;transition:all 0.2s}
+.comments-load-more:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+.comments-empty{font-size:13px;color:var(--muted);text-align:center;padding:24px 0}
+.comments-loading{font-size:12px;color:var(--muted);text-align:center;padding:16px 0}
 </style>
 </head>
 <body>
@@ -497,6 +544,29 @@ footer a{color:var(--muted);text-decoration:none}
           </button>
         </div>
       </div>
+    </div>
+    <!-- COMMENTS -->
+    <div class="comments-section" id="commentsSection" style="padding:0 28px 28px">
+      <div class="comments-header">
+        <div class="comments-title">COMMENTS <span id="commentsEpLabel" style="color:var(--accent);font-size:14px"></span></div>
+        <div class="comments-ep-tabs" id="commentsEpTabs"></div>
+      </div>
+      <div class="comment-input-wrap" id="commentInputWrap">
+        <img class="comment-input-avatar" id="commentUserAvatar" src="" alt="">
+        <div class="comment-input-box">
+          <textarea class="comment-textarea" id="commentTextarea" placeholder="Share your thoughts about this episode…" rows="3"></textarea>
+          <div class="comment-submit-row">
+            <button class="comment-submit" id="commentSubmitBtn" onclick="submitComment()">Post Comment</button>
+          </div>
+        </div>
+      </div>
+      <div class="comment-sign-in" id="commentSignIn" style="display:none">
+        <a onclick="openAuth()">Sign in</a> to leave a comment.
+      </div>
+      <div id="commentsList" class="comments-list">
+        <div class="comments-loading">Loading comments…</div>
+      </div>
+      <button class="comments-load-more" id="commentsLoadMore" style="display:none" onclick="loadMoreComments()">Load more comments</button>
     </div>
   </div>
 </div>
@@ -830,6 +900,9 @@ async function openInfo(item){
   document.getElementById('nextEpPanel').style.display='none';
   document.getElementById('infoModal').classList.add('open');
   document.body.style.overflow='hidden';
+
+  // Load comments
+  initComments(item.mal_id, item.episodes||0);
 
   const isAiring=status.toLowerCase().includes('airing')||status.toLowerCase().includes('currently');
 
@@ -1925,6 +1998,254 @@ async function savePassword(){
   document.getElementById('settingsPasswordConfirm').value='';
   setTimeout(()=>{msg.textContent='';},3000);
 }
+
+
+/* ─────────────────────────────────────────────────
+   COMMENTS
+───────────────────────────────────────────────── */
+let activeCommentMalId = null;
+let activeCommentEp = 0; // 0 = general
+let commentOffset = 0;
+const COMMENTS_PER_PAGE = 20;
+let likedComments = new Set();
+
+function timeAgo(ts){
+  const s=Math.floor((Date.now()-new Date(ts))/1000);
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  if(s<604800) return Math.floor(s/86400)+'d ago';
+  return new Date(ts).toLocaleDateString([],{month:'short',day:'numeric'});
+}
+
+async function initComments(malId, totalEps){
+  activeCommentMalId = malId;
+  activeCommentEp = 0;
+  commentOffset = 0;
+
+  // User avatar/state
+  if(currentUser){
+    const av = getAvatarUrl(currentUser);
+    document.getElementById('commentUserAvatar').src = av;
+    document.getElementById('commentInputWrap').style.display = 'flex';
+    document.getElementById('commentSignIn').style.display = 'none';
+    // Load liked comments
+    const sb = await getSB();
+    const {data} = await sb.from('comment_likes').select('comment_id').eq('user_id', currentUser.id);
+    likedComments = new Set((data||[]).map(r=>r.comment_id));
+  } else {
+    document.getElementById('commentInputWrap').style.display = 'none';
+    document.getElementById('commentSignIn').style.display = 'block';
+  }
+
+  // Build episode tabs
+  buildEpTabs(totalEps);
+  await loadComments(true);
+}
+
+function buildEpTabs(totalEps){
+  const tabs = document.getElementById('commentsEpTabs');
+  tabs.innerHTML = '';
+  // General tab
+  const gen = document.createElement('button');
+  gen.className = 'cep-pill active';
+  gen.textContent = 'General';
+  gen.onclick = () => switchCommentEp(0, gen);
+  tabs.appendChild(gen);
+  // Episode tabs
+  const max = Math.min(totalEps||0, 100);
+  for(let i=1;i<=max;i++){
+    const btn = document.createElement('button');
+    btn.className = 'cep-pill';
+    btn.textContent = 'EP '+i;
+    btn.onclick = (()=>{ const ep=i; return ()=>switchCommentEp(ep,btn); })();
+    tabs.appendChild(btn);
+  }
+  document.getElementById('commentsEpLabel').textContent = '';
+}
+
+async function switchCommentEp(ep, btn){
+  activeCommentEp = ep;
+  commentOffset = 0;
+  document.querySelectorAll('.cep-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('commentsEpLabel').textContent = ep>0 ? '— EP '+ep : '';
+  document.getElementById('commentTextarea').placeholder = ep>0
+    ? `Share your thoughts about Episode ${ep}…`
+    : 'Share your thoughts about this anime…';
+  await loadComments(true);
+}
+
+async function loadComments(reset=false){
+  if(reset){ commentOffset=0; }
+  const list = document.getElementById('commentsList');
+  if(reset) list.innerHTML = '<div class="comments-loading">Loading…</div>';
+
+  const sb = await getSB();
+  const {data, error} = await sb
+    .from('comments')
+    .select('*')
+    .eq('mal_id', activeCommentMalId)
+    .eq('episode', activeCommentEp)
+    .is('parent_id', null)
+    .order('created_at', {ascending:false})
+    .range(commentOffset, commentOffset + COMMENTS_PER_PAGE - 1);
+
+  if(reset) list.innerHTML = '';
+  if(error||!data||!data.length){
+    if(reset) list.innerHTML = '<div class="comments-empty">No comments yet. Be the first!</div>';
+    document.getElementById('commentsLoadMore').style.display = 'none';
+    return;
+  }
+
+  // Fetch replies for each comment
+  const ids = data.map(c=>c.id);
+  const {data:replies} = await sb.from('comments').select('*').in('parent_id', ids).order('created_at',{ascending:true});
+  const replyMap = {};
+  (replies||[]).forEach(r=>{ if(!replyMap[r.parent_id]) replyMap[r.parent_id]=[]; replyMap[r.parent_id].push(r); });
+
+  data.forEach(c => list.appendChild(buildCommentEl(c, replyMap[c.id]||[], false)));
+
+  commentOffset += data.length;
+  document.getElementById('commentsLoadMore').style.display = data.length < COMMENTS_PER_PAGE ? 'none' : 'block';
+}
+
+async function loadMoreComments(){
+  await loadComments(false);
+}
+
+function buildCommentEl(c, replies, isReply){
+  const div = document.createElement('div');
+  div.className = isReply ? 'reply-item' : 'comment-item';
+  div.id = 'comment-'+c.id;
+  const av = c.avatar_url || `https://api.dicebear.com/8.x/avataaars/svg?seed=${encodeURIComponent(c.username||'anon')}&radius=50`;
+  const isLiked = likedComments.has(c.id);
+  const isMine = currentUser && currentUser.id === c.user_id;
+  const repliesHtml = replies.length ? `<div class="replies" id="replies-${c.id}">${replies.map(r=>buildCommentEl(r,[],true).outerHTML).join('')}</div>` : `<div class="replies" id="replies-${c.id}" style="display:none"></div>`;
+
+  div.innerHTML = `
+    <div class="comment-main">
+      <img class="comment-avatar" src="${av}" alt="" onerror="this.style.background='var(--bg3)'">
+      <div class="comment-body">
+        <div class="comment-meta">
+          <span class="comment-name">${escHtml(c.username||'Anon')}</span>
+          <span class="comment-time">${timeAgo(c.created_at)}</span>
+        </div>
+        <div class="comment-text">${escHtml(c.content)}</div>
+        <div class="comment-actions">
+          <button class="caction${isLiked?' liked':''}" onclick="toggleLike('${c.id}',this)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="${isLiked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="likes-${c.id}">${c.likes||0}</span>
+          </button>
+          ${!isReply&&currentUser?`<button class="caction" onclick="toggleReplyForm('${c.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Reply${replies.length?` (${replies.length})`:''}
+          </button>`:''}
+          ${isMine?`<button class="caction" onclick="deleteComment('${c.id}',${isReply})" style="color:var(--muted2)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            Delete
+          </button>`:''}
+        </div>
+        ${!isReply?`<div class="reply-form" id="reply-form-${c.id}">
+          <img class="comment-avatar" src="${currentUser?getAvatarUrl(currentUser):''}" style="width:24px;height:24px" alt="">
+          <textarea class="reply-textarea" id="reply-input-${c.id}" placeholder="Write a reply…" rows="2"></textarea>
+          <button class="reply-submit" onclick="submitReply('${c.id}')">Reply</button>
+        </div>`:''}
+      </div>
+    </div>
+    ${!isReply?repliesHtml:''}`;
+
+  return div;
+}
+
+async function submitComment(){
+  if(!currentUser) return;
+  const ta = document.getElementById('commentTextarea');
+  const text = ta.value.trim();
+  if(!text) return;
+  const btn = document.getElementById('commentSubmitBtn');
+  btn.disabled=true; btn.textContent='Posting…';
+  const sb = await getSB();
+  const {error} = await sb.from('comments').insert({
+    mal_id: activeCommentMalId,
+    episode: activeCommentEp,
+    user_id: currentUser.id,
+    username: getDisplayName(currentUser),
+    avatar_url: getAvatarUrl(currentUser),
+    content: text,
+    parent_id: null,
+    likes: 0
+  });
+  btn.disabled=false; btn.textContent='Post Comment';
+  if(!error){ ta.value=''; await loadComments(true); }
+}
+
+function toggleReplyForm(commentId){
+  const form = document.getElementById('reply-form-'+commentId);
+  if(!form) return;
+  form.classList.toggle('show');
+  if(form.classList.contains('show')) document.getElementById('reply-input-'+commentId)?.focus();
+}
+
+async function submitReply(parentId){
+  if(!currentUser) return;
+  const ta = document.getElementById('reply-input-'+parentId);
+  const text = ta?.value.trim();
+  if(!text) return;
+  const sb = await getSB();
+  const {data, error} = await sb.from('comments').insert({
+    mal_id: activeCommentMalId,
+    episode: activeCommentEp,
+    user_id: currentUser.id,
+    username: getDisplayName(currentUser),
+    avatar_url: getAvatarUrl(currentUser),
+    content: text,
+    parent_id: parentId,
+    likes: 0
+  }).select().single();
+  if(!error && data){
+    ta.value='';
+    const form = document.getElementById('reply-form-'+parentId);
+    if(form) form.classList.remove('show');
+    // Add reply to DOM
+    const repliesEl = document.getElementById('replies-'+parentId);
+    if(repliesEl){
+      repliesEl.style.display='';
+      repliesEl.appendChild(buildCommentEl(data,[],true));
+    }
+  }
+}
+
+async function toggleLike(commentId, btn){
+  if(!currentUser){ openAuth(); return; }
+  const sb = await getSB();
+  const isLiked = likedComments.has(commentId);
+  const countEl = document.getElementById('likes-'+commentId);
+  if(isLiked){
+    await sb.from('comment_likes').delete().eq('user_id',currentUser.id).eq('comment_id',commentId);
+    await sb.from('comments').update({likes: Math.max(0,(parseInt(countEl?.textContent)||1)-1)}).eq('id',commentId);
+    likedComments.delete(commentId);
+    btn.classList.remove('liked');
+    btn.querySelector('svg').setAttribute('fill','none');
+    if(countEl) countEl.textContent=Math.max(0,(parseInt(countEl.textContent)||1)-1);
+  } else {
+    await sb.from('comment_likes').insert({user_id:currentUser.id,comment_id:commentId});
+    await sb.from('comments').update({likes:(parseInt(countEl?.textContent)||0)+1}).eq('id',commentId);
+    likedComments.add(commentId);
+    btn.classList.add('liked');
+    btn.querySelector('svg').setAttribute('fill','currentColor');
+    if(countEl) countEl.textContent=(parseInt(countEl.textContent)||0)+1;
+  }
+}
+
+async function deleteComment(commentId, isReply){
+  if(!currentUser||!confirm('Delete this comment?')) return;
+  const sb = await getSB();
+  await sb.from('comments').delete().eq('id',commentId).eq('user_id',currentUser.id);
+  const el = document.getElementById('comment-'+commentId);
+  if(el) el.remove();
+}
+
 
 document.addEventListener('DOMContentLoaded',init);
 </script>
