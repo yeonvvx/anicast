@@ -441,7 +441,7 @@ function renderSkeletons(){
 
 async function loadRooms(){
   const client=await getSB();
-  const{data,error}=await client.from('party_rooms').select('*').order('created_at',{ascending:false}).limit(100);
+  const{data,error}=await client.from('party_rooms').select('*').order('updated_at',{ascending:false}).limit(100);
   if(error){console.error(error);return;}
   allRooms=data||[];
   renderRooms();
@@ -494,7 +494,7 @@ function mkRoomCard(room){
       <div class="room-card-status ${sc}">
         <div class="status-dot"></div>
         <span class="status-label">${sl}</span>
-        <span style="font-size:10px;color:var(--muted2);margin-left:auto">${getTimeAgo(room.created_at)}</span>
+        <span style="font-size:10px;color:var(--muted2);margin-left:auto">${getTimeAgo(room.updated_at)}</span>
       </div>
       <div class="room-card-creator">
         <img class="creator-avatar" src="${avSrc}" alt="" onerror="this.style.background='var(--bg3)'">
