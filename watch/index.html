@@ -142,6 +142,30 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
   .anime-info-inner{flex-direction:column}
   .anime-poster{width:100%;height:160px}
 }
+
+/* ── HAMBURGER ── */
+.hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;z-index:299;background:rgba(8,8,14,0.98);backdrop-filter:blur(20px);flex-direction:column;overflow-y:auto}
+.mobile-menu.open{display:flex}
+.mm-profile{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:0.5px solid rgba(255,255,255,0.07)}
+.mm-profile img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--bg3)}
+.mm-profile-name{font-size:15px;font-weight:600}
+.mm-profile-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.mm-links{display:flex;flex-direction:column;padding:8px 0}
+.mm-link{display:flex;align-items:center;gap:14px;padding:14px 24px;font-size:15px;font-weight:500;color:var(--text);text-decoration:none;background:none;border:none;font-family:inherit;cursor:pointer;width:100%;text-align:left;transition:background 0.2s;border-bottom:0.5px solid rgba(255,255,255,0.04)}
+.mm-link:hover{background:rgba(255,255,255,0.05)}
+.mm-link:last-child{border-bottom:none}
+.mm-link svg{color:var(--muted);flex-shrink:0}
+@media(max-width:900px){
+  .hamburger{display:flex}
+  .nav-right{gap:8px}
+  .w2g-nav-btn{display:none}
+  .nav-user{display:none}
+}
 </style>
 </head>
 <body>
@@ -163,8 +187,41 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
       Watch Party
     </a>
     <div class="nav-user" id="navUser"></div>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mm-profile">
+    <img id="mmAvatar" src="https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50" alt="">
+    <div>
+      <div class="mm-profile-name" id="mmName">Guest</div>
+      <div class="mm-profile-sub" id="mmSub">Not signed in</div>
+    </div>
+  </div>
+  <div class="mm-links">
+    <a class="mm-link" href="https://anicast.watch" onclick="closeMobileMenu()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+    <a class="mm-link" href="https://anicast.watch" onclick="closeMobileMenu()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      Watchlist
+    </a>
+    <a class="mm-link" id="mmW2g" href="/w2g" onclick="closeMobileMenu()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      Watch Party
+    </a>
+    <a class="mm-link" href="https://anicast.watch" onclick="closeMobileMenu()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Legal
+    </a>
+    <div id="mmAuthLink"></div>
+  </div>
+</div>
 
 <div class="page">
   <div class="watch-layout">
@@ -295,7 +352,8 @@ async function init(){
   // Auth
   const client=await getSB();
   const{data:{session}}=await client.auth.getSession();
-  if(session?.user){ currentUser=session.user; renderNavUser(); }
+  if(session?.user){ currentUser=session.user; renderNavUser(); updateMobileUser(currentUser); }
+  else { updateMobileUser(null); }
 
   // Load player immediately
   loadPlayer(malId, currentEp, currentLang);
@@ -615,6 +673,36 @@ async function deleteComment(commentId){
   const client=await getSB();
   await client.from('comments').delete().eq('id',commentId).eq('user_id',currentUser.id);
   document.getElementById('comment-'+commentId)?.remove();
+}
+
+
+function toggleMobileMenu(){
+  const m=document.getElementById('mobileMenu');
+  const b=document.getElementById('hamburger');
+  const open=m.classList.toggle('open');
+  b.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow='';
+}
+function updateMobileUser(user){
+  if(!user){
+    document.getElementById('mmAvatar').src='https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50';
+    document.getElementById('mmName').textContent='Guest';
+    document.getElementById('mmSub').textContent='Not signed in';
+    document.getElementById('mmAuthLink').innerHTML=`<a class="mm-link" href="https://anicast.watch" style="color:var(--accent)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Sign In
+    </a>`;
+  } else {
+    document.getElementById('mmAvatar').src=getAvatarUrl(user);
+    document.getElementById('mmName').textContent=getDisplayName(user);
+    document.getElementById('mmSub').textContent=user.email||'';
+    document.getElementById('mmAuthLink').innerHTML='';
+  }
 }
 
 init();
