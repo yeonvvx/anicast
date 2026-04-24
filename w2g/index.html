@@ -171,6 +171,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 18px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
 .toast.show{opacity:1}
+/* password modal */
+.pw-modal{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);align-items:center;justify-content:center}
+.pw-modal.open{display:flex}
+.pw-box{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:28px;width:90vw;max-width:360px;position:relative}
+.pw-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:6px}
+.pw-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+/* toggle switch */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:0.5px solid rgba(255,255,255,0.07)}
+.toggle-label{font-size:13px;color:var(--text)}
+.toggle-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg4);border-radius:20px;cursor:pointer;transition:background 0.2s}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform 0.2s}
+.toggle-switch input:checked+.toggle-slider{background:var(--accent)}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(16px)}
+/* kick button */
+.kick-btn{background:rgba(230,57,70,0.15);border:0.5px solid rgba(230,57,70,0.3);color:var(--accent);border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-left:auto;flex-shrink:0}
+.kick-btn:hover{background:rgba(230,57,70,0.3)}
+/* private badge on room card */
+.badge-private{background:rgba(139,92,246,0.2);color:#a78bfa;border:0.5px solid rgba(139,92,246,0.3)}
 
 @media(max-width:768px){
   .sidebar{display:none}
@@ -268,6 +289,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <button class="status-btn" id="msBtnWaiting" onclick="setModalStatus('waiting')">🟡 Waiting</button>
         </div>
       </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+        <div class="toggle-row" style="border-top:none;padding-top:0">
+          <div><div class="toggle-label" style="font-size:12px">🔒 Private Room</div><div class="toggle-desc">Hidden from browse — share link only</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="modalPrivate" onchange="togglePrivateFields()"><span class="toggle-slider"></span></label>
+        </div>
+        <div id="passwordField" style="display:none;margin-top:10px">
+          <label style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Room Password (optional)</label>
+          <input type="password" id="modalPassword" placeholder="Leave blank for link-only" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:8px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none">
+        </div>
+      </div>
       <button class="submit-btn" id="modalSubmitBtn" onclick="createRoom()" disabled>Create Room</button>
       <div class="modal-msg" id="modalMsg"></div>
     </div>
@@ -298,6 +329,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="pnav-btn" onclick="shareRoom()">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       Share
+    </button>
+    <button class="pnav-btn" id="hostSettingsBtn" style="display:none" onclick="openHostSettings()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
     </button>
   </nav>
   <div class="player-body">
@@ -332,6 +367,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div id="viewersPanel" class="viewers-wrap" style="display:none"></div>
     </div>
+  </div>
+</div>
+
+<!-- PASSWORD PROMPT -->
+<div class="pw-modal" id="pwModal">
+  <div class="pw-box">
+    <div class="pw-title">🔒 Private Room</div>
+    <div class="pw-sub" id="pwSub">This room requires a password to join.</div>
+    <div class="field" id="pwFieldWrap" style="margin-bottom:10px">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter room password" autocomplete="off">
+    </div>
+    <button class="submit-btn" onclick="submitPassword()" style="margin-top:0">Join Room</button>
+    <button onclick="closePwModal()" style="width:100%;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:10px;font-family:inherit">Cancel</button>
+    <div class="modal-msg" id="pwMsg"></div>
+  </div>
+</div>
+
+<!-- HOST SETTINGS -->
+<div class="pw-modal" id="hostSettingsModal">
+  <div class="pw-box" style="max-width:400px">
+    <div class="pw-title">Room Settings</div>
+    <div class="pw-sub">Host controls</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">🔒 Private Room</div><div class="toggle-desc">Hidden from browse — link only</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="settingsPrivate" onchange="toggleRoomPrivacy()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="settingsPasswordRow" style="margin-top:10px;display:none">
+      <div class="field" style="margin-bottom:8px">
+        <label>Room Password</label>
+        <input type="password" id="settingsPassword" placeholder="Leave blank for link-only">
+      </div>
+      <button class="submit-btn" onclick="saveRoomPassword()" style="padding:9px;font-size:12px;margin-top:0">Save Password</button>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label" style="color:var(--accent)">🚫 Close Room</div><div class="toggle-desc">Kick all guests and close permanently</div></div>
+      <button class="kick-btn" style="padding:5px 12px;font-size:11px" onclick="closeRoomPermanently()">Close</button>
+    </div>
+    <button onclick="document.getElementById('hostSettingsModal').classList.remove('open')" style="width:100%;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.1);color:var(--text);border-radius:var(--radius);padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:14px">Done</button>
   </div>
 </div>
 
@@ -461,7 +535,7 @@ function setSort(mode,btn){
 }
 
 function renderRooms(){
-  let rooms=[...allRooms];
+  let rooms=[...allRooms].filter(r=>!r.is_private&&!r.is_closed);
   if(filterStatus!=='all') rooms=rooms.filter(r=>r.status===filterStatus);
   if(sortMode==='live_first'){
     const order={live:0,waiting:1,ended:2};
@@ -532,6 +606,10 @@ function setModalStatus(s){
   document.getElementById('msBtnLive').className='status-btn'+(s==='live'?' active-live':'');
   document.getElementById('msBtnWaiting').className='status-btn'+(s==='waiting'?' active-waiting':'');
 }
+function togglePrivateFields(){
+  modalIsPrivate=document.getElementById('modalPrivate').checked;
+  document.getElementById('passwordField').style.display=modalIsPrivate?'block':'none';
+}
 
 async function modalSearch(q){
   const list=document.getElementById('modalResults');
@@ -574,6 +652,7 @@ async function createRoom(){
   const client=await getSB();
   const name=currentUser?getDisplayName(currentUser):'Host_'+genId().slice(0,4);
   const avatar=currentUser?getAvatarUrl(currentUser):'';
+  const pw=modalIsPrivate?document.getElementById('modalPassword').value.trim():'';
   const{error}=await client.from('party_rooms').insert({
     id:roomId,
     anime_mal_id:modalAnime.mal_id,
@@ -581,7 +660,8 @@ async function createRoom(){
     anime_image:modalAnime.images?.jpg?.large_image_url||modalAnime.images?.jpg?.image_url||'',
     episode:ep, lang:modalLang, status:modalStatus,
     is_playing:true, playback_time:0,
-    host_id:currentUser?.id||null, host_name:name, avatar_url:avatar
+    host_id:currentUser?.id||null, host_name:name, avatar_url:avatar,
+    is_private:modalIsPrivate, password:pw||null, is_closed:false
   });
   if(error){msg.textContent=error.message;msg.className='modal-msg err';btn.disabled=false;btn.textContent='Create Room';return;}
   closeCreateModal();
@@ -608,6 +688,20 @@ async function enterRoom(roomId,asHost){
     showToast('Room not found.');
     return;
   }
+  // Check if closed
+  if(room.is_closed && !asHost){showToast('This room is closed.');return;}
+
+  // Check password for non-hosts
+  if(room.password && !asHost){
+    pendingRoomId=roomId;
+    document.getElementById('pwSub').textContent='This room requires a password to join.';
+    document.getElementById('pwFieldWrap').style.display='block';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwMsg').textContent='';
+    document.getElementById('pwModal').classList.add('open');
+    return;
+  }
+
   currentRoom=room;
   isHost=asHost||(currentUser&&room.host_id===currentUser.id);
   currentEp=room.episode; currentLang=room.lang;
@@ -624,6 +718,7 @@ async function enterRoom(roomId,asHost){
   badge.textContent=isHost?'Host':'Guest';
   badge.className='player-badge '+(isHost?'badge-host':'badge-guest');
   document.getElementById('guestBar').style.display=isHost?'none':'flex';
+  document.getElementById('hostSettingsBtn').style.display=isHost?'flex':'none';
 
   // Load video
   document.getElementById('playerFrame').src=`${MEGAPLAY}/${room.anime_mal_id}/${room.episode}/${room.lang}`;
@@ -756,6 +851,12 @@ function updateViewers(state){
   const count=Object.keys(viewers).length;
   document.getElementById('pViewerCount').textContent=count||1;
   renderViewers();
+  // Auto-close room if host is alone AND viewer count drops to 0 (everyone left)
+  if(isHost && count===0){
+    getSB().then(client=>{
+      client.from('party_rooms').update({status:'ended'}).eq('id',currentRoom?.id).then(()=>{});
+    });
+  }
 }
 function renderViewers(){
   const wrap=document.getElementById('viewersPanel');
@@ -763,7 +864,8 @@ function renderViewers(){
   Object.values(viewers).forEach(v=>{
     const div=document.createElement('div');
     div.className='viewer-item';
-    div.innerHTML=`<img class="viewer-avatar" src="${v.avatar||`https://api.dicebear.com/8.x/avataaars/svg?seed=${encodeURIComponent(v.name)}&radius=50`}" alt="" onerror="this.style.background='var(--bg3)'"><span class="viewer-name">${escHtml(v.name)}</span>${v.isHost?'<span class="player-badge badge-host" style="font-size:9px;padding:2px 7px">Host</span>':''}`;
+    const kickBtn=isHost&&!v.isHost?`<button class="kick-btn" onclick="kickUser('${escHtml(v.name)}')">Kick</button>`:'';
+    div.innerHTML=`<img class="viewer-avatar" src="${v.avatar||`https://api.dicebear.com/8.x/avataaars/svg?seed=${encodeURIComponent(v.name)}&radius=50`}" alt="" onerror="this.style.background='var(--bg3)'"><span class="viewer-name">${escHtml(v.name)}</span>${v.isHost?'<span class="player-badge badge-host" style="font-size:9px;padding:2px 7px">Host</span>':''}${kickBtn}`;
     wrap.appendChild(div);
   });
 }
@@ -817,6 +919,81 @@ async function sendMessage(){
 }
 
 /* ── LEAVE ── */
+/* ── PASSWORD MODAL ── */
+async function submitPassword(){
+  const pw=document.getElementById('pwInput').value.trim();
+  const msg=document.getElementById('pwMsg');
+  if(!pw){msg.textContent='Enter the password.';msg.className='modal-msg err';return;}
+  msg.textContent='Checking…';msg.className='modal-msg';
+  const client=await getSB();
+  const{data:room}=await client.from('party_rooms').select('password').eq('id',pendingRoomId).single();
+  if(!room||room.password!==pw){msg.textContent='Wrong password.';msg.className='modal-msg err';return;}
+  document.getElementById('pwModal').classList.remove('open');
+  // Bypass password check and enter
+  const{data:fullRoom}=await client.from('party_rooms').select('*').eq('id',pendingRoomId).single();
+  currentRoom=fullRoom;
+  isHost=false; currentEp=fullRoom.episode; currentLang=fullRoom.lang;
+  window.history.replaceState({},'','/w2g?room='+pendingRoomId);
+  document.getElementById('browsePage').style.display='none';
+  document.getElementById('browseNav').style.display='none';
+  document.getElementById('playerOverlay').classList.add('open');
+  document.getElementById('pNavTitle').textContent=fullRoom.anime_title+' — EP '+fullRoom.episode;
+  const badge=document.getElementById('pNavBadge');
+  badge.textContent='Guest'; badge.className='player-badge badge-guest';
+  document.getElementById('guestBar').style.display='flex';
+  document.getElementById('hostSettingsBtn').style.display='none';
+  document.getElementById('playerFrame').src=`${MEGAPLAY}/${fullRoom.anime_mal_id}/${fullRoom.episode}/${fullRoom.lang}`;
+  subscribeRoom(pendingRoomId);
+  await loadChatHistory(pendingRoomId);
+  addSystemMsg('You joined the room 🎌');
+  pendingRoomId=null;
+}
+function closePwModal(){
+  document.getElementById('pwModal').classList.remove('open');
+  pendingRoomId=null;
+}
+
+/* ── HOST SETTINGS ── */
+function openHostSettings(){
+  if(!isHost||!currentRoom) return;
+  document.getElementById('settingsPrivate').checked=currentRoom.is_private||false;
+  document.getElementById('settingsPasswordRow').style.display=currentRoom.is_private?'block':'none';
+  document.getElementById('settingsPassword').value='';
+  document.getElementById('hostSettingsModal').classList.add('open');
+}
+async function toggleRoomPrivacy(){
+  const isPrivate=document.getElementById('settingsPrivate').checked;
+  document.getElementById('settingsPasswordRow').style.display=isPrivate?'block':'none';
+  const client=await getSB();
+  await client.from('party_rooms').update({is_private:isPrivate,password:isPrivate?currentRoom.password:null}).eq('id',currentRoom.id);
+  currentRoom.is_private=isPrivate;
+  if(!isPrivate) currentRoom.password=null;
+  showToast(isPrivate?'Room is now private 🔒':'Room is now public');
+}
+async function saveRoomPassword(){
+  const pw=document.getElementById('settingsPassword').value.trim();
+  const client=await getSB();
+  await client.from('party_rooms').update({password:pw||null}).eq('id',currentRoom.id);
+  currentRoom.password=pw||null;
+  showToast(pw?'Password saved':'Password removed');
+}
+async function closeRoomPermanently(){
+  if(!confirm('Close this room? All guests will be kicked.')) return;
+  if(roomChannel) await roomChannel.send({type:'broadcast',event:'kicked',payload:{reason:'Room closed by host'}});
+  const client=await getSB();
+  await client.from('party_rooms').update({is_closed:true,status:'ended'}).eq('id',currentRoom.id);
+  document.getElementById('hostSettingsModal').classList.remove('open');
+  leaveRoom();
+  showToast('Room closed.');
+}
+
+/* ── KICK ── */
+async function kickUser(name){
+  if(!isHost||!roomChannel) return;
+  await roomChannel.send({type:'broadcast',event:'kicked',payload:{target:name}});
+  showToast(`${name} was kicked.`);
+}
+
 function leaveRoom(){
   if(roomChannel) roomChannel.unsubscribe();
   
