@@ -676,20 +676,30 @@ function dedupe(items){
 async function anilistQuery(query, variables){
   const body = JSON.stringify({query, variables});
   const headers = {'Content-Type':'application/json','Accept':'application/json'};
-  // Try direct, then multiple CORS proxies
+  // AniList also supports GET with query params — works through GET-only CORS proxies
+  const getUrl = ANILIST + '?query=' + encodeURIComponent(query) + '&variables=' + encodeURIComponent(JSON.stringify(variables||{}));
   const proxies = [
-    ANILIST,
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(ANILIST),
-    'https://proxy.cors.sh/' + ANILIST,
-    'https://thingproxy.freeboard.io/fetch/' + ANILIST,
+    // Direct POST (works if AniList ever adds CORS headers)
+    {url: ANILIST, method:'POST', headers, body},
+    // GET proxies — allorigins wraps response in {contents:'...'}
+    {url: 'https://api.allorigins.win/get?url=' + encodeURIComponent(getUrl), method:'GET', allorigins:true},
+    // cors.sh supports POST
+    {url: 'https://proxy.cors.sh/' + ANILIST, method:'POST', headers: {...headers, 'x-cors-api-key':'temp'}, body},
+    // corsproxy.io GET
+    {url: 'https://corsproxy.io/?' + encodeURIComponent(getUrl), method:'GET'},
   ];
-  for(const url of proxies){
+  for(const p of proxies){
     try{
-      const r = await fetch(url, {method:'POST', headers, body});
-      if(r.ok){
-        const data = await r.json();
-        if(data?.data) return data;
+      const r = await fetch(p.url, {method: p.method||'GET', headers: p.headers, body: p.body});
+      if(!r.ok) continue;
+      let data;
+      if(p.allorigins){
+        const wrapper = await r.json();
+        data = JSON.parse(wrapper.contents);
+      } else {
+        data = await r.json();
       }
+      if(data?.data) return data;
     }catch{}
   }
   return null;
@@ -1744,12 +1754,12 @@ async function createWatchParty(){
   try{
     // Route through CORS proxy since W2G blocks direct browser requests
     const W2G_KEY='x304r5ccqia9dy4dfp4v5oqkr0vlkp1yx6orzp4tk2sohkyyd0t64hegai6bdrrw';
-    // Try multiple CORS proxies for W2G
+    // Try multiple CORS proxies for W2G POST
     const W2G_URL = 'https://api.w2g.tv/rooms/create.json';
     const W2G_PROXIES = [
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(W2G_URL),
       'https://proxy.cors.sh/' + W2G_URL,
-      'https://thingproxy.freeboard.io/fetch/' + W2G_URL,
+      'https://corsproxy.io/?' + encodeURIComponent(W2G_URL),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(W2G_URL),
     ];
     let w2gResp = null;
     for(const W2G_ENDPOINT of W2G_PROXIES){
