@@ -674,55 +674,17 @@ function dedupe(items){
    ANILIST
 ───────────────────────────────────────────────── */
 async function anilistQuery(query, variables){
-  const body = JSON.stringify({query, variables});
-  const headers = {'Content-Type':'application/json','Accept':'application/json'};
-  // AniList also supports GET with query params — works through GET-only CORS proxies
-  const getUrl = ANILIST + '?query=' + encodeURIComponent(query) + '&variables=' + encodeURIComponent(JSON.stringify(variables||{}));
-  const proxies = [
-    // Direct POST (works if AniList ever adds CORS headers)
-    {url: ANILIST, method:'POST', headers, body},
-    // GET proxies — allorigins wraps response in {contents:'...'}
-    {url: 'https://api.allorigins.win/get?url=' + encodeURIComponent(getUrl), method:'GET', allorigins:true},
-    // cors.sh supports POST
-    {url: 'https://proxy.cors.sh/' + ANILIST, method:'POST', headers: {...headers, 'x-cors-api-key':'temp'}, body},
-    // corsproxy.io GET
-    {url: 'https://corsproxy.io/?' + encodeURIComponent(getUrl), method:'GET'},
-  ];
-  for(const p of proxies){
-    try{
-      const r = await fetch(p.url, {method: p.method||'GET', headers: p.headers, body: p.body});
-      if(!r.ok) continue;
-      let data;
-      if(p.allorigins){
-        const wrapper = await r.json();
-        data = JSON.parse(wrapper.contents);
-      } else {
-        data = await r.json();
-      }
-      if(data?.data) return data;
-    }catch{}
-  }
+  // AniList blocks cross-origin requests from custom domains.
+  // All functionality falls back to Jikan which works perfectly.
   return null;
 }
 
 async function fetchAniListBanner(malId){
   if(!malId) return null;
   try{
-    // First try AniList for true wide banners (works when hosted, CORS blocks local file://)
-    const q=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge large}}}`;
-    const j=await anilistQuery(q,{id:malId});
-    const m=j?.data?.Media;
-    if(m){
-      const wide=m.bannerImage||null;
-      const cover=m.coverImage?.extraLarge||m.coverImage?.large||null;
-      if(wide||cover) return {wide:wide||cover, cover:cover||wide, fallback:wide||cover};
-    }
-  }catch(e){}
-  try{
-    // Fallback: Jikan pictures endpoint — no CORS issues, returns HD images
+    // Use Jikan pictures — works on all domains, no CORS issues, returns HD art
     const pics=await jikan('/anime/'+malId+'/pictures');
     const images=pics?.data||[];
-    // Pick largest available image
     const best=images.map(p=>p.jpg?.large_image_url||p.jpg?.image_url||p.webp?.large_image_url||'').filter(Boolean);
     if(best.length) return {wide:best[0], cover:best[0], fallback:best[0]};
   }catch(e){}
@@ -730,13 +692,8 @@ async function fetchAniListBanner(malId){
 }
 
 async function fetchNextEpInfo(malId){
-  const q=`query($id:Int){Media(idMal:$id,type:ANIME){
-    status episodes
-    nextAiringEpisode{episode airingAt timeUntilAiring}
-    endDate{year month day}
-  }}`;
-  const j=await anilistQuery(q,{id:malId});
-  return j?.data?.Media||null;
+  // AniList blocked — next episode info unavailable
+  return null;
 }
 
 /* ─────────────────────────────────────────────────
@@ -1254,13 +1211,7 @@ async function openOngoingCard(show){
     if(d.data){openInfo(d.data);return;}
     openInfo(buildMinimalItem(show.idMal,show));
   } else if(show.id){
-    const q=`query($id:Int){Media(id:$id,type:ANIME){idMal title{english romaji}episodes status}}`;
-    const j=await anilistQuery(q,{id:show.id});
-    const m=j?.data?.Media;
-    if(m?.idMal){
-      const d=await jikan('/anime/'+m.idMal);
-      openInfo(d.data||buildMinimalItem(m.idMal,show));
-    }
+    // AniList blocked — skip, show is missing idMal
   }
 }
 
@@ -1879,26 +1830,17 @@ async function searchAniListCharacters(){
   msg2.textContent='';
   document.getElementById('saveAvatarBtn').style.display='none';
 
-  // Try AniList first
-  const gql=`query($search:String){Page(perPage:24){characters(search:$search,sort:FAVOURITES_DESC){id name{full}image{large medium}}}}`;
+  // Use Jikan for character search (AniList blocked on custom domains)
   let chars = [];
   try{
-    const data = await anilistQuery(gql, {search: query});
-    chars = data?.data?.Page?.characters || [];
+    const r = await jikan('/characters', {q: query, limit: 24});
+    const jikanChars = r?.data || [];
+    chars = jikanChars.map(c=>({
+      id: c.mal_id,
+      name: {full: c.name},
+      image: {large: c.images?.jpg?.image_url || c.images?.webp?.image_url || ''}
+    })).filter(c=>c.image.large);
   }catch(e){}
-
-  // Fallback to Jikan if AniList fails or returns nothing
-  if(!chars.length){
-    try{
-      const r = await jikan('/characters', {q: query, limit: 24});
-      const jikanChars = r?.data || [];
-      chars = jikanChars.map(c=>({
-        id: c.mal_id,
-        name: {full: c.name},
-        image: {large: c.images?.jpg?.image_url || c.images?.webp?.image_url || ''}
-      })).filter(c=>c.image.large);
-    }catch(e){}
-  }
 
   grid.innerHTML='';
   if(!chars.length){
