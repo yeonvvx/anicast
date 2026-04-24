@@ -869,7 +869,7 @@ async function openInfo(item){
     <div><div class="id-label">Duration</div><div class="id-val">${item.duration||'—'}</div></div>
     <div><div class="id-label">Studio</div><div class="id-val">${(item.studios||[]).map(s=>s.name).join(', ')||'—'}</div></div>
     ${item.rating?`<div><div class="id-label">Rating</div><div class="id-val">${item.rating}</div></div>`:''}`;
-  document.getElementById('infoPlayBtn').onclick=()=>{closeInfo();openPlayer(item.mal_id,type,title,item.episodes);};
+  document.getElementById('infoPlayBtn').onclick=()=>{ window.location.href=`/watch?mal=${item.mal_id}&ep=1&lang=${audioLang}`; };
   // Watch Party button
   const existingWpBtn=document.getElementById('infoWpBtn');
   if(existingWpBtn) existingWpBtn.remove();
@@ -997,7 +997,7 @@ function setHero(item){
   const genres=(item.genres||[]).slice(0,3).map(g=>`<span class="h-tag">${g.name}</span>`).join('');
   document.getElementById('heroMeta').innerHTML=(item.score?`<span class="h-rating">★ ${item.score}</span><span class="h-sep"></span>`:'')+
     (item.year?`<span class="h-year">${item.year}</span><span class="h-sep"></span>`:'')+genres;
-  document.getElementById('heroPlayBtn').onclick=()=>openPlayer(item.mal_id,item.type||'TV',item.title_english||item.title,item.episodes);
+  document.getElementById('heroPlayBtn').onclick=()=>{ window.location.href=`/watch?mal=${item.mal_id}&ep=1&lang=${audioLang}`; };
   document.getElementById('heroInfoBtn').onclick=()=>openInfo(item);
   updateHeroDots();
 }
