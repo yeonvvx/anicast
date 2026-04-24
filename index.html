@@ -414,7 +414,7 @@ footer a{color:var(--muted);text-decoration:none}
   <ul class="nav-tabs">
     <li><a href="#" class="active" onclick="closeAll(event)">Home</a></li>
     <li><a href="#" onclick="openWatchlist(event)">Watchlist</a></li>
-    <li><a href="#" onclick="openWatchParty(event)">Watch Party</a></li>
+    <li><a href="/watchparty.html">Watch Party</a></li>
     <li><a href="#" onclick="openLegal(event)">Legal</a></li>
   </ul>
   <div class="nav-right">
@@ -675,7 +675,14 @@ function dedupe(items){
 ───────────────────────────────────────────────── */
 async function anilistQuery(query, variables){
   try{
-    const r=await fetch(ANILIST,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query,variables})});
+    // Try direct first (works on some hosts), fall back to CORS proxy
+    const tryFetch = async (url) => fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({query,variables})});
+    let r = await tryFetch(ANILIST).catch(()=>null);
+    if(!r||!r.ok){
+      const proxied='https://corsproxy.io/?url='+encodeURIComponent(ANILIST);
+      r = await tryFetch(proxied).catch(()=>null);
+    }
+    if(!r||!r.ok) return null;
     return await r.json();
   }catch{return null;}
 }
@@ -825,7 +832,7 @@ async function openInfo(item){
   wpInfoBtn.id='infoWpBtn';
   wpInfoBtn.className='wp-info-btn';
   wpInfoBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Watch Party`;
-  wpInfoBtn.onclick=()=>{closeInfo();openWatchParty(null,item);};
+  wpInfoBtn.onclick=()=>{closeInfo();window.location.href='/watchparty.html?mal='+item.mal_id+'&title='+encodeURIComponent(item.title_english||item.title||'');};
   document.querySelector('.info-actions').appendChild(wpInfoBtn);
   // Watchlist button in info modal
   const existingWlBtn=document.getElementById('infoWlBtn');
@@ -1727,9 +1734,10 @@ async function createWatchParty(){
   const title=(wpSelectedAnime.title_english||wpSelectedAnime.title||'Anime')+' — Ep '+ep;
 
   try{
-    // Call W2G API directly (repo is private so key is safe)
+    // Route through CORS proxy since W2G blocks direct browser requests
     const W2G_KEY='x304r5ccqia9dy4dfp4v5oqkr0vlkp1yx6orzp4tk2sohkyyd0t64hegai6bdrrw';
-    const r=await fetch('https://api.w2g.tv/rooms/create.json',{
+    const W2G_ENDPOINT='https://corsproxy.io/?url='+encodeURIComponent('https://api.w2g.tv/rooms/create.json');
+    const r=await fetch(W2G_ENDPOINT,{
       method:'POST',
       headers:{'Accept':'application/json','Content-Type':'application/json'},
       body:JSON.stringify({w2g_api_key:W2G_KEY,share:streamUrl,bg_color:'08080e',bg_opacity:'100'})
