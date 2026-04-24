@@ -72,8 +72,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 
 .hero{position:relative;height:92vh;min-height:580px;display:flex;align-items:flex-end;overflow:hidden}
 .hero-bg{position:absolute;inset:0;overflow:hidden}
-.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;transition:opacity 0.8s ease,transform 1s ease;will-change:opacity,transform}
-.hero-bg img.fading{opacity:0;transform:scale(1.03)}
+.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;transition:opacity 0.8s ease;will-change:opacity;image-rendering:high-quality;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.hero-bg img.fading{opacity:0}
 .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(8,8,14,0.95) 0%,rgba(8,8,14,0.5) 45%,rgba(8,8,14,0.05) 100%),linear-gradient(to top,rgba(8,8,14,1) 0%,rgba(8,8,14,0.6) 25%,transparent 55%)}
 .hero-content{position:relative;z-index:2;padding:0 2.5rem 5.5rem;max-width:640px}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:7px;margin-bottom:14px;background:var(--accent-dim);border:0.5px solid var(--accent-border);color:var(--accent);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:5px 12px;border-radius:4px}
@@ -222,6 +222,29 @@ footer a{color:var(--muted);text-decoration:none}
   .info-right{padding-top:0}
   .info-banner{height:180px}
 }
+
+/* ── LEGAL PAGE ── */
+.legal-overlay{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-top:60px}
+.legal-overlay.open{display:block}
+.legal-page{max-width:860px;margin:0 auto;padding:3rem 2.5rem 4rem}
+.legal-page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,52px);letter-spacing:2px;margin-bottom:8px}
+.legal-page-sub{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:2.5rem;max-width:600px}
+.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.legal-card{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:22px 24px}
+.legal-card-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.legal-card-icon{width:32px;height:32px;border-radius:6px;background:var(--accent-dim);border:0.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.legal-card-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1.5px}
+.legal-card p{font-size:13px;color:rgba(240,240,248,0.72);line-height:1.8}
+.legal-contact{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:28px 32px;margin-top:14px}
+.legal-contact-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.legal-contact-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.legal-important{background:var(--accent-dim);border:0.5px solid var(--accent-border);border-radius:8px;padding:14px 18px;margin:18px 0;font-size:13px;color:rgba(240,240,248,0.85);line-height:1.75}
+.legal-important strong{color:var(--accent)}
+.legal-contact p{font-size:13px;color:rgba(240,240,248,0.72);line-height:1.8}
+@media(max-width:600px){
+  .legal-grid{grid-template-columns:1fr}
+  .legal-page{padding:2rem 1rem 3rem}
+}
 </style>
 </head>
 <body>
@@ -235,6 +258,7 @@ footer a{color:var(--muted);text-decoration:none}
     <li><a href="#" onclick="quickNav('ongoing',event)">Ongoing</a></li>
     <li><a href="#" onclick="quickNav('seasonal',event)">Seasonal</a></li>
     <li><a href="#" onclick="quickNav('movies',event)">Movies</a></li>
+    <li><a href="#" onclick="openLegal(event)">Legal</a></li>
   </ul>
   <div class="nav-right">
     <div class="name-toggle">
@@ -391,8 +415,7 @@ footer a{color:var(--muted);text-decoration:none}
 </div>
 
 <footer>
-  <p>© 2025 <em>AniCast</em> — Powered by <a href="https://megaplay.buzz" target="_blank">MegaPlay</a> &amp; <a href="https://jikan.moe" target="_blank">Jikan / MAL</a></p>
-  <p style="margin-top:4px;font-size:11px">HYPER does not host any media. All streaming is provided by MegaPlay's infrastructure.</p>
+  <p>© 2025 <em>AniCast</em> — This site does not store any files on the server, we only linked to the media which is hosted on 3rd party services.</p>
 </footer>
 
 <script>
@@ -500,16 +523,27 @@ async function anilistQuery(query, variables){
 }
 
 async function fetchAniListBanner(malId){
-  const q=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge large medium}}}`;
-  const j=await anilistQuery(q,{id:malId});
-  const m=j?.data?.Media;
-  if(!m) return null;
-  // Return object with wide (banner) and tall (cover) for responsive srcset
-  return {
-    wide: m.bannerImage||null,
-    cover: m.coverImage?.extraLarge||m.coverImage?.large||null,
-    fallback: m.bannerImage||m.coverImage?.extraLarge||null
-  };
+  if(!malId) return null;
+  try{
+    // First try AniList for true wide banners (works when hosted, CORS blocks local file://)
+    const q=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge large}}}`;
+    const j=await anilistQuery(q,{id:malId});
+    const m=j?.data?.Media;
+    if(m){
+      const wide=m.bannerImage||null;
+      const cover=m.coverImage?.extraLarge||m.coverImage?.large||null;
+      if(wide||cover) return {wide:wide||cover, cover:cover||wide, fallback:wide||cover};
+    }
+  }catch(e){}
+  try{
+    // Fallback: Jikan pictures endpoint — no CORS issues, returns HD images
+    const pics=await jikan('/anime/'+malId+'/pictures');
+    const images=pics?.data||[];
+    // Pick largest available image
+    const best=images.map(p=>p.jpg?.large_image_url||p.jpg?.image_url||p.webp?.large_image_url||'').filter(Boolean);
+    if(best.length) return {wide:best[0], cover:best[0], fallback:best[0]};
+  }catch(e){}
+  return null;
 }
 
 async function fetchNextEpInfo(malId){
@@ -606,7 +640,7 @@ let cdInterval=null;
 
 async function openInfo(item){
   const title=item.title_english||item.title||'';
-  const poster=item.images?.jpg?.large_image_url||item.images?.webp?.large_image_url||'';
+  const poster=item.images?.jpg?.maximum_image_url||item.images?.jpg?.large_image_url||item.images?.webp?.maximum_image_url||item.images?.webp?.large_image_url||'';
   const synopsis=(item.synopsis||'No synopsis available.').replace(/\[Written.*?\]/g,'');
   const score=item.score, year=item.year||(item.aired?.prop?.from?.year)||'—';
   const type=item.type||'TV', status=item.status||'';
@@ -688,42 +722,36 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfo();closePl
 ───────────────────────────────────────────────── */
 function setBannerImg(bannerData, fallbackUrl){
   const img=document.getElementById('heroBgImg');
-  const isMobile=window.innerWidth<=600;
-  // Pick best source: wide banner for desktop, cover art for mobile (better framing)
   let src='';
   if(bannerData && typeof bannerData==='object'){
-    src = isMobile
-      ? (bannerData.cover||bannerData.wide||fallbackUrl)
-      : (bannerData.wide||bannerData.cover||fallbackUrl);
+    // Always pick the best available — wide first, then extraLarge cover
+    src = bannerData.wide||bannerData.cover||fallbackUrl||'';
   } else if(bannerData && typeof bannerData==='string'){
     src = bannerData;
   } else {
-    src = fallbackUrl;
+    src = fallbackUrl||'';
   }
   if(!src) return;
-  // Crossfade
+  img.srcset='';
   img.classList.add('fading');
   const next=new Image();
   next.onload=()=>{
     img.src=src;
-    // srcset: serve banner at 1x for hidpi awareness; browser picks best
-    if(bannerData?.wide && bannerData?.cover){
-      img.srcset=isMobile
-        ? `${bannerData.cover} 600w, ${bannerData.wide} 1920w`
-        : `${bannerData.wide} 1920w, ${bannerData.cover} 600w`;
-      img.sizes=isMobile ? '100vw' : '100vw';
-    } else {
-      img.srcset='';
-    }
     requestAnimationFrame(()=>img.classList.remove('fading'));
   };
-  next.onerror=()=>{img.src=src;img.classList.remove('fading');};
+  next.onerror=()=>{
+    // Try cover fallback if wide failed
+    const alt=(bannerData&&typeof bannerData==='object')?(bannerData.cover||''):'';
+    if(alt&&alt!==src){img.src=alt;}
+    img.classList.remove('fading');
+  };
   next.src=src;
 }
 
 function setHero(item){
-  const fb=item.images?.jpg?.large_image_url||item.images?.webp?.large_image_url||'';
-  setBannerImg(item._banner, fb);
+  // Best fallback: AniList extraLarge cover > Jikan maximum > Jikan large
+  const jikanFb=item.images?.jpg?.maximum_image_url||item.images?.webp?.maximum_image_url||item.images?.jpg?.large_image_url||item.images?.webp?.large_image_url||'';
+  setBannerImg(item._banner, jikanFb);
   document.getElementById('heroTitle').textContent=getTitle(item);
   document.getElementById('heroDesc').textContent=(item.synopsis||'').replace(/\[Written.*?\]/g,'').slice(0,210)+'…';
   const genres=(item.genres||[]).slice(0,3).map(g=>`<span class="h-tag">${g.name}</span>`).join('');
@@ -767,7 +795,7 @@ function mkOngoingCard(show, node){
   const titleEn=show.title?.english||show.title?.romaji||'Unknown';
   const titleJp=show.title?.native||show.title?.romaji||titleEn;
   const displayTitle=nameLang==='jp'?titleJp:titleEn;
-  const img=show.coverImage?.large||show.coverImage?.medium||show.coverImage?.extraLarge||'';
+  const img=show.coverImage?.extraLarge||show.coverImage?.large||show.coverImage?.medium||'';
   const epNum=node.episode;
   const aired=node.airingAt<now;
   const cdSec=Math.max(0,Math.floor(node.airingAt-now));
@@ -1039,16 +1067,24 @@ async function init(){
   const seasonResp=await jikan('/seasons/now',{limit:25});
   const seasonData=dedupe(seasonResp.data||[]);
   heroItems=seasonData.filter(a=>a.images?.jpg?.large_image_url||a.images?.webp?.large_image_url).slice(0,10);
-  if(heroItems.length){setHero(heroItems[0]);resetHeroTimer();}
   fillRow('seasonRow',seasonData.slice(0,20));
   registerInfinite('seasonRow',async pg=>{const r=await jikan('/seasons/now',{limit:20,page:pg});return dedupe(r.data||[]);});
 
+  // Fetch HD AniList banner for first item BEFORE displaying hero to avoid blurry fallback
+  if(heroItems.length){
+    const firstBanner=await fetchAniListBanner(heroItems[0].mal_id);
+    if(firstBanner) heroItems[0]._banner=firstBanner;
+    setHero(heroItems[0]);
+    resetHeroTimer();
+  }
+
+  // Load remaining banners in background
   heroItems.forEach((item,i)=>{
+    if(i===0) return; // already fetched
     setTimeout(async()=>{
       const b=await fetchAniListBanner(item.mal_id);
       if(b){
         heroItems[i]._banner=b;
-        // Preload the appropriate image for current viewport
         const isMobile=window.innerWidth<=600;
         const preloadSrc=(typeof b==='object')
           ? (isMobile?(b.cover||b.wide):(b.wide||b.cover))
@@ -1056,7 +1092,7 @@ async function init(){
         if(preloadSrc){const p=new Image();p.src=preloadSrc;p.onload=()=>{if(i===heroIdx)setHero(heroItems[i]);};}
         else if(i===heroIdx) setHero(heroItems[i]);
       }
-    },i*600);
+    },(i-1)*600);
   });
 
   await sleep(400);
@@ -1087,7 +1123,86 @@ async function init(){
   registerInfinite('genreRow',async pg=>{const r=await jikan('/anime',{genres:firstId,order_by:'score',sort:'desc',limit:20,page:pg});return dedupe(r.data||[]);});
 }
 
+
+/* ── LEGAL PAGE ── */
+function openLegal(e){
+  if(e) e.preventDefault();
+  document.getElementById('legalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  // mark nav tab active
+  document.querySelectorAll('.nav-tabs a').forEach(a=>a.classList.remove('active'));
+  if(e) e.target.classList.add('active');
+}
+function closeLegal(){
+  document.getElementById('legalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  document.querySelectorAll('.nav-tabs a').forEach((a,i)=>{if(i===0)a.classList.add('active');else a.classList.remove('active');});
+}
+// Close legal when clicking logo
+document.querySelector('.nav-logo-img').addEventListener('click',()=>{
+  closeLegal();
+});
+
 document.addEventListener('DOMContentLoaded',init);
 </script>
+
+<!-- LEGAL PAGE -->
+<div class="legal-overlay" id="legalOverlay">
+  <div class="legal-page">
+    <button onclick="closeLegal()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);color:var(--text);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:1.5rem;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back to Home</button>
+    <h1 class="legal-page-title">Legal Information</h1>
+    <p class="legal-page-sub">AniCast operates as a content discovery platform. Please review the information below to understand how we operate and our policies regarding content.</p>
+    <div class="legal-grid">
+      <div class="legal-card">
+        <div class="legal-card-head">
+          <div class="legal-card-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          </div>
+          <span class="legal-card-title">No Hosting Policy</span>
+        </div>
+        <p>AniCast functions solely as an aggregator that indexes publicly available content from across the web. We do not upload, store, or host any media files on our infrastructure. All streams and downloads originate from external third-party platforms.</p>
+      </div>
+      <div class="legal-card">
+        <div class="legal-card-head">
+          <div class="legal-card-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent)"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <span class="legal-card-title">Content Removal Requests</span>
+        </div>
+        <p>Since AniCast does not host any files, we cannot directly remove content. All removal requests must be submitted to the original hosting platforms where the content actually resides. We have no technical ability to delete files we don't control.</p>
+      </div>
+      <div class="legal-card">
+        <div class="legal-card-head">
+          <div class="legal-card-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="legal-card-title">Copyright Concerns</span>
+        </div>
+        <p>We respect intellectual property rights and operate within legal boundaries. If you are a copyright holder seeking to report content, we are happy to assist by directing you to the source where we discovered the material. Contact us and we will provide any information we can.</p>
+      </div>
+      <div class="legal-card">
+        <div class="legal-card-head">
+          <div class="legal-card-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <span class="legal-card-title">Disclaimer</span>
+        </div>
+        <p>AniCast only utilizes publicly accessible data and APIs. We maintain no ownership or control over any media content. Users are solely responsible for how they interact with third-party services accessed through our platform.</p>
+      </div>
+    </div>
+    <div class="legal-contact">
+      <div class="legal-contact-head">
+        <div class="legal-card-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--accent)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <span class="legal-contact-title">Disclaimer</span>
+      </div>
+      <div class="legal-important">
+        <strong>Important:</strong> AniCast does not host any content. We aggregate links to publicly available media from third-party sources. For content-specific matters, please reach out directly to the websites hosting the files, as they have full control over their content.
+      </div>
+      <p>We will cooperate with legitimate legal requests to the extent technically possible, but please understand that we cannot remove content from servers we do not operate.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>
