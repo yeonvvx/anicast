@@ -330,6 +330,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       Share
     </button>
+    <button class="pnav-btn" id="closeRoomBtn" onclick="closeRoom()" style="display:none;border-color:rgba(230,57,70,0.4);color:var(--accent)">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Close Room
+    </button>
     <button class="pnav-btn" id="hostSettingsBtn" style="display:none" onclick="openHostSettings()">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       Settings
@@ -420,7 +424,7 @@ const MEGAPLAY='https://megaplay.buzz/stream/mal';
 let sb=null, currentUser=null, currentRoom=null;
 let isHost=false, modalLang='sub', modalStatus='live', modalAnime=null;
 let modalSearchTimer=null, allRooms=[], filterStatus='all', sortMode='newest';
-let roomChannel=null, 
+let roomChannel=null;
 let currentEp=1, currentLang='sub', viewers={};
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -544,8 +548,10 @@ function renderRooms(){
   const grid=document.getElementById('roomsGrid');
   document.getElementById('roomsCount').textContent=`${rooms.length} room${rooms.length!==1?'s':''}`;
   grid.innerHTML='';
+  // Hide private and closed rooms from browse
+  rooms = rooms.filter(r=>!r.is_private && !r.is_closed);
   if(!rooms.length){
-    grid.innerHTML=`<div class="rooms-empty"><div class="rooms-empty-icon">🎌</div><p>No rooms yet.<br>Be the first to create one!</p></div>`;
+    grid.innerHTML=`<div class="rooms-empty"><div class="rooms-empty-icon">🎌</div><p>No public rooms yet.<br>Be the first to create one!</p></div>`;
     return;
   }
   rooms.forEach(room=>grid.appendChild(mkRoomCard(room)));
@@ -605,6 +611,16 @@ function setModalStatus(s){
   modalStatus=s;
   document.getElementById('msBtnLive').className='status-btn'+(s==='live'?' active-live':'');
   document.getElementById('msBtnWaiting').className='status-btn'+(s==='waiting'?' active-waiting':'');
+}
+
+let modalIsPrivate=false;
+function setModalPrivacy(priv){
+  modalIsPrivate=priv;
+  document.getElementById('msPublic').className='status-btn'+(priv?'':' active-live');
+  document.getElementById('msPublic').style.cssText=priv?'':'color:#4ade80;background:rgba(74,222,128,0.15);border-color:rgba(74,222,128,0.3)';
+  document.getElementById('msPrivate').className='status-btn'+(priv?' active-waiting':'');
+  document.getElementById('msPrivate').style.cssText=priv?'color:#fbbf24;background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.3)':'';
+  document.getElementById('passwordField').style.display=priv?'block':'none';
 }
 function togglePrivateFields(){
   modalIsPrivate=document.getElementById('modalPrivate').checked;
@@ -704,6 +720,15 @@ async function enterRoom(roomId,asHost){
 
   currentRoom=room;
   isHost=asHost||(currentUser&&room.host_id===currentUser.id);
+
+  // Password check for non-hosts
+  if(!isHost && room.password){
+    const entered=prompt(`🔒 "${room.anime_title}" is password protected.
+Enter the room password:`);
+    if(entered===null){ showToast('Cancelled.'); return; }
+    if(entered.trim()!==room.password){ showToast('Wrong password.'); return; }
+  }
+
   currentEp=room.episode; currentLang=room.lang;
   window.history.replaceState({},'','/w2g?room='+roomId);
 
@@ -718,6 +743,7 @@ async function enterRoom(roomId,asHost){
   badge.textContent=isHost?'Host':'Guest';
   badge.className='player-badge '+(isHost?'badge-host':'badge-guest');
   document.getElementById('guestBar').style.display=isHost?'none':'flex';
+  document.getElementById('closeRoomBtn').style.display=isHost?'flex':'none';
   document.getElementById('hostSettingsBtn').style.display=isHost?'flex':'none';
 
   // Load video
@@ -809,6 +835,13 @@ async function subscribeRoom(roomId){
   roomChannel.on('broadcast',{event:'request_sync'},async()=>{
     if(!isHost) return;
     await roomChannel.send({type:'broadcast',event:'sync',payload:{episode:currentEp,lang:currentLang}});
+  });
+
+  // Host closed the room
+  roomChannel.on('broadcast',{event:'room_closed'},()=>{
+    if(isHost) return;
+    showToast('Host closed the room.');
+    leaveRoom();
   });
 
   // Chat via broadcast (instant, no DB realtime needed)
