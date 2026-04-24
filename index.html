@@ -245,6 +245,166 @@ footer a{color:var(--muted);text-decoration:none}
   .legal-grid{grid-template-columns:1fr}
   .legal-page{padding:2rem 1rem 3rem}
 }
+
+/* ── AUTH MODAL ── */
+.auth-modal{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);align-items:center;justify-content:center}
+.auth-modal.open{display:flex}
+.auth-box{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:36px 32px;width:90vw;max-width:400px;position:relative}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin-bottom:6px}
+.auth-logo em{color:var(--accent);font-style:normal}
+.auth-subtitle{font-size:13px;color:var(--muted);margin-bottom:24px}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;border:0.5px solid rgba(255,255,255,0.1);border-radius:6px;overflow:hidden}
+.auth-tab{flex:1;padding:8px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:none;border:none;color:var(--muted);font-family:inherit;transition:all 0.2s}
+.auth-tab.active{background:var(--accent);color:#fff}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.auth-field input{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.2s}
+.auth-field input:focus{border-color:var(--accent)}
+.auth-submit{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;transition:background 0.2s}
+.auth-submit:hover{background:#c7303c}
+.auth-err{font-size:12px;color:var(--accent);margin-top:10px;min-height:18px;text-align:center}
+.auth-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.07);border:none;color:var(--text);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.auth-close:hover{background:rgba(230,57,70,0.25)}
+
+/* ── USER BUTTON ── */
+.user-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:6px 12px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;font-family:inherit;transition:all 0.2s}
+.user-btn:hover{background:rgba(255,255,255,0.12)}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.user-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:0.5px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;z-index:400;box-shadow:0 20px 60px rgba(0,0,0,0.7);min-width:180px;display:none}
+.user-menu.open{display:block}
+.user-menu-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;cursor:pointer;transition:background 0.15s;color:var(--text)}
+.user-menu-item:hover{background:var(--bg3)}
+.user-menu-item.danger{color:var(--accent)}
+.user-menu-sep{height:0.5px;background:rgba(255,255,255,0.07)}
+.user-wrap{position:relative}
+
+/* ── WATCHLIST CARD BADGE ── */
+.wl-btn{position:absolute;top:6px;right:6px;z-index:3;width:28px;height:28px;border-radius:6px;background:rgba(8,8,14,0.75);border:0.5px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;opacity:0}
+.mcard:hover .wl-btn{opacity:1}
+.wl-btn.in-wl{opacity:1;background:var(--accent);border-color:var(--accent)}
+.wl-btn svg{pointer-events:none}
+
+/* ── WATCHLIST PAGE ── */
+.watchlist-overlay{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-top:60px}
+.watchlist-overlay.open{display:block}
+.watchlist-page{max-width:1100px;margin:0 auto;padding:3rem 2.5rem 4rem}
+.watchlist-page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:12px}
+.watchlist-page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:2px}
+.watchlist-count{font-size:13px;color:var(--muted);margin-top:4px}
+.watchlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px}
+.wl-card{position:relative;cursor:pointer;border-radius:var(--radius);overflow:hidden;background:var(--bg2)}
+.wl-card-img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:var(--bg3)}
+.wl-card-info{padding:8px 10px}
+.wl-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wl-card-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.wl-remove{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:5px;background:rgba(230,57,70,0.85);border:none;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s}
+.wl-card:hover .wl-remove{opacity:1}
+.wl-empty{text-align:center;padding:6rem 2rem;color:var(--muted)}
+.wl-empty-icon{font-size:48px;margin-bottom:16px;opacity:0.3}
+.wl-empty p{font-size:14px;line-height:1.7}
+.wl-login-prompt{text-align:center;padding:6rem 2rem}
+.wl-login-prompt p{color:var(--muted);font-size:14px;margin-bottom:20px}
+@media(max-width:600px){
+  .watchlist-page{padding:2rem 1rem 3rem}
+  .watchlist-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+}
+
+/* ── SETTINGS PAGE ── */
+.settings-overlay{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-top:60px}
+.settings-overlay.open{display:block}
+.settings-page{max-width:680px;margin:0 auto;padding:3rem 2.5rem 4rem}
+.settings-page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:2px;margin-bottom:2rem}
+.settings-section{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:24px;margin-bottom:16px}
+.settings-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--muted);margin-bottom:18px}
+.settings-field{margin-bottom:16px}
+.settings-field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.settings-field input{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.2s}
+.settings-field input:focus{border-color:var(--accent)}
+.settings-save{background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;margin-top:4px}
+.settings-save:hover{background:#c7303c}
+.settings-msg{font-size:12px;margin-top:10px;min-height:18px}
+.settings-msg.ok{color:#4ade80}
+.settings-msg.err{color:var(--accent)}
+
+/* avatar picker grid */
+.avatar-current{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.avatar-current img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);background:var(--bg3)}
+.avatar-current-info{font-size:13px;color:var(--muted);line-height:1.7}
+.avatar-current-info strong{color:var(--text);font-size:14px;display:block;margin-bottom:4px}
+.avatar-search-wrap{display:flex;gap:8px;margin-bottom:14px}
+.avatar-search-input{flex:1;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:9px 14px;font-size:13px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.2s}
+.avatar-search-input:focus{border-color:var(--accent)}
+.avatar-search-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background 0.2s}
+.avatar-search-btn:hover{background:#c7303c}
+.avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;margin-bottom:14px;min-height:40px}
+.avatar-option{position:relative;width:76px;height:76px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all 0.2s;object-fit:cover;background:var(--bg3);flex-shrink:0}
+.avatar-option:hover{border-color:rgba(230,57,70,0.5);transform:scale(1.06)}
+.avatar-option.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(230,57,70,0.25)}
+.avatar-char-name{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:76px}
+.avatar-item{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.avatar-empty{color:var(--muted);font-size:13px;padding:1.5rem 0;text-align:center}
+.avatar-loading-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+@media(max-width:600px){
+  .settings-page{padding:2rem 1rem 3rem}
+  .avatar-grid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr))}
+  .avatar-option{width:60px;height:60px}
+  .avatar-char-name{max-width:60px}
+}
+
+/* ── WATCH PARTY ── */
+.wp-overlay{display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-top:60px}
+.wp-overlay.open{display:block}
+.wp-page{max-width:1000px;margin:0 auto;padding:2.5rem 2.5rem 4rem}
+.wp-page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:2px;margin-bottom:6px}
+.wp-page-sub{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:2rem}
+.wp-layout{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
+.wp-sidebar{display:flex;flex-direction:column;gap:14px}
+.wp-card{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px}
+.wp-card-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--muted);margin-bottom:14px}
+.wp-search-wrap{display:flex;gap:8px;margin-bottom:12px}
+.wp-search-input{flex:1;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:8px 12px;font-size:12px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.2s}
+.wp-search-input:focus{border-color:var(--accent)}
+.wp-search-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;flex-shrink:0}
+.wp-search-btn:hover{background:#c7303c}
+.wp-results{display:flex;flex-direction:column;gap:5px;max-height:260px;overflow-y:auto}
+.wp-result-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:background 0.15s;border:0.5px solid transparent}
+.wp-result-item:hover{background:var(--bg3)}
+.wp-result-item.selected{background:var(--accent-dim);border-color:var(--accent-border)}
+.wp-result-item img{width:32px;height:48px;object-fit:cover;border-radius:3px;flex-shrink:0;background:var(--bg3)}
+.wp-result-title{font-size:12px;font-weight:500;line-height:1.3}
+.wp-result-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.wp-ep-row{display:flex;align-items:center;gap:10px}
+.wp-ep-label{font-size:12px;color:var(--muted);white-space:nowrap}
+.wp-ep-input{width:70px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:7px 10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;text-align:center}
+.wp-lang-row{display:flex;gap:6px;margin-top:10px}
+.wp-lang-btn{flex:1;padding:7px;font-size:11px;font-weight:700;letter-spacing:1px;border-radius:5px;cursor:pointer;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);color:var(--muted);font-family:inherit;transition:all 0.2s}
+.wp-lang-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.wp-create-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-top:4px}
+.wp-create-btn:hover{background:#c7303c}
+.wp-create-btn:disabled{opacity:0.5;cursor:not-allowed}
+.wp-share-row{display:flex;gap:8px;margin-top:14px}
+.wp-share-input{flex:1;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:8px 12px;font-size:11px;color:var(--muted);font-family:inherit;outline:none}
+.wp-copy-btn{background:rgba(255,255,255,0.1);color:var(--text);border:0.5px solid rgba(255,255,255,0.15);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+.wp-copy-btn:hover{background:rgba(255,255,255,0.18)}
+.wp-copy-btn.copied{background:rgba(74,222,128,0.15);border-color:rgba(74,222,128,0.3);color:#4ade80}
+.wp-embed-wrap{background:#000;border-radius:12px;overflow:hidden;border:0.5px solid rgba(255,255,255,0.08);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:sticky;top:80px}
+.wp-embed-wrap iframe{width:100%;height:100%;border:none;display:block}
+.wp-embed-placeholder{text-align:center;padding:3rem;color:var(--muted)}
+.wp-embed-placeholder .wp-big-icon{font-size:52px;margin-bottom:16px;opacity:0.4}
+.wp-embed-placeholder p{font-size:13px;line-height:1.7}
+.wp-msg{font-size:12px;margin-top:10px;min-height:16px;text-align:center}
+.wp-msg.ok{color:#4ade80}
+.wp-msg.err{color:var(--accent)}
+
+/* Watch Party btn on info modal */
+.wp-info-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.09);color:var(--text);border:0.5px solid rgba(255,255,255,0.15);border-radius:var(--radius);padding:12px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.wp-info-btn:hover{background:rgba(255,255,255,0.16)}
+
+@media(max-width:768px){
+  .wp-layout{grid-template-columns:1fr}
+  .wp-embed-wrap{position:static;aspect-ratio:16/9}
+  .wp-page{padding:1.5rem 1rem 3rem}
+}
 </style>
 </head>
 <body>
@@ -252,12 +412,9 @@ footer a{color:var(--muted);text-decoration:none}
 <nav>
   <a href="#" class="nav-logo-img"><img src="https://raw.githubusercontent.com/yeonvvx/AniCastImages/main/Logo/AniCast.png" alt="AniCast" height="32" style="display:block;height:32px;width:auto;object-fit:contain"></a>
   <ul class="nav-tabs">
-    <li><a href="#" class="active">Home</a></li>
-    <li><a href="#" onclick="quickNav('trending',event)">Trending</a></li>
-    <li><a href="#" onclick="quickNav('toprated',event)">Top Rated</a></li>
-    <li><a href="#" onclick="quickNav('ongoing',event)">Ongoing</a></li>
-    <li><a href="#" onclick="quickNav('seasonal',event)">Seasonal</a></li>
-    <li><a href="#" onclick="quickNav('movies',event)">Movies</a></li>
+    <li><a href="#" class="active" onclick="closeAll(event)">Home</a></li>
+    <li><a href="#" onclick="openWatchlist(event)">Watchlist</a></li>
+    <li><a href="#" onclick="openWatchParty(event)">Watch Party</a></li>
     <li><a href="#" onclick="openLegal(event)">Legal</a></li>
   </ul>
   <div class="nav-right">
@@ -269,6 +426,7 @@ footer a{color:var(--muted);text-decoration:none}
       <button class="name-btn active" id="btnEN" onclick="setNameLang('en')">EN</button>
       <button class="name-btn" id="btnJP" onclick="setNameLang('jp')">JP</button>
     </div>
+    <div class="user-wrap" id="userWrap"></div>
     <div class="search-wrap">
       <div class="search-box">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -660,6 +818,33 @@ async function openInfo(item){
     <div><div class="id-label">Studio</div><div class="id-val">${(item.studios||[]).map(s=>s.name).join(', ')||'—'}</div></div>
     ${item.rating?`<div><div class="id-label">Rating</div><div class="id-val">${item.rating}</div></div>`:''}`;
   document.getElementById('infoPlayBtn').onclick=()=>{closeInfo();openPlayer(item.mal_id,type,title,item.episodes);};
+  // Watch Party button
+  const existingWpBtn=document.getElementById('infoWpBtn');
+  if(existingWpBtn) existingWpBtn.remove();
+  const wpInfoBtn=document.createElement('button');
+  wpInfoBtn.id='infoWpBtn';
+  wpInfoBtn.className='wp-info-btn';
+  wpInfoBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Watch Party`;
+  wpInfoBtn.onclick=()=>{closeInfo();openWatchParty(null,item);};
+  document.querySelector('.info-actions').appendChild(wpInfoBtn);
+  // Watchlist button in info modal
+  const existingWlBtn=document.getElementById('infoWlBtn');
+  if(existingWlBtn) existingWlBtn.remove();
+  const wlInfoBtn=document.createElement('button');
+  wlInfoBtn.id='infoWlBtn';
+  wlInfoBtn.className='btn-s';
+  const isInWl=watchlistCache.has(item.mal_id);
+  wlInfoBtn.innerHTML=isInWl
+    ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Saved`
+    : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist`;
+  wlInfoBtn.onclick=async()=>{
+    await toggleWatchlist(item,null);
+    const nowIn=watchlistCache.has(item.mal_id);
+    wlInfoBtn.innerHTML=nowIn
+      ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Saved`
+      : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Watchlist`;
+  };
+  document.querySelector('.info-actions').appendChild(wlInfoBtn);
   document.getElementById('nextEpPanel').style.display='none';
   document.getElementById('infoModal').classList.add('open');
   document.body.style.overflow='hidden';
@@ -781,9 +966,20 @@ function mkCard(item){
   const year=item.year||(item.aired?.prop?.from?.year)||'';
   const img=item.images?.jpg?.large_image_url||item.images?.webp?.large_image_url||item.images?.jpg?.image_url||'';
   const type=item.type||'TV';
+  const inWl=watchlistCache.has(item.mal_id);
   const div=document.createElement('div'); div.className='mcard';
-  div.innerHTML=`<img class="mcard-poster" src="${img}" alt="" loading="lazy"><div class="mcard-ov"><div class="mcard-otitle">${title}</div></div><div class="mcard-info"><div class="ct">${title}</div><div class="cy">${year||type||'—'}</div></div>`;
-  div._item=item; div.onclick=()=>openInfo(item); return div;
+  div.innerHTML=`<img class="mcard-poster" src="${img}" alt="" loading="lazy">
+    <button class="wl-btn${inWl?' in-wl':''}" data-mal-id="${item.mal_id}" title="${inWl?'Remove from Watchlist':'Add to Watchlist'}">
+      ${inWl
+        ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`
+        : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`}
+    </button>
+    <div class="mcard-ov"><div class="mcard-otitle">${title}</div></div>
+    <div class="mcard-info"><div class="ct">${title}</div><div class="cy">${year||type||'—'}</div></div>`;
+  div._item=item;
+  div.querySelector('.wl-btn').onclick=(e)=>toggleWatchlist(item,e);
+  div.onclick=()=>openInfo(item);
+  return div;
 }
 
 /**
@@ -1061,6 +1257,7 @@ function quickNav(id,e){e.preventDefault();document.getElementById(id)?.scrollIn
 ───────────────────────────────────────────────── */
 async function init(){
   skelRow('trendRow'); skelRow('seasonRow');
+  initAuth();
 
   renderOngoing(audioLang);
 
@@ -1124,6 +1321,457 @@ async function init(){
 }
 
 
+
+/* ─────────────────────────────────────────────────
+   SUPABASE
+───────────────────────────────────────────────── */
+const SUPABASE_URL = 'https://cwsmcrqfxhloyzfczpoo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_oqiDI9aRF4SoudJVTeywrQ_O9sjL4Y8';
+
+let _sb = null;
+async function getSB(){
+  if(_sb) return _sb;
+  const {createClient} = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+  _sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  return _sb;
+}
+
+let currentUser = null;
+let watchlistCache = new Set(); // set of mal_ids in watchlist
+
+async function initAuth(){
+  const sb = await getSB();
+  const {data:{session}} = await sb.auth.getSession();
+  if(session?.user) await onSignIn(session.user, false);
+  sb.auth.onAuthStateChange(async (event, session)=>{
+    if(event==='SIGNED_IN' && session?.user){
+      await onSignIn(session.user, false);
+    } else if(event==='SIGNED_OUT'){
+      onSignOut();
+    }
+  });
+}
+
+async function onSignIn(user, closeModal=true){
+  currentUser = user;
+  renderUserBtn();
+  await loadWatchlistCache();
+  renderWatchlistBtns();
+  if(closeModal) closeAuth();
+}
+
+function onSignOut(){
+  currentUser = null;
+  watchlistCache.clear();
+  renderUserBtn();
+  renderWatchlistBtns();
+}
+
+
+
+function getDisplayName(user){
+  return user?.user_metadata?.username || user?.email?.split('@')[0] || 'Anon';
+}
+
+function renderUserBtn(){
+  const wrap = document.getElementById('userWrap');
+  if(!wrap) return;
+  if(currentUser){
+    const name = getDisplayName(currentUser);
+    const seed = currentUser.user_metadata?.avatar_seed || name;
+    const avatarUrl = getAvatarUrl(seed);
+    wrap.innerHTML = `
+      <button class="user-btn" onclick="toggleUserMenu(event)">
+        <img src="${avatarUrl}" alt="avatar" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.15)">
+        <span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600">${name}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="user-menu" id="userMenu">
+        <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,255,255,0.07)">
+          <img src="${avatarUrl}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)">
+          <div>
+            <div style="font-size:13px;font-weight:600">${name}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${currentUser.email}</div>
+          </div>
+        </div>
+        <div class="user-menu-item" onclick="openWatchlist(null)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          My Watchlist
+        </div>
+        <div class="user-menu-item" onclick="openSettings()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
+        <div class="user-menu-sep"></div>
+        <div class="user-menu-item danger" onclick="signOut()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </div>
+      </div>`;
+  } else {
+    wrap.innerHTML = `
+      <button class="user-btn" onclick="toggleUserMenu(event)">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1.5px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="user-menu" id="userMenu">
+        <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,255,255,0.07)">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600">Guest</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Not signed in</div>
+          </div>
+        </div>
+        <div class="user-menu-item" onclick="switchAuthTab('login');openAuth();document.getElementById('userMenu').classList.remove('open')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Sign In
+        </div>
+        <div class="user-menu-item" onclick="switchAuthTab('signup');openAuth();document.getElementById('userMenu').classList.remove('open')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Create Account
+        </div>
+      </div>`;
+  }
+}
+
+function toggleUserMenu(e){
+  e.stopPropagation();
+  const m = document.getElementById('userMenu');
+  if(m) m.classList.toggle('open');
+}
+document.addEventListener('click', ()=>{
+  document.getElementById('userMenu')?.classList.remove('open');
+});
+
+async function signOut(){
+  const sb = await getSB();
+  await sb.auth.signOut();
+  document.getElementById('userMenu')?.classList.remove('open');
+}
+
+/* ── AUTH MODAL ── */
+let authTab = 'login';
+function openAuth(){
+  document.getElementById('authModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('authErr').textContent='';
+}
+function closeAuth(){
+  document.getElementById('authModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function switchAuthTab(tab){
+  authTab = tab;
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+  document.getElementById('authSubmit').textContent = tab==='login'?'Sign In':'Create Account';
+  document.getElementById('authSubtitle').textContent = tab==='login'
+    ? 'Sign in to save your watchlist across devices.'
+    : 'Create a free account to sync your watchlist.';
+  document.getElementById('authErr').textContent='';
+  document.getElementById('usernameField').style.display = tab==='signup'?'block':'none';
+}
+async function submitAuth(){
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authErr');
+  const btn = document.getElementById('authSubmit');
+  if(!email||!password){errEl.textContent='Please fill in all fields.';return;}
+  btn.textContent='Loading…'; btn.disabled=true; errEl.textContent='';
+  const sb = await getSB();
+  let error;
+  if(authTab==='login'){
+    const r = await sb.auth.signInWithPassword({email,password});
+    error = r.error;
+    if(!error) await onSignIn(r.data.user, true);
+  } else {
+    const username = document.getElementById('authUsername').value.trim();
+    if(!username){errEl.textContent='Please enter a username.';btn.textContent='Create Account';btn.disabled=false;return;}
+    const r = await sb.auth.signUp({email, password, options:{data:{username, avatar_seed: username}}});
+    error = r.error;
+    if(!error){
+      if(r.data.user && !r.data.session){
+        errEl.style.color='#4ade80';
+        errEl.textContent='Check your email to confirm your account!';
+        btn.textContent = authTab==='login'?'Sign In':'Create Account';
+        btn.disabled=false; return;
+      }
+      if(r.data.user) await onSignIn(r.data.user, true);
+    }
+  }
+  if(error) errEl.textContent = error.message;
+  errEl.style.color='var(--accent)';
+  btn.textContent = authTab==='login'?'Sign In':'Create Account';
+  btn.disabled=false;
+}
+document.getElementById('authEmail')?.addEventListener('keydown', e=>{ if(e.key==='Enter') submitAuth(); });
+document.getElementById('authPassword')?.addEventListener('keydown', e=>{ if(e.key==='Enter') submitAuth(); });
+document.getElementById('authModal')?.addEventListener('click', function(e){ if(e.target===this) closeAuth(); });
+
+/* ── WATCHLIST DB ── */
+async function loadWatchlistCache(){
+  if(!currentUser) return;
+  const sb = await getSB();
+  const {data} = await sb.from('watchlist').select('mal_id').eq('user_id', currentUser.id);
+  watchlistCache = new Set((data||[]).map(r=>r.mal_id));
+}
+
+async function toggleWatchlist(item, e){
+  if(e){ e.stopPropagation(); e.preventDefault(); }
+  if(!currentUser){ openAuth(); return; }
+  const sb = await getSB();
+  const mid = item.mal_id;
+  if(watchlistCache.has(mid)){
+    await sb.from('watchlist').delete().eq('user_id', currentUser.id).eq('mal_id', mid);
+    watchlistCache.delete(mid);
+  } else {
+    const img = item.images?.jpg?.large_image_url||item.images?.webp?.large_image_url||'';
+    await sb.from('watchlist').upsert({
+      user_id: currentUser.id,
+      mal_id: mid,
+      title: item.title||'',
+      title_english: item.title_english||'',
+      image_url: img,
+      type: item.type||'TV',
+      score: item.score||null,
+      year: item.year||null
+    });
+    watchlistCache.add(mid);
+  }
+  renderWatchlistBtns();
+}
+
+function renderWatchlistBtns(){
+  document.querySelectorAll('.wl-btn').forEach(btn=>{
+    const mid = +btn.dataset.malId;
+    const inWl = watchlistCache.has(mid);
+    btn.classList.toggle('in-wl', inWl);
+    btn.title = inWl ? 'Remove from Watchlist' : 'Add to Watchlist';
+    btn.innerHTML = inWl
+      ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`
+      : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+  });
+}
+
+/* ── WATCHLIST PAGE ── */
+async function openWatchlist(e){
+  if(e && e.preventDefault) e.preventDefault();
+  document.getElementById('userMenu')?.classList.remove('open');
+  if(!currentUser){ openAuth(); return; }
+  document.getElementById('watchlistOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.querySelectorAll('.nav-tabs a').forEach((a,i)=>{ a.classList.toggle('active', i===1); });
+  await renderWatchlistPage();
+}
+function closeWatchlist(){
+  document.getElementById('watchlistOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  document.querySelectorAll('.nav-tabs a').forEach((a,i)=>{ a.classList.toggle('active', i===0); });
+}
+
+async function renderWatchlistPage(){
+  const content = document.getElementById('watchlistContent');
+  const countEl = document.getElementById('watchlistCount');
+  content.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:2rem 0">Loading…</div>';
+  // Show avatar + username in header
+  if(currentUser){
+    const name = getDisplayName(currentUser);
+    const seed = currentUser.user_metadata?.avatar_seed || name;
+    const av = document.getElementById('wlAvatar');
+    if(av){ av.src=getAvatarUrl(seed); av.style.display='block'; }
+    const titleEl = document.getElementById('wlPageTitle');
+    if(titleEl) titleEl.textContent = `${name.toUpperCase()}'S WATCHLIST`;
+  }
+  const sb = await getSB();
+  const {data, error} = await sb.from('watchlist').select('*').eq('user_id', currentUser.id).order('added_at', {ascending:false});
+  if(error||!data){content.innerHTML='<div style="color:var(--accent);font-size:13px">Failed to load watchlist.</div>';return;}
+  countEl.textContent = data.length ? `${data.length} anime saved` : '';
+  if(!data.length){
+    content.innerHTML=`<div class="wl-empty"><div class="wl-empty-icon">🎌</div><p>Your watchlist is empty.<br>Browse anime and hit the bookmark icon to save them here.</p></div>`;
+    return;
+  }
+  const grid = document.createElement('div'); grid.className='watchlist-grid';
+  data.forEach(row=>{
+    const title = nameLang==='jp'?(row.title||row.title_english):(row.title_english||row.title)||'Unknown';
+    const card = document.createElement('div'); card.className='wl-card';
+    card.innerHTML=`
+      <img class="wl-card-img" src="${row.image_url||''}" alt="" loading="lazy">
+      <div class="wl-card-info">
+        <div class="wl-card-title">${title}</div>
+        <div class="wl-card-meta">${[row.type, row.year, row.score?'★ '+row.score:''].filter(Boolean).join(' · ')}</div>
+      </div>
+      <button class="wl-remove" title="Remove" onclick="removeFromWatchlist(${row.mal_id}, this)">✕</button>`;
+    card.querySelector('.wl-card-img').onclick = ()=>openInfoByMalId(row.mal_id);
+    card.querySelector('.wl-card-title').onclick = ()=>openInfoByMalId(row.mal_id);
+    grid.appendChild(card);
+  });
+  content.innerHTML=''; content.appendChild(grid);
+}
+
+async function removeFromWatchlist(malId, btn){
+  btn.textContent='…'; btn.disabled=true;
+  const sb = await getSB();
+  await sb.from('watchlist').delete().eq('user_id', currentUser.id).eq('mal_id', malId);
+  watchlistCache.delete(malId);
+  renderWatchlistBtns();
+  btn.closest('.wl-card').remove();
+  const remaining = document.querySelectorAll('.wl-card').length;
+  document.getElementById('watchlistCount').textContent = remaining ? `${remaining} anime saved` : '';
+  if(!remaining) document.getElementById('watchlistContent').innerHTML=`<div class="wl-empty"><div class="wl-empty-icon">🎌</div><p>Your watchlist is empty.<br>Browse anime and hit the bookmark icon to save them here.</p></div>`;
+}
+
+async function openInfoByMalId(malId){
+  closeWatchlist();
+  const d = await jikan('/anime/'+malId);
+  if(d.data) openInfo(d.data);
+}
+
+/* ── CLOSE ALL (home) ── */
+function closeAll(e){
+  if(e && e.preventDefault) e.preventDefault();
+  closeLegal();
+  closeWatchlist();
+  document.querySelectorAll('.nav-tabs a').forEach((a,i)=>{ a.classList.toggle('active', i===0); });
+}
+
+
+/* ── WATCH PARTY ── */
+let wpSelectedAnime = null;
+let wpLang = 'sub';
+let wpSearchTimer = null;
+
+function openWatchParty(e, anime){
+  if(e && e.preventDefault) e.preventDefault();
+  document.getElementById('wpOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.querySelectorAll('.nav-tabs a').forEach((a,i)=>a.classList.toggle('active',i===2));
+  // If called from an anime card/modal, pre-fill
+  if(anime){
+    wpSelectAnime(anime);
+    document.getElementById('wpSearchInput').value = anime.title_english||anime.title||'';
+  }
+}
+function closeWatchParty(){
+  document.getElementById('wpOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  document.querySelectorAll('.nav-tabs a').forEach((a,i)=>a.classList.toggle('active',i===0));
+}
+
+function setWpLang(lang){
+  wpLang=lang;
+  document.getElementById('wpBtnSub').classList.toggle('active',lang==='sub');
+  document.getElementById('wpBtnDub').classList.toggle('active',lang==='dub');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const si = document.getElementById('wpSearchInput');
+  if(si){
+    si.addEventListener('keydown',e=>{if(e.key==='Enter')wpSearch();});
+    si.addEventListener('input',function(){
+      clearTimeout(wpSearchTimer);
+      if(this.value.trim().length>2) wpSearchTimer=setTimeout(wpSearch,600);
+    });
+  }
+});
+
+async function wpSearch(){
+  const q = document.getElementById('wpSearchInput').value.trim();
+  if(!q) return;
+  const res = document.getElementById('wpResults');
+  res.innerHTML='<div style="font-size:12px;color:var(--muted);padding:6px">Searching…</div>';
+  const data = await jikan('/anime',{q,limit:8});
+  const items = data?.data||[];
+  res.innerHTML='';
+  if(!items.length){res.innerHTML='<div style="font-size:12px;color:var(--muted);padding:6px">No results.</div>';return;}
+  items.forEach(anime=>{
+    const title=anime.title_english||anime.title||'';
+    const img=anime.images?.jpg?.image_url||'';
+    const year=anime.year||''; const type=anime.type||'TV';
+    const isSel=wpSelectedAnime?.mal_id===anime.mal_id;
+    const div=document.createElement('div');
+    div.className='wp-result-item'+(isSel?' selected':'');
+    div.innerHTML=`<img src="${img}" alt="" loading="lazy" onerror="this.style.display='none'"><div><div class="wp-result-title">${title}</div><div class="wp-result-meta">${[type,year].filter(Boolean).join(' · ')}</div></div>`;
+    div.onclick=()=>wpSelectAnime(anime);
+    res.appendChild(div);
+  });
+}
+
+function wpSelectAnime(anime){
+  wpSelectedAnime=anime;
+  const title=anime.title_english||anime.title||'';
+  document.querySelectorAll('.wp-result-item').forEach(el=>{
+    el.classList.toggle('selected', el.querySelector('.wp-result-title')?.textContent===title);
+  });
+  document.getElementById('wpSelectedLabel').innerHTML=`<span style="color:var(--text);font-weight:600">${title}</span><br><span style="font-size:11px;color:var(--muted)">${anime.episodes||'?'} episodes · ${anime.type||'TV'}</span>`;
+  document.getElementById('wpCreateBtn').disabled=false;
+  if(anime.episodes) document.getElementById('wpEpisode').max=anime.episodes;
+  // Reset embed and share
+  document.getElementById('wpShareWrap').style.display='none';
+  document.getElementById('wpMsg').textContent='';
+  document.getElementById('wpEmbedWrap').innerHTML=`<div class="wp-embed-placeholder"><div class="wp-big-icon">🎌</div><p>Room ready to create.<br>Hit <strong>Create Watch Party</strong>.</p></div>`;
+}
+
+async function createWatchParty(){
+  if(!wpSelectedAnime){return;}
+  const btn=document.getElementById('wpCreateBtn');
+  const msg=document.getElementById('wpMsg');
+  const ep=parseInt(document.getElementById('wpEpisode').value)||1;
+  btn.disabled=true; btn.textContent='Creating room…'; msg.textContent='';
+
+  // Build the stream URL (MegaPlay)
+  const streamUrl=`${MEGAPLAY}/${wpSelectedAnime.mal_id}/${ep}/${wpLang}`;
+  const title=(wpSelectedAnime.title_english||wpSelectedAnime.title||'Anime')+' — Ep '+ep;
+
+  try{
+    // Call W2G API directly (repo is private so key is safe)
+    const W2G_KEY='x304r5ccqia9dy4dfp4v5oqkr0vlkp1yx6orzp4tk2sohkyyd0t64hegai6bdrrw';
+    const r=await fetch('https://api.w2g.tv/rooms/create.json',{
+      method:'POST',
+      headers:{'Accept':'application/json','Content-Type':'application/json'},
+      body:JSON.stringify({w2g_api_key:W2G_KEY,share:streamUrl,bg_color:'08080e',bg_opacity:'100'})
+    });
+    if(!r.ok) throw new Error('Server error '+r.status);
+    const data=await r.json();
+    const streamkey=data.streamkey;
+    if(!streamkey) throw new Error('No room key returned');
+
+    const roomUrl=`https://w2g.tv/rooms/${streamkey}`;
+    const embedUrl=`https://w2g.tv/rooms/${streamkey}?embed=true`;
+
+    // Show embed
+    document.getElementById('wpEmbedWrap').innerHTML=`<iframe src="${embedUrl}" allowfullscreen allow="autoplay;fullscreen" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>`;
+
+    // Show share link
+    document.getElementById('wpShareInput').value=roomUrl;
+    document.getElementById('wpShareWrap').style.display='block';
+    document.getElementById('wpCopyBtn').textContent='Copy';
+    document.getElementById('wpCopyBtn').classList.remove('copied');
+
+    msg.textContent='Room created! Share the link with friends.';
+    msg.className='wp-msg ok';
+  }catch(err){
+    msg.textContent='Failed to create room. Check your connection and try again.';
+    msg.className='wp-msg err';
+    console.error('W2G error:',err);
+  }
+
+  btn.disabled=false;
+  btn.innerHTML=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Create Watch Party`;
+}
+
+function copyWpLink(){
+  const input=document.getElementById('wpShareInput');
+  navigator.clipboard.writeText(input.value).then(()=>{
+    const btn=document.getElementById('wpCopyBtn');
+    btn.textContent='Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
 /* ── LEGAL PAGE ── */
 function openLegal(e){
   if(e) e.preventDefault();
@@ -1142,6 +1790,171 @@ function closeLegal(){
 document.querySelector('.nav-logo-img').addEventListener('click',()=>{
   closeLegal();
 });
+
+
+/* ── SETTINGS PAGE ── */
+/* ── SETTINGS PAGE ── */
+let selectedAvatarUrl = null;
+let selectedAvatarCharName = null;
+
+function openSettings(){
+  document.getElementById('userMenu')?.classList.remove('open');
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  populateSettings();
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function populateSettings(){
+  if(!currentUser) return;
+  const name = getDisplayName(currentUser);
+  document.getElementById('settingsUsername').value = name;
+  const avatarUrl = currentUser.user_metadata?.avatar_url || '';
+  const charName = currentUser.user_metadata?.avatar_char || '';
+  const preview = document.getElementById('currentAvatarPreview');
+  const nameEl = document.getElementById('currentAvatarName');
+  if(avatarUrl){ preview.src=avatarUrl; preview.style.opacity='1'; }
+  else { preview.src=''; preview.style.opacity='0.3'; }
+  if(nameEl) nameEl.textContent = charName || 'No avatar set';
+  document.getElementById('avatarGrid').innerHTML='';
+  document.getElementById('avatarSearchInput').value='';
+  document.getElementById('saveAvatarBtn').style.display='none';
+  document.getElementById('avatarMsg').textContent='';
+  document.getElementById('avatarMsg2').textContent='';
+  selectedAvatarUrl=null; selectedAvatarCharName=null;
+}
+
+function getAvatarUrl(seed, style){
+  if(!style && currentUser?.user_metadata?.avatar_url){
+    return currentUser.user_metadata.avatar_url;
+  }
+  return `https://api.dicebear.com/8.x/avataaars/svg?seed=${encodeURIComponent(seed||'default')}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&radius=50`;
+}
+
+async function searchAniListCharacters(){
+  const query = document.getElementById('avatarSearchInput').value.trim();
+  if(!query) return;
+  const grid = document.getElementById('avatarGrid');
+  const msg2 = document.getElementById('avatarMsg2');
+  grid.innerHTML='<div class="avatar-empty">Searching…</div>';
+  msg2.textContent='';
+  document.getElementById('saveAvatarBtn').style.display='none';
+
+  // Try AniList first
+  const gql=`query($search:String){Page(perPage:24){characters(search:$search,sort:FAVOURITES_DESC){id name{full}image{large medium}}}}`;
+  let chars = [];
+  try{
+    const data = await anilistQuery(gql, {search: query});
+    chars = data?.data?.Page?.characters || [];
+  }catch(e){}
+
+  // Fallback to Jikan if AniList fails or returns nothing
+  if(!chars.length){
+    try{
+      const r = await jikan('/characters', {q: query, limit: 24});
+      const jikanChars = r?.data || [];
+      chars = jikanChars.map(c=>({
+        id: c.mal_id,
+        name: {full: c.name},
+        image: {large: c.images?.jpg?.image_url || c.images?.webp?.image_url || ''}
+      })).filter(c=>c.image.large);
+    }catch(e){}
+  }
+
+  grid.innerHTML='';
+  if(!chars.length){
+    grid.innerHTML='<div class="avatar-empty">No characters found. Try a different name.</div>';
+    return;
+  }
+
+  msg2.textContent=`${chars.length} characters found — click one to select`;
+  chars.forEach(char=>{
+    const imgUrl=char.image?.large||char.image?.medium||'';
+    if(!imgUrl) return;
+    const item=document.createElement('div');
+    item.className='avatar-item';
+    item.innerHTML=`<img class="avatar-option" src="${imgUrl}" alt="${char.name?.full||''}" loading="lazy" onerror="this.closest('.avatar-item').remove()"><div class="avatar-char-name">${char.name?.full||''}</div>`;
+    const img=item.querySelector('img');
+    item.onclick=()=>{
+      document.querySelectorAll('.avatar-option').forEach(i=>i.classList.remove('selected'));
+      img.classList.add('selected');
+      selectedAvatarUrl=imgUrl;
+      selectedAvatarCharName=char.name?.full||'';
+      document.getElementById('currentAvatarPreview').src=imgUrl;
+      document.getElementById('currentAvatarPreview').style.opacity='1';
+      document.getElementById('currentAvatarName').textContent=selectedAvatarCharName;
+      document.getElementById('saveAvatarBtn').style.display='inline-block';
+      document.getElementById('avatarMsg').textContent='';
+    };
+    grid.appendChild(item);
+  });
+}
+
+// Enter key support for avatar search
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('avatarSearchInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')searchAniListCharacters();});
+});
+
+async function saveDisplayName(){
+  const msg=document.getElementById('nameMsg');
+  const val=document.getElementById('settingsUsername').value.trim();
+  if(!val){msg.textContent='Please enter a name.';msg.className='settings-msg err';return;}
+  msg.textContent='Saving…';msg.className='settings-msg';
+  const sb=await getSB();
+  const {error}=await sb.auth.updateUser({data:{username:val}});
+  if(error){msg.textContent=error.message;msg.className='settings-msg err';return;}
+  currentUser.user_metadata.username=val;
+  msg.textContent='Display name saved!';msg.className='settings-msg ok';
+  renderUserBtn();
+  setTimeout(()=>{msg.textContent='';},3000);
+}
+
+async function saveAvatar(){
+  const msg=document.getElementById('avatarMsg');
+  if(!selectedAvatarUrl){msg.textContent='Select a character first.';msg.className='settings-msg err';return;}
+  msg.textContent='Saving…';msg.className='settings-msg';
+  const sb=await getSB();
+  const {error}=await sb.auth.updateUser({data:{avatar_url:selectedAvatarUrl,avatar_char:selectedAvatarCharName}});
+  if(error){msg.textContent=error.message;msg.className='settings-msg err';return;}
+  currentUser.user_metadata.avatar_url=selectedAvatarUrl;
+  currentUser.user_metadata.avatar_char=selectedAvatarCharName;
+  msg.textContent='Avatar saved!';msg.className='settings-msg ok';
+  renderUserBtn();
+  setTimeout(()=>{msg.textContent='';},3000);
+}
+
+async function saveEmail(){
+  const msg=document.getElementById('emailMsg');
+  const val=document.getElementById('settingsEmail').value.trim();
+  if(!val){msg.textContent='Enter a new email.';msg.className='settings-msg err';return;}
+  msg.textContent='Saving…';msg.className='settings-msg';
+  const sb=await getSB();
+  const {error}=await sb.auth.updateUser({email:val});
+  if(error){msg.textContent=error.message;msg.className='settings-msg err';return;}
+  msg.textContent='Confirmation sent! Check your inbox.';msg.className='settings-msg ok';
+  document.getElementById('settingsEmail').value='';
+  setTimeout(()=>{msg.textContent='';},5000);
+}
+
+async function savePassword(){
+  const msg=document.getElementById('passwordMsg');
+  const p1=document.getElementById('settingsPassword').value;
+  const p2=document.getElementById('settingsPasswordConfirm').value;
+  if(!p1){msg.textContent='Enter a new password.';msg.className='settings-msg err';return;}
+  if(p1!==p2){msg.textContent='Passwords do not match.';msg.className='settings-msg err';return;}
+  if(p1.length<6){msg.textContent='Password must be at least 6 characters.';msg.className='settings-msg err';return;}
+  msg.textContent='Saving…';msg.className='settings-msg';
+  const sb=await getSB();
+  const {error}=await sb.auth.updateUser({password:p1});
+  if(error){msg.textContent=error.message;msg.className='settings-msg err';return;}
+  msg.textContent='Password updated!';msg.className='settings-msg ok';
+  document.getElementById('settingsPassword').value='';
+  document.getElementById('settingsPasswordConfirm').value='';
+  setTimeout(()=>{msg.textContent='';},3000);
+}
 
 document.addEventListener('DOMContentLoaded',init);
 </script>
@@ -1204,5 +2017,179 @@ document.addEventListener('DOMContentLoaded',init);
     </div>
   </div>
 </div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal" id="authModal">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+    <div class="auth-logo">Ani<em>Cast</em></div>
+    <div class="auth-subtitle" id="authSubtitle">Sign in to save your watchlist across devices.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <div class="auth-field" id="usernameField" style="display:none">
+      <label>Username</label>
+      <input type="text" id="authUsername" placeholder="yourname" autocomplete="username" maxlength="30">
+    </div>
+    <div class="auth-field">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="auth-field">
+      <label>Password</label>
+      <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="auth-submit" id="authSubmit" onclick="submitAuth()">Sign In</button>
+    <div class="auth-err" id="authErr"></div>
+  </div>
+</div>
+
+<!-- WATCHLIST PAGE -->
+<div class="watchlist-overlay" id="watchlistOverlay">
+  <div class="watchlist-page">
+    <button onclick="closeWatchlist()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);color:var(--text);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:1.5rem;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back to Home</button>
+    <div class="watchlist-page-head">
+      <div style="display:flex;align-items:center;gap:16px">
+        <img id="wlAvatar" src="" alt="avatar" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);display:none">
+        <div>
+          <div class="watchlist-page-title" id="wlPageTitle">MY WATCHLIST</div>
+          <div class="watchlist-count" id="watchlistCount"></div>
+        </div>
+      </div>
+    </div>
+    <div id="watchlistContent"></div>
+  </div>
+</div>
+
+
+<!-- SETTINGS PAGE -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-page">
+    <button onclick="closeSettings()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);color:var(--text);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:1.5rem;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</button>
+    <div class="settings-page-title">SETTINGS</div>
+
+    <!-- Profile -->
+    <div class="settings-section">
+      <div class="settings-section-title">PROFILE</div>
+      <div class="settings-field">
+        <label>Display Name</label>
+        <input type="text" id="settingsUsername" placeholder="Your display name" maxlength="30">
+      </div>
+      <button class="settings-save" onclick="saveDisplayName()">Save Name</button>
+      <div class="settings-msg" id="nameMsg"></div>
+    </div>
+
+    <!-- Avatar picker -->
+    <div class="settings-section">
+      <div class="settings-section-title">PROFILE PICTURE</div>
+      <div class="avatar-current">
+        <img id="currentAvatarPreview" src="" alt="avatar" onerror="this.style.opacity='0.3'">
+        <div class="avatar-current-info">
+          <strong id="currentAvatarName">No avatar set</strong>
+          Search for any anime character and pick their portrait as your profile picture.
+        </div>
+      </div>
+      <div class="avatar-search-wrap">
+        <input class="avatar-search-input" id="avatarSearchInput" placeholder="Search character… e.g. Luffy, Naruto, Gojo" autocomplete="off">
+        <button class="avatar-search-btn" onclick="searchAniListCharacters()">Search</button>
+      </div>
+      <div class="avatar-grid" id="avatarGrid"></div>
+      <div id="avatarMsg2" style="font-size:12px;color:var(--muted);margin-bottom:12px"></div>
+      <button class="settings-save" id="saveAvatarBtn" onclick="saveAvatar()" style="display:none">Save as Profile Picture</button>
+      <div class="settings-msg" id="avatarMsg"></div>
+    </div>
+
+    <!-- Email -->
+    <div class="settings-section">
+      <div class="settings-section-title">CHANGE EMAIL</div>
+      <div class="settings-field">
+        <label>New Email Address</label>
+        <input type="email" id="settingsEmail" placeholder="new@example.com">
+      </div>
+      <button class="settings-save" onclick="saveEmail()">Update Email</button>
+      <div class="settings-msg" id="emailMsg"></div>
+    </div>
+
+    <!-- Password -->
+    <div class="settings-section">
+      <div class="settings-section-title">CHANGE PASSWORD</div>
+      <div class="settings-field">
+        <label>New Password</label>
+        <input type="password" id="settingsPassword" placeholder="••••••••">
+      </div>
+      <div class="settings-field">
+        <label>Confirm Password</label>
+        <input type="password" id="settingsPasswordConfirm" placeholder="••••••••">
+      </div>
+      <button class="settings-save" onclick="savePassword()">Update Password</button>
+      <div class="settings-msg" id="passwordMsg"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- WATCH PARTY PAGE -->
+<div class="wp-overlay" id="wpOverlay">
+  <div class="wp-page">
+    <button onclick="closeWatchParty()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);color:var(--text);border-radius:var(--radius);padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:1.5rem;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back to Home</button>
+    <div class="wp-page-title">WATCH PARTY</div>
+    <p class="wp-page-sub">Watch anime in sync with friends — pick an anime, create a room, share the link. Powered by Watch2Gether.</p>
+    <div class="wp-layout">
+      <!-- Sidebar -->
+      <div class="wp-sidebar">
+        <!-- Search -->
+        <div class="wp-card">
+          <div class="wp-card-title">PICK ANIME</div>
+          <div class="wp-search-wrap">
+            <input class="wp-search-input" id="wpSearchInput" placeholder="Search anime…" autocomplete="off">
+            <button class="wp-search-btn" onclick="wpSearch()">Go</button>
+          </div>
+          <div class="wp-results" id="wpResults">
+            <div style="font-size:12px;color:var(--muted);padding:4px">Search for an anime to get started.</div>
+          </div>
+        </div>
+        <!-- Episode & lang -->
+        <div class="wp-card">
+          <div class="wp-card-title">EPISODE & LANGUAGE</div>
+          <div class="wp-ep-row">
+            <span class="wp-ep-label">Episode</span>
+            <input class="wp-ep-input" type="number" id="wpEpisode" value="1" min="1">
+          </div>
+          <div class="wp-lang-row">
+            <button class="wp-lang-btn active" id="wpBtnSub" onclick="setWpLang('sub')">SUB</button>
+            <button class="wp-lang-btn" id="wpBtnDub" onclick="setWpLang('dub')">DUB</button>
+          </div>
+        </div>
+        <!-- Create -->
+        <div class="wp-card">
+          <div class="wp-card-title">CREATE ROOM</div>
+          <div id="wpSelectedLabel" style="font-size:12px;color:var(--muted);margin-bottom:10px">No anime selected yet.</div>
+          <button class="wp-create-btn" id="wpCreateBtn" onclick="createWatchParty()" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            Create Watch Party
+          </button>
+          <div class="wp-msg" id="wpMsg"></div>
+          <!-- Share link (shown after room created) -->
+          <div id="wpShareWrap" style="display:none">
+            <div style="font-size:11px;color:var(--muted);margin:14px 0 6px;letter-spacing:1px;text-transform:uppercase">Share this link with friends</div>
+            <div class="wp-share-row">
+              <input class="wp-share-input" id="wpShareInput" readonly>
+              <button class="wp-copy-btn" id="wpCopyBtn" onclick="copyWpLink()">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Embed -->
+      <div class="wp-embed-wrap" id="wpEmbedWrap">
+        <div class="wp-embed-placeholder">
+          <div class="wp-big-icon">🎌</div>
+          <p>Your Watch Party room<br>will appear here.<br><br>Search an anime, pick an episode,<br>then hit <strong>Create Watch Party</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
