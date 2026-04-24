@@ -414,7 +414,7 @@ footer a{color:var(--muted);text-decoration:none}
   <ul class="nav-tabs">
     <li><a href="#" class="active" onclick="closeAll(event)">Home</a></li>
     <li><a href="#" onclick="openWatchlist(event)">Watchlist</a></li>
-    <li><a href="/watchparty.html">Watch Party</a></li>
+    <li><a href="/w2g">Watch Party</a></li>
     <li><a href="#" onclick="openLegal(event)">Legal</a></li>
   </ul>
   <div class="nav-right">
@@ -832,7 +832,7 @@ async function openInfo(item){
   wpInfoBtn.id='infoWpBtn';
   wpInfoBtn.className='wp-info-btn';
   wpInfoBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Watch Party`;
-  wpInfoBtn.onclick=()=>{closeInfo();window.location.href='/watchparty.html?mal='+item.mal_id+'&title='+encodeURIComponent(item.title_english||item.title||'');};
+  wpInfoBtn.onclick=()=>{closeInfo();window.location.href='/w2g?mal='+item.mal_id+'&title='+encodeURIComponent(item.title_english||item.title||'');};
   document.querySelector('.info-actions').appendChild(wpInfoBtn);
   // Watchlist button in info modal
   const existingWlBtn=document.getElementById('infoWlBtn');
