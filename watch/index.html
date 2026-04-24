@@ -133,9 +133,10 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
 @media(max-width:900px){
-  .watch-layout{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .page{padding:1rem}
+  .hamburger{display:flex;margin-left:auto}
+  .nav-right{gap:8px;justify-content:flex-end}
+  .w2g-nav-btn{display:none}
+  .nav-user{display:none}
 }
 @media(max-width:600px){
   nav{padding:0 1rem}
@@ -195,12 +196,13 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
-  <div class="mm-profile">
-    <img id="mmAvatar" src="https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50" alt="">
-    <div>
+  <div class="mm-profile" style="display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:0.5px solid rgba(255,255,255,0.07)">
+    <img id="mmAvatar" src="https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0">
+    <div style="flex:1;min-width:0">
       <div class="mm-profile-name" id="mmName">Guest</div>
       <div class="mm-profile-sub" id="mmSub">Not signed in</div>
     </div>
+    <div id="mmProfileAction" style="flex-shrink:0"></div>
   </div>
   <div class="mm-links">
     <a class="mm-link" href="https://anicast.watch" onclick="closeMobileMenu()">
@@ -689,19 +691,23 @@ function closeMobileMenu(){
   document.body.style.overflow='';
 }
 function updateMobileUser(user){
+  const avEl=document.getElementById('mmAvatar');
+  const nmEl=document.getElementById('mmName');
+  const sbEl=document.getElementById('mmSub');
+  const actionEl=document.getElementById('mmProfileAction');
+  if(!avEl) return;
   if(!user){
-    document.getElementById('mmAvatar').src='https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50';
-    document.getElementById('mmName').textContent='Guest';
-    document.getElementById('mmSub').textContent='Not signed in';
-    document.getElementById('mmAuthLink').innerHTML=`<a class="mm-link" href="https://anicast.watch" style="color:var(--accent)">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Sign In
-    </a>`;
+    avEl.src='https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50';
+    nmEl.textContent='Guest';
+    sbEl.textContent='Not signed in';
+    if(actionEl) actionEl.innerHTML=
+      `<a href="https://anicast.watch" style="background:var(--accent);color:#fff;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Sign In</a>`;
   } else {
-    document.getElementById('mmAvatar').src=getAvatarUrl(user);
-    document.getElementById('mmName').textContent=getDisplayName(user);
-    document.getElementById('mmSub').textContent=user.email||'';
-    document.getElementById('mmAuthLink').innerHTML='';
+    avEl.src=getAvatarUrl(user);
+    nmEl.textContent=getDisplayName(user);
+    sbEl.textContent=user.email||'';
+    if(actionEl) actionEl.innerHTML=
+      `<a href="https://anicast.watch" title="Settings" style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>`;
   }
 }
 
