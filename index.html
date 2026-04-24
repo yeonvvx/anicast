@@ -545,29 +545,7 @@ footer a{color:var(--muted);text-decoration:none}
         </div>
       </div>
     </div>
-    <!-- COMMENTS -->
-    <div class="comments-section" id="commentsSection" style="padding:0 28px 28px">
-      <div class="comments-header">
-        <div class="comments-title">COMMENTS <span id="commentsEpLabel" style="color:var(--accent);font-size:14px"></span></div>
-        <div class="comments-ep-tabs" id="commentsEpTabs"></div>
-      </div>
-      <div class="comment-input-wrap" id="commentInputWrap">
-        <img class="comment-input-avatar" id="commentUserAvatar" src="" alt="">
-        <div class="comment-input-box">
-          <textarea class="comment-textarea" id="commentTextarea" placeholder="Share your thoughts about this episode…" rows="3"></textarea>
-          <div class="comment-submit-row">
-            <button class="comment-submit" id="commentSubmitBtn" onclick="submitComment()">Post Comment</button>
-          </div>
-        </div>
-      </div>
-      <div class="comment-sign-in" id="commentSignIn" style="display:none">
-        <a onclick="openAuth()">Sign in</a> to leave a comment.
-      </div>
-      <div id="commentsList" class="comments-list">
-        <div class="comments-loading">Loading comments…</div>
-      </div>
-      <button class="comments-load-more" id="commentsLoadMore" style="display:none" onclick="loadMoreComments()">Load more comments</button>
-    </div>
+
   </div>
 </div>
 
@@ -900,9 +878,6 @@ async function openInfo(item){
   document.getElementById('nextEpPanel').style.display='none';
   document.getElementById('infoModal').classList.add('open');
   document.body.style.overflow='hidden';
-
-  // Load comments
-  initComments(item.mal_id, item.episodes||0);
 
   const isAiring=status.toLowerCase().includes('airing')||status.toLowerCase().includes('currently');
 
