@@ -1706,21 +1706,12 @@ async function createWatchParty(){
   try{
     // Route through CORS proxy since W2G blocks direct browser requests
     const W2G_KEY='x304r5ccqia9dy4dfp4v5oqkr0vlkp1yx6orzp4tk2sohkyyd0t64hegai6bdrrw';
-    // Try multiple CORS proxies for W2G POST
-    const W2G_URL = 'https://api.w2g.tv/rooms/create.json';
-    const W2G_PROXIES = [
-      'https://proxy.cors.sh/' + W2G_URL,
-      'https://corsproxy.io/?' + encodeURIComponent(W2G_URL),
-      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(W2G_URL),
-    ];
-    let w2gResp = null;
-    for(const W2G_ENDPOINT of W2G_PROXIES){
-      try{
-        const tr = await fetch(W2G_ENDPOINT,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({w2g_api_key:W2G_KEY,share:streamUrl,bg_color:'08080e',bg_opacity:'100'})});
-        if(tr.ok){ w2gResp = tr; break; }
-      }catch{}
-    }
-    const r = w2gResp;
+    // Use Cloudflare Worker proxy
+    const r = await fetch('https://raspy-union-db25.yeonixsites.workers.dev', {
+      method:'POST',
+      headers:{'Accept':'application/json','Content-Type':'application/json'},
+      body:JSON.stringify({w2g_api_key:W2G_KEY,share:streamUrl,bg_color:'08080e',bg_opacity:'100'})
+    });
 
     if(!r.ok) throw new Error('Server error '+r.status);
     const data=await r.json();
