@@ -820,6 +820,11 @@ async function fetchHeroBanner(i){
 
 async function fetchAniListBanner(malId){
   if(!malId) return null;
+  // Check localStorage cache first — avoids re-fetching and rate limits
+  try{
+    const cached=localStorage.getItem('al_banner_'+malId);
+    if(cached) return JSON.parse(cached);
+  }catch(e){}
   const query=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge large}}}`;
   try{
     const r=await fetch('https://raspy-union-db25.yeonixsites.workers.dev?target=anilist',{
@@ -831,10 +836,13 @@ async function fetchAniListBanner(malId){
       const d=await r.json();
       const m=d?.data?.Media;
       if(m){
-        return {
+        const result={
           banner: m.bannerImage||null,
           cover: m.coverImage?.extraLarge||m.coverImage?.large||null
         };
+        // Cache for 7 days
+        try{ localStorage.setItem('al_banner_'+malId, JSON.stringify(result)); }catch(e){}
+        return result;
       }
     }
   }catch(e){}
@@ -1373,10 +1381,9 @@ async function init(){
 
   // Fetch HD AniList banner for first item BEFORE displaying hero to avoid blurry fallback
   if(heroItems.length){
-    resetHeroTimer();
-    // Fetch first banner before showing hero — avoids MAL image flash
+    // Fetch only the first banner, others load on demand when user navigates
     fetchHeroBanner(0).then(()=>setHero(heroItems[0]));
-    heroItems.slice(1,5).forEach((_,j)=>setTimeout(()=>fetchHeroBanner(j+1),(j+1)*4000));
+    resetHeroTimer();
   }
 
   await sleep(400);
