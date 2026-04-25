@@ -100,7 +100,7 @@ nav{
 .ep-section{
   margin-top:12px;background:var(--bg2);
   border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;
-  overflow:hidden;       /* contain the scrollable ep-grid */
+  overflow:hidden;
   min-width:0;
 }
 .ep-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:nowrap}
@@ -108,7 +108,6 @@ nav{
 .lang-toggle{display:flex;border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;overflow:hidden;flex-shrink:0;margin-left:auto}
 .lang-btn{padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;background:none;border:none;color:var(--muted);font-family:inherit;transition:all 0.2s}
 .lang-btn.active{background:var(--accent);color:#fff}
-/* Always single scrollable row — never wraps */
 .ep-grid{
   display:flex;flex-wrap:nowrap;gap:5px;
   overflow-x:auto;overflow-y:hidden;
@@ -164,6 +163,18 @@ nav{
 .ep-pill:hover{background:rgba(255,255,255,0.13);color:var(--text)}
 .ep-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
+/* ─── EP COUNT LOADING ─── */
+.ep-count-status{
+  font-size:11px;color:var(--muted);padding:4px 0 8px;
+  display:flex;align-items:center;gap:6px;
+}
+.ep-count-status.hidden{display:none}
+.ep-count-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:pulse 1s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+
 /* ─── ANIME INFO ─── */
 .anime-info{
   margin-top:12px;background:var(--bg2);
@@ -194,7 +205,6 @@ nav{
 .sidebar-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
 
 /* ─── COMMENTS ─── */
-/* Only 2 pills now: General + current episode */
 .cep-bar{display:flex;gap:6px;margin-bottom:14px}
 .cep-pill{
   padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;
@@ -269,10 +279,8 @@ nav{
   .page{padding:1rem 1.25rem 3rem}
 }
 
-/* ── MOBILE (≤ 768px) — covers all phones including large ones ── */
+/* ── MOBILE (≤ 768px) ── */
 @media(max-width:768px){
-
-  /* Nav: logo + title + hamburger only */
   nav{padding:0 0.75rem;gap:0}
   .nav-sep{display:none!important}
   .nav-back{display:none!important}
@@ -281,10 +289,8 @@ nav{
   .nav-user{display:none!important}
   .hamburger{display:flex!important;margin-left:auto}
 
-  /* Page: zero side padding, strict no overflow */
   .page{padding:0 0 2rem;overflow-x:hidden}
 
-  /* Player: 16:9 but capped so it doesn't dominate */
   .player-frame{
     border-radius:0;
     aspect-ratio:unset;
@@ -294,25 +300,21 @@ nav{
     position:relative;
   }
 
-  /* Give everything below player 12px side padding */
   .ep-section,
   .anime-info,
   .sidebar-card{
     margin-left:10px;
     margin-right:10px;
-    /* CRITICAL: constrain width so inner scroll doesn't escape */
     width:calc(100% - 20px);
     box-sizing:border-box;
   }
   .sidebar{margin:0 10px;width:calc(100% - 20px)}
 
-  /* Episode section */
   .ep-section{margin-top:10px;padding:10px 12px}
   .ep-section-head{margin-bottom:8px}
   .ep-section-title{font-size:12px;letter-spacing:1.5px}
   #epCurrentLabel{display:none}
 
-  /* ep-pill: shrink:0 so they don't collapse */
   .ep-pill{
     flex-shrink:0;
     min-width:34px;
@@ -321,11 +323,9 @@ nav{
     font-size:12px;
   }
 
-  /* Season dropdown full width on mobile */
   .season-dropdown-wrap{width:100%;margin-bottom:8px}
   .season-dropdown-btn{width:100%;min-width:unset}
 
-  /* Anime info */
   .anime-info{margin-top:10px;padding:12px 14px}
   .anime-info-inner{gap:12px;align-items:flex-start}
   .anime-poster{width:60px;height:90px;border-radius:5px}
@@ -334,12 +334,10 @@ nav{
   .anime-actions{gap:6px;margin-top:10px}
   .btn-sm{padding:6px 12px;font-size:11px}
 
-  /* Comments */
   .sidebar-card{margin-top:10px;padding:14px}
   .cep-bar{gap:8px}
   .cep-pill{font-size:12px;padding:6px 16px}
 
-  /* Related — horizontal scroll strip */
   .sidebar{margin-top:10px}
   #relatedList{
     display:flex;
@@ -471,6 +469,11 @@ nav{
           </button>
           <div class="season-dropdown-menu" id="seasonDropdownMenu"></div>
         </div>
+        <!-- Episode count loading status -->
+        <div class="ep-count-status hidden" id="epCountStatus">
+          <div class="ep-count-dot"></div>
+          <span id="epCountText">Fetching episodes…</span>
+        </div>
         <div class="ep-grid" id="epGrid">
           <div class="skel" style="width:100%;height:36px"></div>
         </div>
@@ -491,7 +494,6 @@ nav{
       <!-- Comments -->
       <div class="sidebar-card" style="margin-top:12px">
         <div class="sidebar-title">COMMENTS</div>
-        <!-- Only 2 pills: General + current episode (built by JS) -->
         <div class="cep-bar" id="commentEpBar"></div>
         <div id="commentInputArea">
           <div class="comment-sign-in" id="commentSignIn">
@@ -527,6 +529,9 @@ let animeData=null;
 let commentEp=0, commentOffset=0;
 const PER_PAGE=20;
 let likedComments=new Set();
+
+// Cache resolved episode counts so we don't re-fetch on language switch
+const epCountCache={};
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
@@ -590,9 +595,9 @@ async function init(){
   if(data?.data){
     animeData=data.data;
     renderAnimeInfo(animeData);
-    buildEpGrid(animeData.episodes||1);
-    loadSeasons(); // async — loads season tabs in background
-    // Build comment bar AFTER we know currentEp
+    // ↓ now async — fetches real episode count for long-running anime
+    await buildEpGrid(animeData.episodes);
+    loadSeasons(); // async in background
     buildCommentEpBar();
     loadRelated(animeData.genres?.[0]?.mal_id, malId);
     document.title=`${animeData.title_english||animeData.title||'Watch'} — AniCast`;
@@ -632,7 +637,6 @@ function loadPlayer(mal,ep,lang){
     },80);
   }
 
-  // Update comment ep bar to reflect new episode
   buildCommentEpBar();
 }
 
@@ -643,23 +647,60 @@ function setLang(lang){
   loadPlayer(malId,currentEp,lang);
 }
 
-/* ── SEASONS & EPISODES ──
-   Strategy:
-   1. Fetch /anime/{id}/relations to find sequel/prequel seasons (separate MAL entries)
-   2. Group current anime's episodes into chunks of 12 as "part" tabs within this season
-   3. Season tabs = actual separate seasons from relations
-   4. Part tabs = sub-groups of 12 within the current entry's episodes
-*/
+/* ══════════════════════════════════════════════
+   EPISODE COUNT — handles airing / long anime
+   (e.g. One Piece returns episodes: null from Jikan)
+   ══════════════════════════════════════════════ */
 
-let seasons=[];       // [{label, malId, epOffset}] — separate MAL entries
-let currentSeason=0;  // index into seasons[] (0 = current entry)
-let epChunks=[];      // [[1..12],[13..24],...] for current season
+/**
+ * Fetches the real episode count by paginating /anime/{id}/episodes.
+ * Shows a subtle loading indicator while doing so.
+ * Results are cached per malId so switching language is instant.
+ */
+async function fetchActualEpisodeCount(id){
+  const cacheKey=String(id);
+  if(epCountCache[cacheKey]) return epCountCache[cacheKey];
+
+  const statusEl=document.getElementById('epCountStatus');
+  const textEl=document.getElementById('epCountText');
+  if(statusEl) statusEl.classList.remove('hidden');
+
+  let page=1, highestEp=1, hasNext=true;
+
+  while(hasNext){
+    if(textEl) textEl.textContent=`Fetching episodes… (page ${page})`;
+    const data=await jikan(`/anime/${id}/episodes`,{page});
+    const eps=data?.data||[];
+    if(!eps.length) break;
+
+    // episode number is in mal_id field
+    const nums=eps.map(e=>e.mal_id).filter(n=>Number.isFinite(n)&&n>0);
+    if(nums.length) highestEp=Math.max(highestEp,...nums);
+
+    hasNext=data?.pagination?.has_next_page===true;
+    page++;
+
+    // Safety cap — 150 pages = up to 15,000 episodes, more than enough
+    if(page>150) break;
+
+    // Small delay on later pages to be polite to the API
+    if(page>3) await sleep(300);
+  }
+
+  if(statusEl) statusEl.classList.add('hidden');
+  epCountCache[cacheKey]=highestEp;
+  return highestEp;
+}
+
+/* ── SEASONS & EPISODES ── */
+let seasons=[];
+let currentSeason=0;
+let epChunks=[];
 let currentChunk=0;
 
 async function loadSeasons(){
   const rel=await jikan('/anime/'+malId+'/relations');
   const entries=rel?.data||[];
-  // Collect Sequel/Prequel TV entries
   const related=[];
   for(const r of entries){
     const type=r.relation;
@@ -668,25 +709,20 @@ async function loadSeasons(){
       if(e.type==='anime') related.push({label:'',malId:e.mal_id,relation:type});
     }
   }
-  // Fetch titles for related entries (batch, max 4 to avoid rate limiting)
   const toFetch=related.slice(0,4);
   const fetched=await Promise.all(toFetch.map(async r=>{
     const d=await jikan('/anime/'+r.malId);
     return{...r,label:d?.data?.title_english||d?.data?.title||'Season',episodes:d?.data?.episodes||0,year:d?.data?.year};
   }));
 
-  // Build seasons array: figure out order by year or relation
-  // Start: current anime as S1 (or just label it by title chunk)
   const currentTitle=animeData.title_english||animeData.title||'';
   const allSeasons=[
     {label:currentTitle,malId:parseInt(malId),episodes:animeData.episodes||1,year:animeData.year,isCurrent:true},
     ...fetched.map(s=>({...s,isCurrent:false}))
   ].sort((a,b)=>(a.year||9999)-(b.year||9999));
 
-  // Number them S1, S2, S3...
   allSeasons.forEach((s,i)=>{ if(!s.label||s.label===currentTitle) s.label=`Season ${i+1}`; });
 
-  // Find current index
   currentSeason=allSeasons.findIndex(s=>s.malId==parseInt(malId));
   if(currentSeason<0) currentSeason=0;
   seasons=allSeasons;
@@ -704,9 +740,7 @@ function renderSeasonTabs(){
     wrap.style.display='none';
   } else {
     wrap.style.display='block';
-    // Set button label to current season
     label.textContent=seasons[currentSeason]?.label||'Season 1';
-    // Build menu options
     menu.innerHTML='';
     seasons.forEach((s,i)=>{
       const opt=document.createElement('button');
@@ -716,7 +750,7 @@ function renderSeasonTabs(){
       menu.appendChild(opt);
     });
   }
-  buildEpChunks(animeData.episodes||1);
+  // Don't rebuild ep chunks here — already built by buildEpGrid
 }
 
 function toggleSeasonDropdown(){
@@ -725,7 +759,6 @@ function toggleSeasonDropdown(){
   const isOpen=menu.classList.toggle('open');
   btn.classList.toggle('open',isOpen);
   if(isOpen){
-    // Close on outside click
     setTimeout(()=>document.addEventListener('click',outsideSeasonClick,{once:true}),0);
   }
 }
@@ -743,12 +776,11 @@ function switchSeason(idx){
   const s=seasons[idx];
   if(!s) return;
   currentSeason=idx;
-  // Update dropdown label + active option
   const label=document.getElementById('seasonDropdownLabel');
   if(label) label.textContent=s.label;
   document.querySelectorAll('.season-option').forEach((o,i)=>o.classList.toggle('active',i===idx));
   if(s.isCurrent){
-    buildEpChunks(animeData.episodes||1);
+    buildEpGrid(animeData.episodes);
   } else {
     window.location.href=`/watch?mal=${s.malId}&ep=1&lang=${currentLang}`;
   }
@@ -760,17 +792,31 @@ function buildEpChunks(total){
   for(let i=1;i<=total;i+=CHUNK){
     epChunks.push({start:i,end:Math.min(i+CHUNK-1,total)});
   }
-  // Find which chunk the current ep belongs to
   currentChunk=epChunks.findIndex(c=>currentEp>=c.start&&currentEp<=c.end);
   if(currentChunk<0) currentChunk=0;
-
-  // Render chunk selector above pills (only show if >1 chunk)
   renderChunkBar();
   renderEpPills(epChunks[currentChunk]);
 }
 
+/**
+ * Main entry point for building the episode grid.
+ * If animeData.episodes is null/0/1 (common for airing series),
+ * fetches the real count from the episodes endpoint first.
+ */
+async function buildEpGrid(totalFromAnime){
+  let total=totalFromAnime;
+
+  // Treat null, 0, or 1 as "possibly wrong" for long-running series
+  // A single-episode OVA genuinely has 1 ep, but we can't tell without checking.
+  // The episodes endpoint returns empty for specials/OVAs quickly, so the cost is low.
+  if(!total||total<=1){
+    total=await fetchActualEpisodeCount(malId);
+  }
+
+  buildEpChunks(total||1);
+}
+
 function renderChunkBar(){
-  // Inject chunk bar inside ep-section, before ep-grid
   let bar=document.getElementById('epChunkBar');
   if(!bar){
     bar=document.createElement('div');
@@ -809,11 +855,6 @@ function renderEpPills(chunk){
     const a=grid.querySelector('.ep-pill.active');
     if(a) a.scrollIntoView({block:'nearest',inline:'center'});
   },80);
-}
-
-function buildEpGrid(total){
-  // Legacy entry point — now delegates to chunk system
-  buildEpChunks(total);
 }
 
 function renderAnimeInfo(anime){
@@ -906,24 +947,18 @@ function updateMobileUser(user){
   }
 }
 
-/* ── COMMENTS ──
-   Bar shows only 2 pills:
-   1. "General" — episode 0 (series-wide)
-   2. "EP {n}" — the episode currently being watched
-*/
+/* ── COMMENTS ── */
 function buildCommentEpBar(){
   const bar=document.getElementById('commentEpBar');
   if(!bar) return;
   bar.innerHTML='';
 
-  // General pill
   const gen=document.createElement('button');
   gen.className='cep-pill'+(commentEp===0?' active':'');
   gen.textContent='General';
   gen.onclick=()=>switchCommentEp(0,gen);
   bar.appendChild(gen);
 
-  // Current episode pill (only if ep > 0)
   if(currentEp>0){
     const epBtn=document.createElement('button');
     epBtn.className='cep-pill'+(commentEp===currentEp?' active':'');
