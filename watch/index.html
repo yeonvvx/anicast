@@ -16,8 +16,8 @@
   --radius:8px;
   --nav-h:52px;
 }
-html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
@@ -81,8 +81,9 @@ nav{
 .mm-link svg{color:var(--muted);flex-shrink:0}
 
 /* ─── PAGE LAYOUT ─── */
-.page{max-width:1440px;margin:0 auto;padding:1.25rem 1.5rem 3rem}
-.watch-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+.page{max-width:1440px;margin:0 auto;padding:1.25rem 1.5rem 3rem;overflow-x:hidden}
+.watch-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;min-width:0}
+.watch-layout > *{min-width:0}
 
 /* ─── PLAYER ─── */
 .player-frame{
@@ -98,25 +99,28 @@ nav{
 /* ─── EPISODE STRIP ─── */
 .ep-section{
   margin-top:12px;background:var(--bg2);
-  border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px
+  border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;
+  overflow:hidden;       /* contain the scrollable ep-grid */
+  min-width:0;
 }
-.ep-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.ep-section-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--muted)}
-.lang-toggle{display:flex;border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;overflow:hidden}
+.ep-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:nowrap}
+.ep-section-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--muted);flex-shrink:0}
+.lang-toggle{display:flex;border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;overflow:hidden;flex-shrink:0;margin-left:auto}
 .lang-btn{padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;background:none;border:none;color:var(--muted);font-family:inherit;transition:all 0.2s}
 .lang-btn.active{background:var(--accent);color:#fff}
-/* Always single scrollable row — never wraps, never stacks */
+/* Always single scrollable row — never wraps */
 .ep-grid{
   display:flex;flex-wrap:nowrap;gap:5px;
   overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
   padding-bottom:3px;
+  min-width:0;width:100%;
 }
 .ep-grid::-webkit-scrollbar{display:none}
 
 /* ─── SEASON DROPDOWN ─── */
 .season-dropdown-wrap{
-  position:relative;display:inline-flex;margin-bottom:10px;
+  position:relative;display:inline-block;margin-bottom:10px;
 }
 .season-dropdown-btn{
   display:flex;align-items:center;gap:7px;
@@ -277,58 +281,52 @@ nav{
   .nav-user{display:none!important}
   .hamburger{display:flex!important;margin-left:auto}
 
-  /* Page: zero side padding for edge-to-edge player */
-  .page{padding:0 0 2rem}
+  /* Page: zero side padding, strict no overflow */
+  .page{padding:0 0 2rem;overflow-x:hidden}
 
-  /* Player: compact fixed height — not aspect-ratio (avoids giant box) */
+  /* Player: 16:9 but capped so it doesn't dominate */
   .player-frame{
     border-radius:0;
     aspect-ratio:unset;
     width:100%;
-    height:48vw;        /* ~180px on 375px, ~211px on 440px */
-    max-height:220px;   /* cap for large phones */
+    height:56vw;
+    max-height:240px;
     position:relative;
   }
 
-  /* Restore horizontal padding for everything below player */
+  /* Give everything below player 12px side padding */
   .ep-section,
   .anime-info,
-  .sidebar-card,
-  .sidebar{margin-left:0.75rem;margin-right:0.75rem}
+  .sidebar-card{
+    margin-left:10px;
+    margin-right:10px;
+    /* CRITICAL: constrain width so inner scroll doesn't escape */
+    width:calc(100% - 20px);
+    box-sizing:border-box;
+  }
+  .sidebar{margin:0 10px;width:calc(100% - 20px)}
 
   /* Episode section */
-  .ep-section{
-    margin-top:10px;
-    border-radius:8px;
-    padding:10px 12px;
-  }
-  /* Header row: title left, toggle right — no wrap */
-  .ep-section-head{
-    flex-wrap:nowrap;
-    align-items:center;
-    gap:8px;
-    margin-bottom:8px;
-  }
-  .ep-section-title{font-size:12px;letter-spacing:1.5px;flex-shrink:0}
-
-  /* SUB/DUB toggle — always visible, right-aligned */
-  .lang-toggle{flex-shrink:0;margin-left:auto}
-  .lang-btn{padding:5px 14px;font-size:11px}
-
-  /* Episode current label — hide on mobile to save space */
+  .ep-section{margin-top:10px;padding:10px 12px}
+  .ep-section-head{margin-bottom:8px}
+  .ep-section-title{font-size:12px;letter-spacing:1.5px}
   #epCurrentLabel{display:none}
 
-  /* Episode pills — always horizontal scroll, pills are flex-shrink:0 */
+  /* ep-pill: shrink:0 so they don't collapse */
   .ep-pill{
     flex-shrink:0;
-    min-width:36px;
+    min-width:34px;
     text-align:center;
     padding:6px 10px;
     font-size:12px;
   }
 
+  /* Season dropdown full width on mobile */
+  .season-dropdown-wrap{width:100%;margin-bottom:8px}
+  .season-dropdown-btn{width:100%;min-width:unset}
+
   /* Anime info */
-  .anime-info{margin-top:10px;padding:12px 14px;border-radius:8px}
+  .anime-info{margin-top:10px;padding:12px 14px}
   .anime-info-inner{gap:12px;align-items:flex-start}
   .anime-poster{width:60px;height:90px;border-radius:5px}
   .anime-title-main{font-size:17px;margin-bottom:5px}
@@ -337,12 +335,12 @@ nav{
   .btn-sm{padding:6px 12px;font-size:11px}
 
   /* Comments */
-  .sidebar-card{margin-top:10px;border-radius:8px;padding:14px}
+  .sidebar-card{margin-top:10px;padding:14px}
   .cep-bar{gap:8px}
   .cep-pill{font-size:12px;padding:6px 16px}
 
   /* Related — horizontal scroll strip */
-  .sidebar{display:block;margin-top:10px}
+  .sidebar{margin-top:10px}
   #relatedList{
     display:flex;
     flex-wrap:nowrap;
@@ -351,7 +349,6 @@ nav{
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
     padding-bottom:4px;
-    grid-template-columns:unset;
   }
   #relatedList::-webkit-scrollbar{display:none}
   .related-card{
@@ -706,7 +703,7 @@ function renderSeasonTabs(){
   if(seasons.length<=1){
     wrap.style.display='none';
   } else {
-    wrap.style.display='inline-flex';
+    wrap.style.display='block';
     // Set button label to current season
     label.textContent=seasons[currentSeason]?.label||'Season 1';
     // Build menu options
@@ -778,7 +775,7 @@ function renderChunkBar(){
   if(!bar){
     bar=document.createElement('div');
     bar.id='epChunkBar';
-    bar.style.cssText='display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;-webkit-overflow-scrolling:touch';
+    bar.style.cssText='display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;-webkit-overflow-scrolling:touch;min-width:0;width:100%';
     const grid=document.getElementById('epGrid');
     grid.parentNode.insertBefore(bar,grid);
   }
