@@ -396,7 +396,10 @@ async function init(){
 let currentServer = 1;
 
 function getPlayerUrl(mal, ep, lang, server){
-  if(server === 2) return `https://player.vidplus.to/embed/anime/${mal}/${ep}?dub=${lang==='dub'}`;
+  // Server 1: MegaPlay via MAL ID
+  if(server === 1) return `https://megaplay.buzz/stream/mal/${mal}/${ep}/${lang}`;
+  // Server 2: MegaPlay via AniList ID (different lookup, acts as fallback)
+  if(server === 2) return `https://megaplay.buzz/stream/ani/${mal}/${ep}/${lang}`;
   return `https://megaplay.buzz/stream/mal/${mal}/${ep}/${lang}`;
 }
 
