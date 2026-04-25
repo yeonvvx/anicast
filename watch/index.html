@@ -114,21 +114,44 @@ nav{
 }
 .ep-grid::-webkit-scrollbar{display:none}
 
-/* ─── SEASON TABS ─── */
-.season-tabs{
-  display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;
-  scrollbar-width:none;margin-bottom:10px;
-  -webkit-overflow-scrolling:touch;
+/* ─── SEASON DROPDOWN ─── */
+.season-dropdown-wrap{
+  position:relative;display:inline-flex;margin-bottom:10px;
 }
-.season-tabs::-webkit-scrollbar{display:none}
-.season-tab{
-  flex-shrink:0;padding:4px 12px;border-radius:5px;font-size:11px;font-weight:700;
-  background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);
-  color:var(--muted);cursor:pointer;font-family:inherit;transition:all 0.15s;
-  white-space:nowrap;
+.season-dropdown-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;
+  background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.14);
+  color:var(--text);cursor:pointer;font-family:inherit;transition:all 0.15s;
+  white-space:nowrap;min-width:120px;justify-content:space-between;
 }
-.season-tab:hover{background:rgba(255,255,255,0.12);color:var(--text)}
-.season-tab.active{background:rgba(230,57,70,0.18);border-color:rgba(230,57,70,0.4);color:var(--accent)}
+.season-dropdown-btn:hover{background:rgba(255,255,255,0.11);border-color:rgba(255,255,255,0.22)}
+.season-dropdown-btn.open{
+  background:rgba(255,255,255,0.09);
+  border-color:rgba(230,57,70,0.5);
+  color:var(--accent);
+}
+.season-dropdown-btn svg{flex-shrink:0;transition:transform 0.2s}
+.season-dropdown-btn.open svg{transform:rotate(180deg)}
+.season-dropdown-menu{
+  position:absolute;top:calc(100% + 5px);left:0;z-index:200;
+  background:var(--bg3);border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:8px;overflow:hidden;min-width:100%;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  opacity:0;pointer-events:none;transform:translateY(-4px);
+  transition:opacity 0.15s,transform 0.15s;
+}
+.season-dropdown-menu.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.season-option{
+  display:block;width:100%;padding:9px 14px;text-align:left;
+  font-size:12px;font-weight:600;font-family:inherit;
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  transition:background 0.12s,color 0.12s;white-space:nowrap;
+  border-bottom:0.5px solid rgba(255,255,255,0.05);
+}
+.season-option:last-child{border-bottom:none}
+.season-option:hover{background:rgba(255,255,255,0.07);color:var(--text)}
+.season-option.active{color:var(--accent);background:var(--accent-dim)}
 .ep-pill{
   padding:5px 10px;border-radius:5px;font-size:12px;font-weight:600;
   background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.1);
@@ -443,8 +466,14 @@ nav{
             </div>
           </div>
         </div>
-        <!-- Season tabs (hidden until populated) -->
-        <div class="season-tabs" id="seasonTabs" style="display:none"></div>
+        <!-- Season dropdown (hidden until populated) -->
+        <div class="season-dropdown-wrap" id="seasonDropdownWrap" style="display:none">
+          <button class="season-dropdown-btn" id="seasonDropdownBtn" onclick="toggleSeasonDropdown()">
+            <span id="seasonDropdownLabel">Season 1</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="season-dropdown-menu" id="seasonDropdownMenu"></div>
+        </div>
         <div class="ep-grid" id="epGrid">
           <div class="skel" style="width:100%;height:36px"></div>
         </div>
@@ -669,37 +698,61 @@ async function loadSeasons(){
 }
 
 function renderSeasonTabs(){
-  const container=document.getElementById('seasonTabs');
-  if(!container) return;
+  const wrap=document.getElementById('seasonDropdownWrap');
+  const menu=document.getElementById('seasonDropdownMenu');
+  const label=document.getElementById('seasonDropdownLabel');
+  if(!wrap||!menu||!label) return;
+
   if(seasons.length<=1){
-    // Only 1 season — hide tabs, just show episode chunks if needed
-    container.style.display='none';
+    wrap.style.display='none';
   } else {
-    container.style.display='flex';
-    container.innerHTML='';
+    wrap.style.display='inline-flex';
+    // Set button label to current season
+    label.textContent=seasons[currentSeason]?.label||'Season 1';
+    // Build menu options
+    menu.innerHTML='';
     seasons.forEach((s,i)=>{
-      const btn=document.createElement('button');
-      btn.className='season-tab'+(i===currentSeason?' active':'');
-      btn.textContent=s.label;
-      btn.onclick=()=>switchSeason(i);
-      container.appendChild(btn);
+      const opt=document.createElement('button');
+      opt.className='season-option'+(i===currentSeason?' active':'');
+      opt.textContent=s.label;
+      opt.onclick=()=>{ closeSeasonDropdown(); switchSeason(i); };
+      menu.appendChild(opt);
     });
   }
-  // Build episode chunks for the current season's episode count
   buildEpChunks(animeData.episodes||1);
+}
+
+function toggleSeasonDropdown(){
+  const btn=document.getElementById('seasonDropdownBtn');
+  const menu=document.getElementById('seasonDropdownMenu');
+  const isOpen=menu.classList.toggle('open');
+  btn.classList.toggle('open',isOpen);
+  if(isOpen){
+    // Close on outside click
+    setTimeout(()=>document.addEventListener('click',outsideSeasonClick,{once:true}),0);
+  }
+}
+function closeSeasonDropdown(){
+  document.getElementById('seasonDropdownBtn')?.classList.remove('open');
+  document.getElementById('seasonDropdownMenu')?.classList.remove('open');
+}
+function outsideSeasonClick(e){
+  if(!document.getElementById('seasonDropdownWrap')?.contains(e.target)){
+    closeSeasonDropdown();
+  }
 }
 
 function switchSeason(idx){
   const s=seasons[idx];
   if(!s) return;
   currentSeason=idx;
-  // Update tab active state
-  document.querySelectorAll('.season-tab').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  // Update dropdown label + active option
+  const label=document.getElementById('seasonDropdownLabel');
+  if(label) label.textContent=s.label;
+  document.querySelectorAll('.season-option').forEach((o,i)=>o.classList.toggle('active',i===idx));
   if(s.isCurrent){
-    // Already on this MAL entry — just re-render ep grid
     buildEpChunks(animeData.episodes||1);
   } else {
-    // Navigate to different MAL entry
     window.location.href=`/watch?mal=${s.malId}&ep=1&lang=${currentLang}`;
   }
 }
