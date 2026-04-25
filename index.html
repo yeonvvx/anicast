@@ -1046,11 +1046,11 @@ function updateHeroDots(){
   heroItems.forEach((_,i)=>{
     const el=document.createElement('div');
     el.className='hdot'+(i===heroIdx?' active':'');
-    el.onclick=()=>{heroIdx=i;setHero(heroItems[i]);resetHeroTimer();};
+    el.onclick=()=>{heroIdx=i;setHero(heroItems[i]);resetHeroTimer();fetchHeroBanner(i);};
     d.appendChild(el);
   });
 }
-function nextHero(){if(!heroItems.length)return;heroIdx=(heroIdx+1)%heroItems.length;setHero(heroItems[heroIdx]);}
+function nextHero(){if(!heroItems.length)return;heroIdx=(heroIdx+1)%heroItems.length;setHero(heroItems[heroIdx]);fetchHeroBanner(heroIdx);}
 function resetHeroTimer(){clearInterval(heroTimer);heroTimer=setInterval(nextHero,6000);}
 
 /* ─────────────────────────────────────────────────
@@ -1360,18 +1360,21 @@ async function init(){
   // Fetch HD AniList banner for first item BEFORE displaying hero to avoid blurry fallback
   if(heroItems.length){ setHero(heroItems[0]); resetHeroTimer(); }
 
-  // Fetch HD banners from AniList — only first 5, staggered 2s apart to avoid 429
-  heroItems.slice(0,5).forEach((item,i)=>{
-    setTimeout(async()=>{
-      const banner=await fetchAniListBanner(item.mal_id);
-      if(banner){
-        heroItems[i]._banner=banner;
-        const preload=new Image();
-        preload.src=banner;
-        preload.onload=()=>{ if(i===heroIdx) setHero(heroItems[i]); };
-      }
-    }, i*2000);
-  });
+  // Fetch banner for first hero immediately, then others lazily on a long stagger
+  async function fetchHeroBanner(i){
+    if(!heroItems[i]||heroItems[i]._banner||heroItems[i]._bannerFetched) return;
+    heroItems[i]._bannerFetched=true;
+    const banner=await fetchAniListBanner(heroItems[i].mal_id);
+    if(banner){
+      heroItems[i]._banner=banner;
+      const preload=new Image();
+      preload.src=banner;
+      preload.onload=()=>{ if(i===heroIdx) setHero(heroItems[i]); };
+    }
+  }
+  // Fetch first one immediately, rest staggered every 4 seconds
+  fetchHeroBanner(0);
+  heroItems.slice(1,5).forEach((_,j)=>setTimeout(()=>fetchHeroBanner(j+1),(j+1)*4000));
 
   await sleep(400);
   const trendResp=await jikan('/top/anime',{limit:20,filter:'bypopularity'});
