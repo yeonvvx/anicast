@@ -815,12 +815,13 @@ async function fetchAniListBanner(malId){
     });
     if(r.ok){
       const d=await r.json();
+      console.log('[Banner] raw response:',JSON.stringify(d).slice(0,300));
       const m=d?.data?.Media;
       const banner=m?.bannerImage||m?.coverImage?.extraLarge||null;
-      console.log('[Banner] malId:',malId,'banner:',banner);
       if(banner) return banner;
     } else {
-      console.warn('[Banner] Worker returned',r.status);
+      const txt=await r.text();
+      console.warn('[Banner] Worker returned',r.status, txt);
     }
   }catch(e){ console.warn('[Banner] Error:',e.message); }
   return null;
