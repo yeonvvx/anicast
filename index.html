@@ -484,7 +484,7 @@ footer a{color:var(--muted);text-decoration:none}
 <body>
 
 <nav>
-  <a href="#" class="nav-logo-img"><img src="https://raw.githubusercontent.com/yeonvvx/AniCastImages/main/Logo/AniCast.png" alt="AniCast" height="32" style="display:block;height:32px;width:auto;object-fit:contain"></a>
+  <a href="#" class="nav-logo-img" style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;text-decoration:none;margin-right:2rem;flex-shrink:0"><span style="color:#f0f0f8">ANI</span><span style="color:var(--accent)">CAST</span></a>
   <ul class="nav-tabs">
     <li><a href="#" class="active" onclick="closeAll(event)">Home</a></li>
     <li><a href="#" onclick="openWatchlist(event)">Watchlist</a></li>
@@ -1360,8 +1360,8 @@ async function init(){
   // Fetch HD AniList banner for first item BEFORE displaying hero to avoid blurry fallback
   if(heroItems.length){ setHero(heroItems[0]); resetHeroTimer(); }
 
-  // Fetch HD banners from AniList via Worker proxy — stagger to be polite
-  heroItems.forEach((item,i)=>{
+  // Fetch HD banners from AniList — only first 5, staggered 2s apart to avoid 429
+  heroItems.slice(0,5).forEach((item,i)=>{
     setTimeout(async()=>{
       const banner=await fetchAniListBanner(item.mal_id);
       if(banner){
@@ -1370,7 +1370,7 @@ async function init(){
         preload.src=banner;
         preload.onload=()=>{ if(i===heroIdx) setHero(heroItems[i]); };
       }
-    }, i*500);
+    }, i*2000);
   });
 
   await sleep(400);
