@@ -238,82 +238,91 @@ nav{
 /* ── PHONE ── */
 @media(max-width:600px){
 
-  /* Nav: compact */
-  nav{padding:0 0.75rem;gap:6px}
-  .nav-sep{display:none}
-  .nav-back{display:none}              /* hide "Browse" text on phone — logo is enough */
-  .nav-title{font-size:12px}
-  .w2g-nav-btn{display:none}
-  .nav-user{display:none}
-  .hamburger{display:flex;margin-left:auto}
+  /* Nav: logo only + title + hamburger */
+  nav{padding:0 0.75rem;gap:0}
+  .nav-sep{display:none!important}
+  .nav-back{display:none!important}
+  .nav-title{font-size:12px;margin-left:8px}
+  .w2g-nav-btn{display:none!important}
+  .nav-user{display:none!important}
+  .hamburger{display:flex!important;margin-left:auto}
 
-  /* Page: zero side padding so player is full-bleed */
+  /* Page: zero side padding so player is edge-to-edge */
   .page{padding:0 0 2rem}
 
-  /* Player: sticky below nav so it doesn't scroll away */
+  /* Player: normal flow (NOT sticky), edge-to-edge, fixed height so it
+     doesn't blow up. 56vw gives ~211px on a 375px phone — compact & watchable.
+     Use height instead of aspect-ratio to prevent the giant-box issue. */
   .player-frame{
     border-radius:0;
-    position:sticky;
-    top:var(--nav-h);
-    z-index:50;
-    /* Slightly taller than 16/9 on very small screens */
-    aspect-ratio:16/9;
+    position:relative;         /* NOT sticky — causes layout bugs on iOS */
+    aspect-ratio:unset;
+    width:100%;
+    height:56vw;               /* ~211px on 375px phone, ~246px on 440px */
+    max-height:260px;          /* cap for large phones in landscape */
   }
 
-  /* Content below player gets normal padding */
+  /* Content below player — restore horizontal padding */
   .ep-section,
   .anime-info,
   .sidebar-card{margin-left:0.75rem;margin-right:0.75rem}
 
-  /* Episode strip — compact scrollable row instead of wrapping grid */
+  /* Episode section */
   .ep-section{
     margin-top:10px;
     border-radius:8px;
     padding:10px 12px;
   }
-  .ep-section-head{margin-bottom:8px}
+  .ep-section-head{
+    margin-bottom:8px;
+    /* Stack title and lang toggle vertically on very small screens */
+    flex-wrap:nowrap;
+    gap:6px;
+  }
   .ep-section-title{font-size:12px;letter-spacing:1.5px}
+
+  /* Episode pills — single horizontal scroll row */
   .ep-grid{
     display:flex;
-    flex-wrap:nowrap;      /* single horizontal scrollable row */
+    flex-wrap:nowrap;
     overflow-x:auto;
     overflow-y:hidden;
     max-height:none;
     gap:5px;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
-    padding-bottom:2px;
+    padding-bottom:3px;
   }
   .ep-grid::-webkit-scrollbar{display:none}
   .ep-pill{
     flex-shrink:0;
-    min-width:38px;
+    min-width:36px;
     text-align:center;
-    padding:6px 10px;
+    padding:6px 9px;
     font-size:12px;
   }
 
-  /* Anime info — poster on left, text on right (stays horizontal) */
+  /* Anime info */
   .anime-info{
     margin-top:10px;
-    padding:14px;
+    padding:12px 14px;
     border-radius:8px;
   }
-  .anime-info-inner{gap:12px}
-  .anime-poster{width:64px;height:96px}
-  .anime-title-main{font-size:18px;margin-bottom:6px}
-  .anime-synopsis{-webkit-line-clamp:3}
-  .anime-actions{gap:6px}
+  .anime-info-inner{gap:12px;align-items:flex-start}
+  .anime-poster{width:60px;height:90px;border-radius:5px}
+  .anime-title-main{font-size:17px;margin-bottom:5px}
+  .anime-synopsis{-webkit-line-clamp:3;font-size:12px}
+  .anime-actions{gap:6px;margin-top:10px}
   .btn-sm{padding:6px 12px;font-size:11px}
 
-  /* Comments */
+  /* Comments card */
   .sidebar-card{
     margin-top:10px;
     border-radius:8px;
     padding:14px;
   }
 
-  /* Related — horizontal scroll strip on phone */
+  /* Related — horizontal scroll strip */
   .sidebar{display:block;margin:0 0.75rem}
   #relatedList{
     display:flex;
@@ -328,7 +337,7 @@ nav{
   .related-card{
     flex-direction:column;
     flex-shrink:0;
-    width:130px;
+    width:120px;
     border-bottom:none;
     background:var(--bg2);
     border:0.5px solid rgba(255,255,255,0.07);
@@ -336,8 +345,8 @@ nav{
     overflow:hidden;
     padding:0;
   }
-  .related-poster{width:130px;height:90px;border-radius:0}
-  .related-card > div{padding:7px 8px 8px}
+  .related-poster{width:120px;height:80px;border-radius:0}
+  .related-card > div{padding:6px 8px 8px}
   .related-title{font-size:11px;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
   .related-meta{font-size:10px}
 }
