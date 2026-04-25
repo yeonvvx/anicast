@@ -804,6 +804,18 @@ async function anilistQuery(query, variables){
   }catch(e){ return null; }
 }
 
+async function fetchHeroBanner(i){
+  if(!heroItems[i]||heroItems[i]._banner||heroItems[i]._bannerFetched) return;
+  heroItems[i]._bannerFetched=true;
+  const banner=await fetchAniListBanner(heroItems[i].mal_id);
+  if(banner){
+    heroItems[i]._banner=banner;
+    const preload=new Image();
+    preload.src=banner;
+    preload.onload=()=>{ if(i===heroIdx) setHero(heroItems[i]); };
+  }
+}
+
 async function fetchAniListBanner(malId){
   if(!malId) return null;
   const query=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge}}}`;
@@ -815,13 +827,11 @@ async function fetchAniListBanner(malId){
     });
     if(r.ok){
       const d=await r.json();
-      console.log('[Banner] raw response:',JSON.stringify(d).slice(0,300));
       const m=d?.data?.Media;
       const banner=m?.bannerImage||m?.coverImage?.extraLarge||null;
       if(banner) return banner;
     } else {
-      const txt=await r.text();
-      console.warn('[Banner] Worker returned',r.status, txt);
+
     }
   }catch(e){ console.warn('[Banner] Error:',e.message); }
   return null;
@@ -1360,19 +1370,7 @@ async function init(){
   // Fetch HD AniList banner for first item BEFORE displaying hero to avoid blurry fallback
   if(heroItems.length){ setHero(heroItems[0]); resetHeroTimer(); }
 
-  // Fetch banner for first hero immediately, then others lazily on a long stagger
-  async function fetchHeroBanner(i){
-    if(!heroItems[i]||heroItems[i]._banner||heroItems[i]._bannerFetched) return;
-    heroItems[i]._bannerFetched=true;
-    const banner=await fetchAniListBanner(heroItems[i].mal_id);
-    if(banner){
-      heroItems[i]._banner=banner;
-      const preload=new Image();
-      preload.src=banner;
-      preload.onload=()=>{ if(i===heroIdx) setHero(heroItems[i]); };
-    }
-  }
-  // Fetch first one immediately, rest staggered every 4 seconds
+  // Fetch first banner immediately, rest staggered every 4 seconds
   fetchHeroBanner(0);
   heroItems.slice(1,5).forEach((_,j)=>setTimeout(()=>fetchHeroBanner(j+1),(j+1)*4000));
 
