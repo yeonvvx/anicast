@@ -255,6 +255,12 @@ nav{
 .related-title{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:3px}
 .related-meta{font-size:10px;color:var(--muted)}
 
+/* ─── CHUNK BAR BUTTONS (JS-generated) ─── */
+.chunk-btn{
+  flex-shrink:0;padding:3px 10px;border-radius:5px;font-size:11px;
+  font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all 0.15s;
+}
+
 /* ─── SKELETON ─── */
 .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius)}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -315,16 +321,20 @@ nav{
   .ep-section-title{font-size:12px;letter-spacing:1.5px}
   #epCurrentLabel{display:none}
 
+  .chunk-btn{padding:8px 14px;font-size:13px;border-radius:7px;}
+
   .ep-pill{
     flex-shrink:0;
-    min-width:34px;
+    min-width:46px;
     text-align:center;
-    padding:6px 10px;
-    font-size:12px;
+    padding:10px 14px;
+    font-size:14px;
+    border-radius:7px;
   }
 
-  .season-dropdown-wrap{width:100%;margin-bottom:8px}
-  .season-dropdown-btn{width:100%;min-width:unset}
+  .season-dropdown-wrap{width:100%;margin-bottom:10px}
+  .season-dropdown-btn{width:100%;min-width:unset;padding:10px 14px;font-size:14px;border-radius:8px}
+  .season-option{padding:13px 16px;font-size:14px}
 
   .anime-info{margin-top:10px;padding:12px 14px}
   .anime-info-inner{gap:12px;align-items:flex-start}
@@ -365,7 +375,7 @@ nav{
 @media(max-width:380px){
   .anime-poster{width:56px;height:84px}
   .anime-title-main{font-size:16px}
-  .ep-pill{min-width:34px;padding:5px 8px;font-size:11px}
+  .ep-pill{min-width:40px;padding:9px 10px;font-size:13px}
   .player-frame{height:52vw;max-height:200px}
 }
 
@@ -830,7 +840,7 @@ function renderChunkBar(){
   bar.style.display='flex';
   epChunks.forEach((c,i)=>{
     const btn=document.createElement('button');
-    btn.style.cssText='flex-shrink:0;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all 0.15s';
+    btn.className='chunk-btn';
     btn.style.background=i===currentChunk?'rgba(230,57,70,0.18)':'rgba(255,255,255,0.06)';
     btn.style.border=i===currentChunk?'0.5px solid rgba(230,57,70,0.4)':'0.5px solid rgba(255,255,255,0.1)';
     btn.style.color=i===currentChunk?'var(--accent)':'var(--muted)';
