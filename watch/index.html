@@ -105,7 +105,30 @@ nav{
 .lang-toggle{display:flex;border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;overflow:hidden}
 .lang-btn{padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;background:none;border:none;color:var(--muted);font-family:inherit;transition:all 0.2s}
 .lang-btn.active{background:var(--accent);color:#fff}
-.ep-grid{display:flex;flex-wrap:wrap;gap:5px;max-height:200px;overflow-y:auto}
+/* Always single scrollable row — never wraps, never stacks */
+.ep-grid{
+  display:flex;flex-wrap:nowrap;gap:5px;
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding-bottom:3px;
+}
+.ep-grid::-webkit-scrollbar{display:none}
+
+/* ─── SEASON TABS ─── */
+.season-tabs{
+  display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;
+  scrollbar-width:none;margin-bottom:10px;
+  -webkit-overflow-scrolling:touch;
+}
+.season-tabs::-webkit-scrollbar{display:none}
+.season-tab{
+  flex-shrink:0;padding:4px 12px;border-radius:5px;font-size:11px;font-weight:700;
+  background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);
+  color:var(--muted);cursor:pointer;font-family:inherit;transition:all 0.15s;
+  white-space:nowrap;
+}
+.season-tab:hover{background:rgba(255,255,255,0.12);color:var(--text)}
+.season-tab.active{background:rgba(230,57,70,0.18);border-color:rgba(230,57,70,0.4);color:var(--accent)}
 .ep-pill{
   padding:5px 10px;border-radius:5px;font-size:12px;font-weight:600;
   background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.1);
@@ -272,19 +295,7 @@ nav{
   /* Episode current label — hide on mobile to save space */
   #epCurrentLabel{display:none}
 
-  /* Episode pills — single horizontal scroll row */
-  .ep-grid{
-    display:flex;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    overflow-y:hidden;
-    max-height:none;
-    gap:5px;
-    scrollbar-width:none;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:3px;
-  }
-  .ep-grid::-webkit-scrollbar{display:none}
+  /* Episode pills — always horizontal scroll, pills are flex-shrink:0 */
   .ep-pill{
     flex-shrink:0;
     min-width:36px;
@@ -432,6 +443,8 @@ nav{
             </div>
           </div>
         </div>
+        <!-- Season tabs (hidden until populated) -->
+        <div class="season-tabs" id="seasonTabs" style="display:none"></div>
         <div class="ep-grid" id="epGrid">
           <div class="skel" style="width:100%;height:36px"></div>
         </div>
@@ -552,6 +565,7 @@ async function init(){
     animeData=data.data;
     renderAnimeInfo(animeData);
     buildEpGrid(animeData.episodes||1);
+    loadSeasons(); // async — loads season tabs in background
     // Build comment bar AFTER we know currentEp
     buildCommentEpBar();
     loadRelated(animeData.genres?.[0]?.mal_id, malId);
@@ -577,7 +591,20 @@ function loadPlayer(mal,ep,lang){
   window.history.replaceState({},'',url);
   document.getElementById('epCurrentLabel').textContent=`Episode ${ep}`;
   if(animeData) document.getElementById('navTitle').textContent=(animeData.title_english||animeData.title||'')+` — EP ${ep}`;
-  document.querySelectorAll('.ep-pill').forEach(b=>b.classList.toggle('active',+b.dataset.ep===ep));
+
+  // Update active pill — if ep is in a different chunk, switch chunk first
+  const chunkIdx=epChunks.findIndex(c=>ep>=c.start&&ep<=c.end);
+  if(chunkIdx>=0&&chunkIdx!==currentChunk){
+    currentChunk=chunkIdx;
+    renderChunkBar();
+    renderEpPills(epChunks[currentChunk]);
+  } else {
+    document.querySelectorAll('.ep-pill').forEach(b=>b.classList.toggle('active',+b.dataset.ep===ep));
+    setTimeout(()=>{
+      const a=document.querySelector('.ep-pill.active');
+      if(a) a.scrollIntoView({block:'nearest',inline:'center'});
+    },80);
+  }
 
   // Update comment ep bar to reflect new episode
   buildCommentEpBar();
@@ -590,11 +617,137 @@ function setLang(lang){
   loadPlayer(malId,currentEp,lang);
 }
 
-function buildEpGrid(total){
+/* ── SEASONS & EPISODES ──
+   Strategy:
+   1. Fetch /anime/{id}/relations to find sequel/prequel seasons (separate MAL entries)
+   2. Group current anime's episodes into chunks of 12 as "part" tabs within this season
+   3. Season tabs = actual separate seasons from relations
+   4. Part tabs = sub-groups of 12 within the current entry's episodes
+*/
+
+let seasons=[];       // [{label, malId, epOffset}] — separate MAL entries
+let currentSeason=0;  // index into seasons[] (0 = current entry)
+let epChunks=[];      // [[1..12],[13..24],...] for current season
+let currentChunk=0;
+
+async function loadSeasons(){
+  const rel=await jikan('/anime/'+malId+'/relations');
+  const entries=rel?.data||[];
+  // Collect Sequel/Prequel TV entries
+  const related=[];
+  for(const r of entries){
+    const type=r.relation;
+    if(!['Sequel','Prequel','Alternative version'].includes(type)) continue;
+    for(const e of (r.entry||[])){
+      if(e.type==='anime') related.push({label:'',malId:e.mal_id,relation:type});
+    }
+  }
+  // Fetch titles for related entries (batch, max 4 to avoid rate limiting)
+  const toFetch=related.slice(0,4);
+  const fetched=await Promise.all(toFetch.map(async r=>{
+    const d=await jikan('/anime/'+r.malId);
+    return{...r,label:d?.data?.title_english||d?.data?.title||'Season',episodes:d?.data?.episodes||0,year:d?.data?.year};
+  }));
+
+  // Build seasons array: figure out order by year or relation
+  // Start: current anime as S1 (or just label it by title chunk)
+  const currentTitle=animeData.title_english||animeData.title||'';
+  const allSeasons=[
+    {label:currentTitle,malId:parseInt(malId),episodes:animeData.episodes||1,year:animeData.year,isCurrent:true},
+    ...fetched.map(s=>({...s,isCurrent:false}))
+  ].sort((a,b)=>(a.year||9999)-(b.year||9999));
+
+  // Number them S1, S2, S3...
+  allSeasons.forEach((s,i)=>{ if(!s.label||s.label===currentTitle) s.label=`Season ${i+1}`; });
+
+  // Find current index
+  currentSeason=allSeasons.findIndex(s=>s.malId==parseInt(malId));
+  if(currentSeason<0) currentSeason=0;
+  seasons=allSeasons;
+
+  renderSeasonTabs();
+}
+
+function renderSeasonTabs(){
+  const container=document.getElementById('seasonTabs');
+  if(!container) return;
+  if(seasons.length<=1){
+    // Only 1 season — hide tabs, just show episode chunks if needed
+    container.style.display='none';
+  } else {
+    container.style.display='flex';
+    container.innerHTML='';
+    seasons.forEach((s,i)=>{
+      const btn=document.createElement('button');
+      btn.className='season-tab'+(i===currentSeason?' active':'');
+      btn.textContent=s.label;
+      btn.onclick=()=>switchSeason(i);
+      container.appendChild(btn);
+    });
+  }
+  // Build episode chunks for the current season's episode count
+  buildEpChunks(animeData.episodes||1);
+}
+
+function switchSeason(idx){
+  const s=seasons[idx];
+  if(!s) return;
+  currentSeason=idx;
+  // Update tab active state
+  document.querySelectorAll('.season-tab').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  if(s.isCurrent){
+    // Already on this MAL entry — just re-render ep grid
+    buildEpChunks(animeData.episodes||1);
+  } else {
+    // Navigate to different MAL entry
+    window.location.href=`/watch?mal=${s.malId}&ep=1&lang=${currentLang}`;
+  }
+}
+
+function buildEpChunks(total){
+  const CHUNK=12;
+  epChunks=[];
+  for(let i=1;i<=total;i+=CHUNK){
+    epChunks.push({start:i,end:Math.min(i+CHUNK-1,total)});
+  }
+  // Find which chunk the current ep belongs to
+  currentChunk=epChunks.findIndex(c=>currentEp>=c.start&&currentEp<=c.end);
+  if(currentChunk<0) currentChunk=0;
+
+  // Render chunk selector above pills (only show if >1 chunk)
+  renderChunkBar();
+  renderEpPills(epChunks[currentChunk]);
+}
+
+function renderChunkBar(){
+  // Inject chunk bar inside ep-section, before ep-grid
+  let bar=document.getElementById('epChunkBar');
+  if(!bar){
+    bar=document.createElement('div');
+    bar.id='epChunkBar';
+    bar.style.cssText='display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;-webkit-overflow-scrolling:touch';
+    const grid=document.getElementById('epGrid');
+    grid.parentNode.insertBefore(bar,grid);
+  }
+  bar.innerHTML='';
+  if(epChunks.length<=1){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  epChunks.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.style.cssText='flex-shrink:0;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all 0.15s';
+    btn.style.background=i===currentChunk?'rgba(230,57,70,0.18)':'rgba(255,255,255,0.06)';
+    btn.style.border=i===currentChunk?'0.5px solid rgba(230,57,70,0.4)':'0.5px solid rgba(255,255,255,0.1)';
+    btn.style.color=i===currentChunk?'var(--accent)':'var(--muted)';
+    btn.textContent=`${c.start}–${c.end}`;
+    btn.onclick=()=>{ currentChunk=i; renderChunkBar(); renderEpPills(epChunks[i]); };
+    bar.appendChild(btn);
+  });
+}
+
+function renderEpPills(chunk){
   const grid=document.getElementById('epGrid');
   grid.innerHTML='';
-  const count=Math.min(total,500);
-  for(let i=1;i<=count;i++){
+  for(let i=chunk.start;i<=chunk.end;i++){
     const btn=document.createElement('button');
     btn.className='ep-pill'+(i===currentEp?' active':'');
     btn.textContent=i;
@@ -605,7 +758,12 @@ function buildEpGrid(total){
   setTimeout(()=>{
     const a=grid.querySelector('.ep-pill.active');
     if(a) a.scrollIntoView({block:'nearest',inline:'center'});
-  },100);
+  },80);
+}
+
+function buildEpGrid(total){
+  // Legacy entry point — now delegates to chunk system
+  buildEpChunks(total);
 }
 
 function renderAnimeInfo(anime){
