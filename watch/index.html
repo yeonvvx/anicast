@@ -144,9 +144,14 @@ nav{
 .sidebar-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
 
 /* ─── COMMENTS ─── */
-.cep-bar{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
-.cep-bar::-webkit-scrollbar{display:none}
-.cep-pill{flex-shrink:0;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--muted);font-family:inherit;transition:all 0.2s}
+/* Only 2 pills now: General + current episode */
+.cep-bar{display:flex;gap:6px;margin-bottom:14px}
+.cep-pill{
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;
+  cursor:pointer;border:0.5px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);color:var(--muted);
+  font-family:inherit;transition:all 0.2s;white-space:nowrap
+}
 .cep-pill.active,.cep-pill:hover{background:var(--accent-dim);border-color:var(--accent-border);color:var(--accent)}
 .comment-input-wrap{display:flex;gap:8px;margin-bottom:16px;align-items:flex-start}
 .comment-avatar-sm{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3)}
@@ -194,51 +199,30 @@ nav{
 .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius)}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-/* ═══════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-   ═══════════════════════════════════════════
+/* ═══════════════════════════
+   RESPONSIVE
+   ═══════════════════════════ */
 
-   Desktop  : > 1024px  — 2-col grid (player + sidebar)
-   Tablet   : 600-1024px — 1-col, sidebar hidden, ep grid 2 rows
-   Phone    : < 600px   — full-bleed player, compact ep strip, stacked
-*/
-
-/* ── TABLET (iPad portrait/landscape) ── */
+/* ── TABLET ── */
 @media(max-width:1024px){
-  .watch-layout{
-    grid-template-columns:1fr;
-    gap:0;
-  }
-  /* Sidebar becomes inline below content on tablet */
-  .sidebar{
-    display:block;
-    margin-top:0;
-  }
-  /* Related cards go horizontal on tablet */
+  .watch-layout{grid-template-columns:1fr;gap:0}
+  .sidebar{display:block;margin-top:0}
   #relatedList{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
     gap:10px;
   }
-  .related-card{
-    flex-direction:column;
-    padding:0;
-    border-bottom:none;
-    background:var(--bg3);
-    border-radius:8px;
-    overflow:hidden;
-  }
+  .related-card{flex-direction:column;padding:0;border-bottom:none;background:var(--bg3);border-radius:8px;overflow:hidden}
   .related-poster{width:100%;height:110px;border-radius:0}
   .related-card > div{padding:8px 10px 10px}
   .related-card:hover{opacity:1;transform:translateY(-2px);transition:transform 0.2s}
-
   .page{padding:1rem 1.25rem 3rem}
 }
 
-/* ── PHONE ── */
-@media(max-width:600px){
+/* ── MOBILE (≤ 768px) — covers all phones including large ones ── */
+@media(max-width:768px){
 
-  /* Nav: logo only + title + hamburger */
+  /* Nav: logo + title + hamburger only */
   nav{padding:0 0.75rem;gap:0}
   .nav-sep{display:none!important}
   .nav-back{display:none!important}
@@ -247,25 +231,24 @@ nav{
   .nav-user{display:none!important}
   .hamburger{display:flex!important;margin-left:auto}
 
-  /* Page: zero side padding so player is edge-to-edge */
+  /* Page: zero side padding for edge-to-edge player */
   .page{padding:0 0 2rem}
 
-  /* Player: normal flow (NOT sticky), edge-to-edge, fixed height so it
-     doesn't blow up. 56vw gives ~211px on a 375px phone — compact & watchable.
-     Use height instead of aspect-ratio to prevent the giant-box issue. */
+  /* Player: compact fixed height — not aspect-ratio (avoids giant box) */
   .player-frame{
     border-radius:0;
-    position:relative;         /* NOT sticky — causes layout bugs on iOS */
     aspect-ratio:unset;
     width:100%;
-    height:56vw;               /* ~211px on 375px phone, ~246px on 440px */
-    max-height:260px;          /* cap for large phones in landscape */
+    height:48vw;        /* ~180px on 375px, ~211px on 440px */
+    max-height:220px;   /* cap for large phones */
+    position:relative;
   }
 
-  /* Content below player — restore horizontal padding */
+  /* Restore horizontal padding for everything below player */
   .ep-section,
   .anime-info,
-  .sidebar-card{margin-left:0.75rem;margin-right:0.75rem}
+  .sidebar-card,
+  .sidebar{margin-left:0.75rem;margin-right:0.75rem}
 
   /* Episode section */
   .ep-section{
@@ -273,13 +256,21 @@ nav{
     border-radius:8px;
     padding:10px 12px;
   }
+  /* Header row: title left, toggle right — no wrap */
   .ep-section-head{
-    margin-bottom:8px;
-    /* Stack title and lang toggle vertically on very small screens */
     flex-wrap:nowrap;
-    gap:6px;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
   }
-  .ep-section-title{font-size:12px;letter-spacing:1.5px}
+  .ep-section-title{font-size:12px;letter-spacing:1.5px;flex-shrink:0}
+
+  /* SUB/DUB toggle — always visible, right-aligned */
+  .lang-toggle{flex-shrink:0;margin-left:auto}
+  .lang-btn{padding:5px 14px;font-size:11px}
+
+  /* Episode current label — hide on mobile to save space */
+  #epCurrentLabel{display:none}
 
   /* Episode pills — single horizontal scroll row */
   .ep-grid{
@@ -298,16 +289,12 @@ nav{
     flex-shrink:0;
     min-width:36px;
     text-align:center;
-    padding:6px 9px;
+    padding:6px 10px;
     font-size:12px;
   }
 
   /* Anime info */
-  .anime-info{
-    margin-top:10px;
-    padding:12px 14px;
-    border-radius:8px;
-  }
+  .anime-info{margin-top:10px;padding:12px 14px;border-radius:8px}
   .anime-info-inner{gap:12px;align-items:flex-start}
   .anime-poster{width:60px;height:90px;border-radius:5px}
   .anime-title-main{font-size:17px;margin-bottom:5px}
@@ -315,15 +302,13 @@ nav{
   .anime-actions{gap:6px;margin-top:10px}
   .btn-sm{padding:6px 12px;font-size:11px}
 
-  /* Comments card */
-  .sidebar-card{
-    margin-top:10px;
-    border-radius:8px;
-    padding:14px;
-  }
+  /* Comments */
+  .sidebar-card{margin-top:10px;border-radius:8px;padding:14px}
+  .cep-bar{gap:8px}
+  .cep-pill{font-size:12px;padding:6px 16px}
 
   /* Related — horizontal scroll strip */
-  .sidebar{display:block;margin:0 0.75rem}
+  .sidebar{display:block;margin-top:10px}
   #relatedList{
     display:flex;
     flex-wrap:nowrap;
@@ -332,18 +317,14 @@ nav{
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
     padding-bottom:4px;
+    grid-template-columns:unset;
   }
   #relatedList::-webkit-scrollbar{display:none}
   .related-card{
-    flex-direction:column;
-    flex-shrink:0;
-    width:120px;
-    border-bottom:none;
-    background:var(--bg2);
+    flex-direction:column;flex-shrink:0;width:120px;
+    border-bottom:none;background:var(--bg2);
     border:0.5px solid rgba(255,255,255,0.07);
-    border-radius:8px;
-    overflow:hidden;
-    padding:0;
+    border-radius:8px;overflow:hidden;padding:0;
   }
   .related-poster{width:120px;height:80px;border-radius:0}
   .related-card > div{padding:6px 8px 8px}
@@ -351,21 +332,22 @@ nav{
   .related-meta{font-size:10px}
 }
 
-/* ── VERY SMALL PHONES (< 380px) ── */
+/* ── VERY SMALL (< 380px) ── */
 @media(max-width:380px){
   .anime-poster{width:56px;height:84px}
   .anime-title-main{font-size:16px}
   .ep-pill{min-width:34px;padding:5px 8px;font-size:11px}
+  .player-frame{height:52vw;max-height:200px}
 }
 
-/* ── DESKTOP: show hamburger never ── */
-@media(min-width:601px){
+/* ── DESKTOP: never show hamburger ── */
+@media(min-width:769px){
   .hamburger{display:none}
   .mobile-menu{display:none!important}
 }
 
-/* ── TABLET ONLY: hamburger visible, no sidebar collapse needed ── */
-@media(min-width:601px) and (max-width:1024px){
+/* ── TABLET ONLY (769–1024): show hamburger, show w2g btn ── */
+@media(min-width:769px) and (max-width:1024px){
   .hamburger{display:flex;margin-left:auto}
   .w2g-nav-btn{display:flex}
   nav{padding:0 1.25rem}
@@ -470,6 +452,7 @@ nav{
       <!-- Comments -->
       <div class="sidebar-card" style="margin-top:12px">
         <div class="sidebar-title">COMMENTS</div>
+        <!-- Only 2 pills: General + current episode (built by JS) -->
         <div class="cep-bar" id="commentEpBar"></div>
         <div id="commentInputArea">
           <div class="comment-sign-in" id="commentSignIn">
@@ -569,7 +552,8 @@ async function init(){
     animeData=data.data;
     renderAnimeInfo(animeData);
     buildEpGrid(animeData.episodes||1);
-    buildCommentEpBar(animeData.episodes||0);
+    // Build comment bar AFTER we know currentEp
+    buildCommentEpBar();
     loadRelated(animeData.genres?.[0]?.mal_id, malId);
     document.title=`${animeData.title_english||animeData.title||'Watch'} — AniCast`;
     document.getElementById('navTitle').textContent=(animeData.title_english||animeData.title||'')+` — EP ${currentEp}`;
@@ -594,6 +578,9 @@ function loadPlayer(mal,ep,lang){
   document.getElementById('epCurrentLabel').textContent=`Episode ${ep}`;
   if(animeData) document.getElementById('navTitle').textContent=(animeData.title_english||animeData.title||'')+` — EP ${ep}`;
   document.querySelectorAll('.ep-pill').forEach(b=>b.classList.toggle('active',+b.dataset.ep===ep));
+
+  // Update comment ep bar to reflect new episode
+  buildCommentEpBar();
 }
 
 function setLang(lang){
@@ -711,19 +698,31 @@ function updateMobileUser(user){
   }
 }
 
-/* ── COMMENTS ── */
-function buildCommentEpBar(total){
+/* ── COMMENTS ──
+   Bar shows only 2 pills:
+   1. "General" — episode 0 (series-wide)
+   2. "EP {n}" — the episode currently being watched
+*/
+function buildCommentEpBar(){
   const bar=document.getElementById('commentEpBar');
+  if(!bar) return;
   bar.innerHTML='';
+
+  // General pill
   const gen=document.createElement('button');
-  gen.className='cep-pill active'; gen.textContent='General';
-  gen.onclick=()=>switchCommentEp(0,gen); bar.appendChild(gen);
-  const max=Math.min(total,100);
-  for(let i=1;i<=max;i++){
-    const btn=document.createElement('button');
-    btn.className='cep-pill'; btn.textContent='EP '+i;
-    btn.onclick=(()=>{const ep=i;return()=>switchCommentEp(ep,btn);})();
-    bar.appendChild(btn);
+  gen.className='cep-pill'+(commentEp===0?' active':'');
+  gen.textContent='General';
+  gen.onclick=()=>switchCommentEp(0,gen);
+  bar.appendChild(gen);
+
+  // Current episode pill (only if ep > 0)
+  if(currentEp>0){
+    const epBtn=document.createElement('button');
+    epBtn.className='cep-pill'+(commentEp===currentEp?' active':'');
+    epBtn.textContent=`EP ${currentEp}`;
+    epBtn.dataset.ep=currentEp;
+    epBtn.onclick=()=>switchCommentEp(currentEp,epBtn);
+    bar.appendChild(epBtn);
   }
 }
 
