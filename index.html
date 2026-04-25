@@ -805,20 +805,22 @@ async function anilistQuery(query, variables){
 }
 
 async function fetchHeroBanner(i){
-  if(!heroItems[i]||heroItems[i]._banner||heroItems[i]._bannerFetched) return;
+  if(!heroItems[i]||heroItems[i]._bannerFetched) return;
   heroItems[i]._bannerFetched=true;
-  const banner=await fetchAniListBanner(heroItems[i].mal_id);
-  if(banner){
-    heroItems[i]._banner=banner;
-    const preload=new Image();
-    preload.src=banner;
-    preload.onload=()=>{ if(i===heroIdx) setHero(heroItems[i]); };
+  const result=await fetchAniListBanner(heroItems[i].mal_id);
+  if(result){
+    heroItems[i]._banner=result.banner||result.cover;
+    heroItems[i]._cover=result.cover;
+    const img=result.banner||result.cover;
+    if(img && i===heroIdx){
+      document.getElementById('heroBg').style.backgroundImage=`url(${img})`;
+    }
   }
 }
 
 async function fetchAniListBanner(malId){
   if(!malId) return null;
-  const query=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge}}}`;
+  const query=`query($id:Int){Media(idMal:$id,type:ANIME){bannerImage coverImage{extraLarge large}}}`;
   try{
     const r=await fetch('https://raspy-union-db25.yeonixsites.workers.dev?target=anilist',{
       method:'POST',
@@ -828,12 +830,14 @@ async function fetchAniListBanner(malId){
     if(r.ok){
       const d=await r.json();
       const m=d?.data?.Media;
-      const banner=m?.bannerImage||m?.coverImage?.extraLarge||null;
-      if(banner) return banner;
-    } else {
-
+      if(m){
+        return {
+          banner: m.bannerImage||null,
+          cover: m.coverImage?.extraLarge||m.coverImage?.large||null
+        };
+      }
     }
-  }catch(e){ console.warn('[Banner] Error:',e.message); }
+  }catch(e){}
   return null;
 }
 async function fetchNextEpInfo(malId){
@@ -1039,9 +1043,9 @@ function setBannerImg(src, fallbackUrl){
 }
 
 function setHero(item){
-  const fallback=item.images?.jpg?.large_image_url||item.images?.webp?.large_image_url||'';
-  const bannerImg=item._banner||fallback;
-  document.getElementById('heroBg').style.backgroundImage=`url(${bannerImg})`;
+  // Only use AniList images — if not fetched yet, leave blank until ready
+  const bannerImg=item._banner||item._cover||null;
+  document.getElementById('heroBg').style.backgroundImage=bannerImg?`url(${bannerImg})`:'none';
   document.getElementById('heroTitle').textContent=getTitle(item);
   document.getElementById('heroDesc').textContent=(item.synopsis||'').replace(/\[Written.*?\]/g,'').slice(0,210)+'…';
   const genres=(item.genres||[]).slice(0,3).map(g=>`<span class="h-tag">${g.name}</span>`).join('');
@@ -1368,11 +1372,12 @@ async function init(){
   registerInfinite('seasonRow',async pg=>{const r=await jikan('/seasons/now',{limit:20,page:pg});return dedupe(r.data||[]);});
 
   // Fetch HD AniList banner for first item BEFORE displaying hero to avoid blurry fallback
-  if(heroItems.length){ setHero(heroItems[0]); resetHeroTimer(); }
-
-  // Fetch first banner immediately, rest staggered every 4 seconds
-  fetchHeroBanner(0);
-  heroItems.slice(1,5).forEach((_,j)=>setTimeout(()=>fetchHeroBanner(j+1),(j+1)*4000));
+  if(heroItems.length){
+    resetHeroTimer();
+    // Fetch first banner before showing hero — avoids MAL image flash
+    fetchHeroBanner(0).then(()=>setHero(heroItems[0]));
+    heroItems.slice(1,5).forEach((_,j)=>setTimeout(()=>fetchHeroBanner(j+1),(j+1)*4000));
+  }
 
   await sleep(400);
   const trendResp=await jikan('/top/anime',{limit:20,filter:'bypopularity'});
