@@ -14,6 +14,7 @@
   --bg:#08080e;--bg2:#101018;--bg3:#181825;--bg4:#20202e;
   --text:#f0f0f8;--muted:#7a7a96;--muted2:#545470;
   --radius:8px;
+  --nav-h:52px;
 }
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
@@ -21,43 +22,103 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:center;padding:0 1.5rem;gap:12px;background:rgba(8,8,14,0.98);border-bottom:0.5px solid rgba(255,255,255,0.07);backdrop-filter:blur(16px)}
+/* ─── NAV ─── */
+nav{
+  position:sticky;top:0;z-index:100;height:var(--nav-h);
+  display:flex;align-items:center;padding:0 1.5rem;gap:10px;
+  background:rgba(8,8,14,0.98);border-bottom:0.5px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(16px);
+}
 .nav-logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0}
-.nav-sep{width:1px;height:18px;background:rgba(255,255,255,0.1)}
-.nav-back{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s}
+.nav-sep{width:1px;height:18px;background:rgba(255,255,255,0.1);flex-shrink:0}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s;white-space:nowrap;flex-shrink:0}
 .nav-back:hover{color:var(--text)}
-.nav-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
 .nav-user{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted)}
 .nav-user img{width:24px;height:24px;border-radius:50%;object-fit:cover}
-.w2g-nav-btn{display:flex;align-items:center;gap:6px;background:var(--accent-dim);border:0.5px solid var(--accent-border);color:var(--accent);border-radius:var(--radius);padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:all 0.2s;white-space:nowrap}
+.w2g-nav-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--accent-dim);border:0.5px solid var(--accent-border);
+  color:var(--accent);border-radius:var(--radius);padding:5px 12px;
+  font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;
+  text-decoration:none;transition:all 0.2s;white-space:nowrap;flex-shrink:0
+}
 .w2g-nav-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* LAYOUT */
-.page{max-width:1400px;margin:0 auto;padding:1.5rem}
+/* ─── HAMBURGER ─── */
+.hamburger{
+  display:none;flex-direction:column;justify-content:center;align-items:center;
+  gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;
+  padding:4px;flex-shrink:0;margin-left:auto;
+}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ─── MOBILE MENU ─── */
+.mobile-menu{
+  display:none;position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
+  z-index:299;background:rgba(8,8,14,0.98);backdrop-filter:blur(20px);
+  flex-direction:column;overflow-y:auto;
+}
+.mobile-menu.open{display:flex}
+.mm-profile{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:0.5px solid rgba(255,255,255,0.07)}
+.mm-profile-info{flex:1;min-width:0}
+.mm-profile-name{font-size:15px;font-weight:600}
+.mm-profile-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.mm-links{display:flex;flex-direction:column;padding:8px 0}
+.mm-link{
+  display:flex;align-items:center;gap:14px;padding:14px 24px;
+  font-size:15px;font-weight:500;color:var(--text);text-decoration:none;
+  background:none;border:none;font-family:inherit;cursor:pointer;
+  width:100%;text-align:left;transition:background 0.2s;
+  border-bottom:0.5px solid rgba(255,255,255,0.04)
+}
+.mm-link:hover{background:rgba(255,255,255,0.05)}
+.mm-link:last-child{border-bottom:none}
+.mm-link svg{color:var(--muted);flex-shrink:0}
+
+/* ─── PAGE LAYOUT ─── */
+.page{max-width:1440px;margin:0 auto;padding:1.25rem 1.5rem 3rem}
 .watch-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
 
-/* PLAYER */
-.player-section{}
-.player-frame{width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;position:relative}
+/* ─── PLAYER ─── */
+.player-frame{
+  width:100%;aspect-ratio:16/9;background:#000;
+  border-radius:10px;overflow:hidden;position:relative;
+}
 .player-frame iframe{width:100%;height:100%;border:none;display:block}
-.player-frame .player-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;font-size:13px;color:var(--muted)}
+.player-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:#000;font-size:13px;color:var(--muted);z-index:2;
+}
 
-/* EP STRIP */
-.ep-section{margin-top:14px;background:var(--bg2);border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px}
+/* ─── EPISODE STRIP ─── */
+.ep-section{
+  margin-top:12px;background:var(--bg2);
+  border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px
+}
 .ep-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .ep-section-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--muted)}
 .lang-toggle{display:flex;border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;overflow:hidden}
 .lang-btn{padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;background:none;border:none;color:var(--muted);font-family:inherit;transition:all 0.2s}
 .lang-btn.active{background:var(--accent);color:#fff}
 .ep-grid{display:flex;flex-wrap:wrap;gap:5px;max-height:200px;overflow-y:auto}
-.ep-pill{padding:5px 10px;border-radius:5px;font-size:12px;font-weight:600;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.1);color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:inherit}
+.ep-pill{
+  padding:5px 10px;border-radius:5px;font-size:12px;font-weight:600;
+  background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.1);
+  color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:inherit
+}
 .ep-pill:hover{background:rgba(255,255,255,0.13);color:var(--text)}
 .ep-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
-/* ANIME INFO */
-.anime-info{margin-top:14px;background:var(--bg2);border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:20px}
+/* ─── ANIME INFO ─── */
+.anime-info{
+  margin-top:12px;background:var(--bg2);
+  border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:20px
+}
 .anime-info-inner{display:flex;gap:16px}
 .anime-poster{width:80px;height:120px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--bg3)}
 .anime-info-text{flex:1;min-width:0}
@@ -74,14 +135,15 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
 .btn-sm-primary:hover{background:#c7303c}
 .btn-sm-sec{background:rgba(255,255,255,0.08);color:var(--text);border:0.5px solid rgba(255,255,255,0.12)}
 .btn-sm-sec:hover{background:rgba(255,255,255,0.14)}
-.btn-sm-sec.saved{background:var(--accent-dim);border-color:var(--accent-border);color:var(--accent)}
 
-/* SIDEBAR */
-.sidebar{}
-.sidebar-card{background:var(--bg2);border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px;margin-bottom:14px}
+/* ─── SIDEBAR ─── */
+.sidebar-card{
+  background:var(--bg2);border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:10px;padding:16px;margin-bottom:14px
+}
 .sidebar-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
 
-/* COMMENTS */
+/* ─── COMMENTS ─── */
 .cep-bar{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
 .cep-bar::-webkit-scrollbar{display:none}
 .cep-pill{flex-shrink:0;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--muted);font-family:inherit;transition:all 0.2s}
@@ -120,7 +182,7 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
 .load-more-btn{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:var(--radius);padding:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:10px;transition:all 0.2s}
 .load-more-btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
 
-/* RELATED */
+/* ─── RELATED ─── */
 .related-card{display:flex;gap:10px;cursor:pointer;padding:6px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);transition:opacity 0.2s}
 .related-card:hover{opacity:0.8}
 .related-card:last-child{border-bottom:none}
@@ -128,44 +190,177 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
 .related-title{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:3px}
 .related-meta{font-size:10px;color:var(--muted)}
 
+/* ─── SKELETON ─── */
 .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius)}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-@media(max-width:900px){
-  .hamburger{display:flex;margin-left:auto}
-  .nav-right{gap:8px;justify-content:flex-end}
-  .w2g-nav-btn{display:none}
-  .nav-user{display:none}
+/* ═══════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════
+
+   Desktop  : > 1024px  — 2-col grid (player + sidebar)
+   Tablet   : 600-1024px — 1-col, sidebar hidden, ep grid 2 rows
+   Phone    : < 600px   — full-bleed player, compact ep strip, stacked
+*/
+
+/* ── TABLET (iPad portrait/landscape) ── */
+@media(max-width:1024px){
+  .watch-layout{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+  /* Sidebar becomes inline below content on tablet */
+  .sidebar{
+    display:block;
+    margin-top:0;
+  }
+  /* Related cards go horizontal on tablet */
+  #relatedList{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:10px;
+  }
+  .related-card{
+    flex-direction:column;
+    padding:0;
+    border-bottom:none;
+    background:var(--bg3);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .related-poster{width:100%;height:110px;border-radius:0}
+  .related-card > div{padding:8px 10px 10px}
+  .related-card:hover{opacity:1;transform:translateY(-2px);transition:transform 0.2s}
+
+  .page{padding:1rem 1.25rem 3rem}
 }
+
+/* ── PHONE ── */
 @media(max-width:600px){
-  nav{padding:0 1rem}
-  .anime-info-inner{flex-direction:column}
-  .anime-poster{width:100%;height:160px}
-}
 
-/* ── HAMBURGER ── */
-.hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0}
-.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.hamburger.open span:nth-child(2){opacity:0}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mobile-menu{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;z-index:299;background:rgba(8,8,14,0.98);backdrop-filter:blur(20px);flex-direction:column;overflow-y:auto}
-.mobile-menu.open{display:flex}
-.mm-profile{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:0.5px solid rgba(255,255,255,0.07)}
-.mm-profile img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--bg3)}
-.mm-profile-name{font-size:15px;font-weight:600}
-.mm-profile-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.mm-links{display:flex;flex-direction:column;padding:8px 0}
-.mm-link{display:flex;align-items:center;gap:14px;padding:14px 24px;font-size:15px;font-weight:500;color:var(--text);text-decoration:none;background:none;border:none;font-family:inherit;cursor:pointer;width:100%;text-align:left;transition:background 0.2s;border-bottom:0.5px solid rgba(255,255,255,0.04)}
-.mm-link:hover{background:rgba(255,255,255,0.05)}
-.mm-link:last-child{border-bottom:none}
-.mm-link svg{color:var(--muted);flex-shrink:0}
-@media(max-width:900px){
-  .hamburger{display:flex}
-  .nav-right{gap:8px}
+  /* Nav: compact */
+  nav{padding:0 0.75rem;gap:6px}
+  .nav-sep{display:none}
+  .nav-back{display:none}              /* hide "Browse" text on phone — logo is enough */
+  .nav-title{font-size:12px}
   .w2g-nav-btn{display:none}
   .nav-user{display:none}
+  .hamburger{display:flex;margin-left:auto}
+
+  /* Page: zero side padding so player is full-bleed */
+  .page{padding:0 0 2rem}
+
+  /* Player: sticky below nav so it doesn't scroll away */
+  .player-frame{
+    border-radius:0;
+    position:sticky;
+    top:var(--nav-h);
+    z-index:50;
+    /* Slightly taller than 16/9 on very small screens */
+    aspect-ratio:16/9;
+  }
+
+  /* Content below player gets normal padding */
+  .ep-section,
+  .anime-info,
+  .sidebar-card{margin-left:0.75rem;margin-right:0.75rem}
+
+  /* Episode strip — compact scrollable row instead of wrapping grid */
+  .ep-section{
+    margin-top:10px;
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .ep-section-head{margin-bottom:8px}
+  .ep-section-title{font-size:12px;letter-spacing:1.5px}
+  .ep-grid{
+    display:flex;
+    flex-wrap:nowrap;      /* single horizontal scrollable row */
+    overflow-x:auto;
+    overflow-y:hidden;
+    max-height:none;
+    gap:5px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+  .ep-grid::-webkit-scrollbar{display:none}
+  .ep-pill{
+    flex-shrink:0;
+    min-width:38px;
+    text-align:center;
+    padding:6px 10px;
+    font-size:12px;
+  }
+
+  /* Anime info — poster on left, text on right (stays horizontal) */
+  .anime-info{
+    margin-top:10px;
+    padding:14px;
+    border-radius:8px;
+  }
+  .anime-info-inner{gap:12px}
+  .anime-poster{width:64px;height:96px}
+  .anime-title-main{font-size:18px;margin-bottom:6px}
+  .anime-synopsis{-webkit-line-clamp:3}
+  .anime-actions{gap:6px}
+  .btn-sm{padding:6px 12px;font-size:11px}
+
+  /* Comments */
+  .sidebar-card{
+    margin-top:10px;
+    border-radius:8px;
+    padding:14px;
+  }
+
+  /* Related — horizontal scroll strip on phone */
+  .sidebar{display:block;margin:0 0.75rem}
+  #relatedList{
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    gap:10px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+  }
+  #relatedList::-webkit-scrollbar{display:none}
+  .related-card{
+    flex-direction:column;
+    flex-shrink:0;
+    width:130px;
+    border-bottom:none;
+    background:var(--bg2);
+    border:0.5px solid rgba(255,255,255,0.07);
+    border-radius:8px;
+    overflow:hidden;
+    padding:0;
+  }
+  .related-poster{width:130px;height:90px;border-radius:0}
+  .related-card > div{padding:7px 8px 8px}
+  .related-title{font-size:11px;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .related-meta{font-size:10px}
+}
+
+/* ── VERY SMALL PHONES (< 380px) ── */
+@media(max-width:380px){
+  .anime-poster{width:56px;height:84px}
+  .anime-title-main{font-size:16px}
+  .ep-pill{min-width:34px;padding:5px 8px;font-size:11px}
+}
+
+/* ── DESKTOP: show hamburger never ── */
+@media(min-width:601px){
+  .hamburger{display:none}
+  .mobile-menu{display:none!important}
+}
+
+/* ── TABLET ONLY: hamburger visible, no sidebar collapse needed ── */
+@media(min-width:601px) and (max-width:1024px){
+  .hamburger{display:flex;margin-left:auto}
+  .w2g-nav-btn{display:flex}
+  nav{padding:0 1.25rem}
+  .page{padding:1rem 1.25rem 3rem}
 }
 </style>
 </head>
@@ -198,7 +393,7 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
 <div class="mobile-menu" id="mobileMenu">
   <div class="mm-profile" style="display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:0.5px solid rgba(255,255,255,0.07)">
     <img id="mmAvatar" src="https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0">
-    <div style="flex:1;min-width:0">
+    <div class="mm-profile-info">
       <div class="mm-profile-name" id="mmName">Guest</div>
       <div class="mm-profile-sub" id="mmSub">Not signed in</div>
     </div>
@@ -221,7 +416,6 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       Legal
     </a>
-    <div id="mmAuthLink"></div>
   </div>
 </div>
 
@@ -255,8 +449,8 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
       <!-- Anime info -->
       <div class="anime-info" id="animeInfo">
         <div class="anime-info-inner">
-          <div class="skel anime-poster" id="posterSkel"></div>
-          <div style="flex:1">
+          <div class="skel anime-poster" id="posterSkel" style="flex-shrink:0"></div>
+          <div style="flex:1;min-width:0">
             <div class="skel" style="height:22px;width:70%;margin-bottom:10px"></div>
             <div class="skel" style="height:14px;width:50%;margin-bottom:10px"></div>
             <div class="skel" style="height:60px;width:100%"></div>
@@ -265,7 +459,7 @@ nav{position:sticky;top:0;z-index:100;height:52px;display:flex;align-items:cente
       </div>
 
       <!-- Comments -->
-      <div class="sidebar-card" style="margin-top:14px">
+      <div class="sidebar-card" style="margin-top:12px">
         <div class="sidebar-title">COMMENTS</div>
         <div class="cep-bar" id="commentEpBar"></div>
         <div id="commentInputArea">
@@ -351,20 +545,16 @@ async function init(){
 
   if(!malId){ window.location.href='https://anicast.watch'; return; }
 
-  // Auth
   const client=await getSB();
   const{data:{session}}=await client.auth.getSession();
   if(session?.user){ currentUser=session.user; renderNavUser(); updateMobileUser(currentUser); }
-  else { updateMobileUser(null); }
+  else{ updateMobileUser(null); }
 
-  // Load player immediately
   loadPlayer(malId, currentEp, currentLang);
 
-  // Update lang buttons
   document.getElementById('btnSub').classList.toggle('active',currentLang==='sub');
   document.getElementById('btnDub').classList.toggle('active',currentLang==='dub');
 
-  // Load anime data
   const data=await jikan('/anime/'+malId);
   if(data?.data){
     animeData=data.data;
@@ -373,15 +563,14 @@ async function init(){
     buildCommentEpBar(animeData.episodes||0);
     loadRelated(animeData.genres?.[0]?.mal_id, malId);
     document.title=`${animeData.title_english||animeData.title||'Watch'} — AniCast`;
-    document.getElementById('navTitle').textContent=(animeData.title_english||animeData.title||'')+(` — EP ${currentEp}`);
+    document.getElementById('navTitle').textContent=(animeData.title_english||animeData.title||'')+` — EP ${currentEp}`;
     document.getElementById('w2gBtn').href=`https://anicast.watch/w2g?mal=${malId}&title=${encodeURIComponent(animeData.title_english||animeData.title||'')}`;
   }
 
-  // Load comments
   initComments();
 }
 
-function loadPlayer(mal, ep, lang){
+function loadPlayer(mal,ep,lang){
   const frame=document.getElementById('playerFrame');
   const loading=document.getElementById('playerLoading');
   frame.style.opacity='0';
@@ -389,15 +578,12 @@ function loadPlayer(mal, ep, lang){
   frame.src=`${MEGAPLAY}/${mal}/${ep}/${lang}`;
   frame.onload=()=>{ frame.style.opacity='1'; loading.style.display='none'; };
   currentEp=ep; currentLang=lang;
-  // Update URL
   const url=new URL(window.location);
   url.searchParams.set('ep',ep);
   url.searchParams.set('lang',lang);
   window.history.replaceState({},'',url);
-  // Update ep label
   document.getElementById('epCurrentLabel').textContent=`Episode ${ep}`;
   if(animeData) document.getElementById('navTitle').textContent=(animeData.title_english||animeData.title||'')+` — EP ${ep}`;
-  // Highlight active ep
   document.querySelectorAll('.ep-pill').forEach(b=>b.classList.toggle('active',+b.dataset.ep===ep));
 }
 
@@ -420,7 +606,6 @@ function buildEpGrid(total){
     btn.onclick=()=>loadPlayer(malId,i,currentLang);
     grid.appendChild(btn);
   }
-  // Scroll active into view
   setTimeout(()=>{
     const a=grid.querySelector('.ep-pill.active');
     if(a) a.scrollIntoView({block:'nearest',inline:'center'});
@@ -432,7 +617,6 @@ function renderAnimeInfo(anime){
   const poster=anime.images?.jpg?.large_image_url||anime.images?.jpg?.image_url||'';
   const synopsis=(anime.synopsis||'').replace(/\[Written.*?\]/g,'');
   const genres=(anime.genres||[]).slice(0,4).map(g=>`<span class="anime-genre">${g.name}</span>`).join('');
-  const inWl=false; // TODO: connect to watchlist
   document.getElementById('animeInfo').innerHTML=`
     <div class="anime-info-inner">
       <img class="anime-poster" src="${poster}" alt="">
@@ -459,7 +643,7 @@ function renderAnimeInfo(anime){
     </div>`;
 }
 
-async function loadRelated(genreId, excludeMal){
+async function loadRelated(genreId,excludeMal){
   if(!genreId) return;
   const data=await jikan('/anime',{genres:genreId,order_by:'score',sort:'desc',limit:8});
   const items=(data?.data||[]).filter(a=>a.mal_id!=excludeMal).slice(0,6);
@@ -482,6 +666,40 @@ function renderNavUser(){
   const name=getDisplayName(currentUser);
   const av=getAvatarUrl(currentUser);
   el.innerHTML=`<img src="${av}" onerror="this.style.display='none'"><span style="font-size:12px;font-weight:600">${esc(name)}</span>`;
+}
+
+/* ── MOBILE MENU ── */
+function toggleMobileMenu(){
+  const m=document.getElementById('mobileMenu');
+  const b=document.getElementById('hamburger');
+  const open=m.classList.toggle('open');
+  b.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow='';
+}
+function updateMobileUser(user){
+  const avEl=document.getElementById('mmAvatar');
+  const nmEl=document.getElementById('mmName');
+  const sbEl=document.getElementById('mmSub');
+  const actionEl=document.getElementById('mmProfileAction');
+  if(!avEl) return;
+  if(!user){
+    avEl.src='https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50';
+    nmEl.textContent='Guest';
+    sbEl.textContent='Not signed in';
+    if(actionEl) actionEl.innerHTML=
+      `<a href="https://anicast.watch" style="background:var(--accent);color:#fff;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Sign In</a>`;
+  } else {
+    avEl.src=getAvatarUrl(user);
+    nmEl.textContent=getDisplayName(user);
+    sbEl.textContent=user.email||'';
+    if(actionEl) actionEl.innerHTML=
+      `<a href="https://anicast.watch" title="Settings" style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>`;
+  }
 }
 
 /* ── COMMENTS ── */
@@ -510,7 +728,6 @@ async function switchCommentEp(ep,btn){
 }
 
 async function initComments(){
-  // Show input or sign-in
   const area=document.getElementById('commentInputArea');
   if(currentUser){
     const av=getAvatarUrl(currentUser);
@@ -522,7 +739,6 @@ async function initComments(){
           <div class="comment-submit-row"><button class="comment-submit" onclick="submitComment()">Post Comment</button></div>
         </div>
       </div>`;
-    // Load liked
     const client=await getSB();
     const{data}=await client.from('comment_likes').select('comment_id').eq('user_id',currentUser.id);
     likedComments=new Set((data||[]).map(r=>r.comment_id));
@@ -610,11 +826,11 @@ async function submitComment(){
   ta.value='';
   const client=await getSB();
   await client.from('comments').insert({
-    mal_id:malId, episode:commentEp,
+    mal_id:malId,episode:commentEp,
     user_id:currentUser.id,
     username:getDisplayName(currentUser),
     avatar_url:getAvatarUrl(currentUser),
-    content:text, parent_id:null, likes:0
+    content:text,parent_id:null,likes:0
   });
   await loadComments(true);
 }
@@ -633,11 +849,11 @@ async function submitReply(parentId){
   if(!text) return;
   const client=await getSB();
   const{data,error}=await client.from('comments').insert({
-    mal_id:malId, episode:commentEp,
+    mal_id:malId,episode:commentEp,
     user_id:currentUser.id,
     username:getDisplayName(currentUser),
     avatar_url:getAvatarUrl(currentUser),
-    content:text, parent_id:parentId, likes:0
+    content:text,parent_id:parentId,likes:0
   }).select().single();
   if(!error&&data){
     ta.value='';
@@ -675,40 +891,6 @@ async function deleteComment(commentId){
   const client=await getSB();
   await client.from('comments').delete().eq('id',commentId).eq('user_id',currentUser.id);
   document.getElementById('comment-'+commentId)?.remove();
-}
-
-
-function toggleMobileMenu(){
-  const m=document.getElementById('mobileMenu');
-  const b=document.getElementById('hamburger');
-  const open=m.classList.toggle('open');
-  b.classList.toggle('open',open);
-  document.body.style.overflow=open?'hidden':'';
-}
-function closeMobileMenu(){
-  document.getElementById('mobileMenu').classList.remove('open');
-  document.getElementById('hamburger').classList.remove('open');
-  document.body.style.overflow='';
-}
-function updateMobileUser(user){
-  const avEl=document.getElementById('mmAvatar');
-  const nmEl=document.getElementById('mmName');
-  const sbEl=document.getElementById('mmSub');
-  const actionEl=document.getElementById('mmProfileAction');
-  if(!avEl) return;
-  if(!user){
-    avEl.src='https://api.dicebear.com/8.x/avataaars/svg?seed=guest&radius=50';
-    nmEl.textContent='Guest';
-    sbEl.textContent='Not signed in';
-    if(actionEl) actionEl.innerHTML=
-      `<a href="https://anicast.watch" style="background:var(--accent);color:#fff;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Sign In</a>`;
-  } else {
-    avEl.src=getAvatarUrl(user);
-    nmEl.textContent=getDisplayName(user);
-    sbEl.textContent=user.email||'';
-    if(actionEl) actionEl.innerHTML=
-      `<a href="https://anicast.watch" title="Settings" style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>`;
-  }
 }
 
 init();
