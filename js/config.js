@@ -11,7 +11,7 @@
  *    Deploy from branch → main → / (root)) and the site is live.
  * -------------------------------------------------------------
  */
-const TMDB_API_KEY = "YOUR_TMDB_API_KEY_HERE";
+const TMDB_API_KEY = "f1df4f14cd29615aba9945cd4630b823";
 
 const CONFIG = {
   apiKey: TMDB_API_KEY,
