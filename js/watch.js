@@ -1,129 +1,223 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  CV.initTopSearch();
-  const ready = await CV.checkApiKey();
+/* =================================================================
+   Anicast — watch.js
+   Real streaming integration with XPass, VidCore, VidSrc, Videasy
+================================================================= */
 
-  const playerFrame = document.getElementById("playerFrame");
-  const watchBody = document.getElementById("watchBody");
+(async () => {
+  "use strict";
 
   const params = new URLSearchParams(location.search);
-  const type = params.get("type") === "tv" ? "tv" : "movie";
-  const id = params.get("id");
-
-  if (!ready) {
-    playerFrame.innerHTML = "";
-    watchBody.innerHTML = CV.configNoticeHTML();
-    return;
-  }
+  const id = params.get("id");           // TMDB ID
+  const type = params.get("type") || "movie"; // movie | tv
+  const season = params.get("season");
+  const episode = params.get("episode");
 
   if (!id) {
-    playerFrame.innerHTML = "";
-    watchBody.innerHTML = CV.emptyStateHTML("No title selected", "Head back and pick something to watch a trailer for.");
+    document.body.innerHTML = `<div class="empty-state"><h3>No ID provided</h3></div>`;
     return;
   }
 
-  playerFrame.innerHTML = `<div class="no-trailer"><div class="section-note" style="padding:0;">loading…</div></div>`;
-  watchBody.innerHTML = "";
+  // DOM refs
+  const titleEl = document.getElementById("watchTitle");
+  const metaEl = document.getElementById("watchMeta");
+  const posterEl = document.getElementById("watchPoster");
+  const playerWrap = document.getElementById("playerWrap");
+  const sourceTabs = document.getElementById("sourceTabs");
+  const epGrid = document.getElementById("episodeGrid");
 
-  try {
-    const data = await CV.tmdb(`/${type}/${id}`, { append_to_response: "videos,credits" });
-    const trailers = (data.videos?.results || []).filter((v) => v.site === "YouTube");
-    const trailer = CV.pickTrailer(trailers);
+  let tmdbData = null;
+  let imdbId = null;
+  let currentSource = null;
 
-    document.title = `${CV.titleOf(data)} — Watch Trailer — CineVault`;
+  /* ---------------- Load TMDB details ---------------- */
+  async function loadDetails() {
+    try {
+      const path = type === "tv" ? `/tv/${id}` : `/movie/${id}`;
+      tmdbData = await CV.tmdb(path, { append_to_response: "external_ids" });
+      
+      // Extract IMDB ID for VidSrc
+      imdbId = tmdbData.external_ids?.imdb_id || null;
+      
+      renderHeader();
+      renderPlayer();
+      if (type === "tv") renderSeasons();
+      
+    } catch (e) {
+      console.error(e);
+      playerWrap.innerHTML = `<div class="empty-state"><h3>Failed to load title</h3><p>${e.message}</p></div>`;
+    }
+  }
 
-    renderPlayer(playerFrame, trailer);
-    if (trailers.length > 1) renderTrailerPicker(watchBody, trailers, trailer, playerFrame);
+  function renderHeader() {
+    const title = tmdbData.title || tmdbData.name;
+    const year = (tmdbData.release_date || tmdbData.first_air_date || "").slice(0, 4);
+    const runtime = tmdbData.runtime || tmdbData.episode_run_time?.[0];
+    const rating = tmdbData.vote_average ? tmdbData.vote_average.toFixed(1) : "—";
+    
+    if (titleEl) titleEl.textContent = title;
+    if (metaEl) {
+      metaEl.innerHTML = `
+        <span class="rating">★ ${rating}</span>
+        <span>${year}</span>
+        ${runtime ? `<span>${Math.floor(runtime / 60)}h ${runtime % 60}m</span>` : ""}
+        <span>${tmdbData.genres?.map(g => g.name).join(", ") || ""}</span>
+      `;
+    }
+    if (posterEl) {
+      posterEl.src = CV.IMG.poster(tmdbData.poster_path, "w500") || CV.PLACEHOLDER_POSTER;
+    }
+    document.title = `${title} — Anicast`;
+  }
 
-    const title = CV.titleOf(data);
-    const year = CV.yearOf(data);
-    const runtime = data.runtime
-      ? `${data.runtime} min`
-      : data.episode_run_time?.[0]
-      ? `${data.episode_run_time[0]} min/ep`
-      : data.number_of_seasons
-      ? `${data.number_of_seasons} season${data.number_of_seasons > 1 ? "s" : ""}`
-      : null;
+  /* ---------------- Build embed URLs ---------------- */
+  function getEmbedUrl(sourceKey) {
+    const src = STREAMING_SOURCES[sourceKey];
+    if (!src) return null;
 
-    const cast = (data.credits?.cast || []).slice(0, 10);
+    // Check if we have the required ID type
+    if (src.supports === "imdb" && !imdbId) return null;
+    const idToUse = src.supports === "imdb" ? imdbId : id;
 
-    const infoWrap = document.createElement("div");
-    infoWrap.innerHTML = `
-      <h1 class="watch-title">${title}</h1>
-      <div class="watch-meta">
-        ${data.vote_average ? `<span class="badge rating">★ ${data.vote_average.toFixed(1)}</span>` : ""}
-        <span class="badge">${year}</span>
-        ${runtime ? `<span class="badge">${runtime}</span>` : ""}
-        <span class="badge">${type === "tv" ? "TV Show" : "Movie"}</span>
-      </div>
-      <p class="watch-overview">${data.overview || "No overview available."}</p>
-      <div class="watch-genres">${(data.genres || []).map((g) => `<span class="chip">${g.name}</span>`).join("")}</div>
-      <div class="watch-actions">
-        <button class="btn btn-primary" id="watchlistBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg>
-          <span id="watchlistBtnLabel">${CV.isInWatchlist(id, type) ? "In Watchlist" : "Add to Watchlist"}</span>
-        </button>
-      </div>
-      ${
-        cast.length
-          ? `<div class="cast-row">${cast
-              .map(
-                (c) => `
-        <div class="cast-card">
-          <img src="${CV.IMG.profile(c.profile_path) || CV.PLACEHOLDER_POSTER}" alt="${c.name}" />
-          <div class="cn">${c.name}</div>
-          <div class="cc">${c.character || ""}</div>
-        </div>`
-              )
-              .join("")}</div>`
-          : ""
-      }`;
-    watchBody.appendChild(infoWrap);
+    if (type === "tv" && season && episode) {
+      return src.tv(idToUse, season, episode);
+    }
+    return src.movie(idToUse);
+  }
 
-    document.getElementById("watchlistBtn").addEventListener("click", () => {
-      const inList = CV.toggleWatchlist(data, type);
-      document.getElementById("watchlistBtnLabel").textContent = inList ? "In Watchlist" : "Add to Watchlist";
+  /* ---------------- Render player + source tabs ---------------- */
+  function renderPlayer() {
+    // Build source tabs
+    const availableSources = SOURCE_PRIORITY.filter(key => {
+      const src = STREAMING_SOURCES[key];
+      if (src.supports === "imdb" && !imdbId) return false;
+      return true;
     });
 
-    CV.logHistory(data, type);
-  } catch (e) {
-    playerFrame.innerHTML = "";
-    watchBody.innerHTML = CV.emptyStateHTML("Couldn't load this title", "Check your connection or TMDB key and try again.");
-  }
-});
+    if (availableSources.length === 0) {
+      playerWrap.innerHTML = `<div class="empty-state"><h3>No streaming sources available</h3><p>This title is missing required IDs.</p></div>`;
+      return;
+    }
 
-function renderPlayer(playerFrame, trailer) {
-  playerFrame.innerHTML = "";
-  if (trailer) {
-    const iframe = document.createElement("iframe");
-    iframe.src = `https://www.youtube.com/embed/${trailer.key}?autoplay=1&rel=0`;
-    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
-    iframe.allowFullscreen = true;
-    iframe.title = trailer.name || "Trailer";
-    playerFrame.appendChild(iframe);
-  } else {
-    playerFrame.innerHTML = `
-      <div class="no-trailer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 5v14l11-7L8 5Z"/></svg>
-        <div>No trailer available for this title on TMDB</div>
-      </div>`;
-  }
-}
+    // Source tab buttons
+    if (sourceTabs) {
+      sourceTabs.innerHTML = availableSources.map(key => {
+        const src = STREAMING_SOURCES[key];
+        const isActive = key === (currentSource || availableSources[0]);
+        return `<button class="source-tab ${isActive ? 'active' : ''}" data-source="${key}">${src.name}</button>`;
+      }).join("");
+      
+      // Tab click handlers
+      sourceTabs.querySelectorAll(".source-tab").forEach(btn => {
+        btn.addEventListener("click", () => switchSource(btn.dataset.source));
+      });
+    }
 
-function renderTrailerPicker(watchBody, trailers, current, playerFrame) {
-  const picker = document.createElement("div");
-  picker.className = "trailer-picker";
-  picker.innerHTML = trailers
-    .slice(0, 6)
-    .map((v) => `<button data-key="${v.key}" class="${current && v.key === current.key ? "active" : ""}">${v.type}${v.official ? " · official" : ""}</button>`)
-    .join("");
-  watchBody.prepend(picker);
-  picker.querySelectorAll("button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const t = trailers.find((v) => v.key === btn.dataset.key);
-      renderPlayer(playerFrame, t);
-      picker.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      playerFrame.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Auto-load first available source
+    switchSource(currentSource || availableSources[0]);
+  }
+
+  function switchSource(sourceKey) {
+    currentSource = sourceKey;
+    const url = getEmbedUrl(sourceKey);
+    
+    if (!url) {
+      playerWrap.innerHTML = `<div class="empty-state"><h3>Source unavailable</h3></div>`;
+      return;
+    }
+
+    // Update active tab
+    document.querySelectorAll(".source-tab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.source === sourceKey);
     });
-  });
-}
+
+    // Render iframe
+    const isXPass = sourceKey === "xpass";
+    const iframeHtml = `
+      <iframe 
+        id="videoPlayer"
+        src="${url}" 
+        width="100%" 
+        height="100%" 
+        frameborder="0" 
+        allowfullscreen
+        allow="encrypted-media; autoplay; picture-in-picture"
+        ${isXPass ? 'data-postmessage="true"' : ''}
+      ></iframe>
+    `;
+    playerWrap.innerHTML = iframeHtml;
+
+    // Setup XPass postMessage controls if applicable
+    if (isXPass) setupXPassControls();
+  }
+
+  /* ---------------- XPass PostMessage API ---------------- */
+  function setupXPassControls() {
+    // Optional: Add custom controls overlay for XPass
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "https://play.xpass.top") return;
+      const data = event.data;
+      if (data?.type !== "player.event") return;
+      
+      switch (data.event.name) {
+        case "ready":
+          console.log("XPass player ready");
+          break;
+        case "error":
+          console.error("XPass error:", data.event.code, data.event.message);
+          // Auto-fallback on error
+          fallbackSource();
+          break;
+      }
+    });
+  }
+
+  function playerAction(action, extra = {}) {
+    const iframe = document.getElementById("videoPlayer");
+    if (!iframe || !iframe.dataset.postmessage) return;
+    iframe.contentWindow.postMessage(
+      { type: "player.action", action, ...extra },
+      "https://play.xpass.top"
+    );
+  }
+
+  function fallbackSource() {
+    // Try next available source
+    const remaining = SOURCE_PRIORITY.filter(k => k !== currentSource);
+    const next = remaining.find(k => getEmbedUrl(k));
+    if (next) {
+      console.log(`Falling back to ${next}`);
+      switchSource(next);
+    }
+  }
+
+  /* ---------------- TV Season/Episode picker ---------------- */
+  async function renderSeasons() {
+    if (!epGrid) return;
+    
+    try {
+      const { seasons } = await CV.tmdb(`/tv/${id}`);
+      const currentSeason = season ? parseInt(season) : 1;
+      
+      // Fetch episodes for current season
+      const seasonData = await CV.tmdb(`/tv/${id}/season/${currentSeason}`);
+      
+      epGrid.innerHTML = seasonData.episodes.map(ep => {
+        const isActive = episode && parseInt(episode) === ep.episode_number;
+        return `
+          <a href="watch.html?id=${id}&type=tv&season=${currentSeason}&episode=${ep.episode_number}" 
+             class="ep-card ${isActive ? 'active' : ''}">
+            <span class="ep-num">${ep.episode_number}</span>
+            <span class="ep-title">${ep.name}</span>
+            <span class="ep-runtime">${ep.runtime || "—"}m</span>
+          </a>
+        `;
+      }).join("");
+      
+    } catch (e) {
+      console.error("Failed to load episodes:", e);
+    }
+  }
+
+  // Initialize
+  await loadDetails();
+})();
