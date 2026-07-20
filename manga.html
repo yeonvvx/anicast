@@ -97,17 +97,22 @@
       <div class="topbar-tag" id="apiStatusTag">checking TMDB key…</div>
     </div>
     <section class="grid-view">
-      <div class="grid-header"><div class="grid-title">Manga</div></div>
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17.5A2.5 2.5 0 0 1 17.5 22H6.5A2.5 2.5 0 0 1 4 19.5v-15Z"/><path d="M4 17h16"/></svg>
-        <h3>No manga source connected</h3>
-        <p>This build is wired to TMDB, which only covers film and TV. Manga is left in the nav for structural parity but has no data source here.</p>
+      <div class="grid-header">
+        <div class="grid-title">Manga</div>
+        <div class="inline-search">
+          <form id="mangaSearchForm">
+            <input id="mangaSearchInput" type="text" placeholder="Search manga, manhwa, novels…" autocomplete="off" />
+          </form>
+        </div>
       </div>
+      <div class="chip-row" id="mangaTypeChips" style="margin-bottom:22px;"></div>
+      <div id="mangaGrid" class="poster-grid"></div>
+      <div class="section-note">Data from Jikan (unofficial MyAnimeList API) — cards open the title's MyAnimeList page.</div>
     </section>
   </div>
 </div>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
-<script src="js/static-page.js"></script>
+<script src="js/manga.js"></script>
 </body>
 </html>

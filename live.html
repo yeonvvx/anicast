@@ -98,16 +98,14 @@
     </div>
     <section class="grid-view">
       <div class="grid-header"><div class="grid-title">Live Sports</div></div>
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M5 5a11 11 0 0 0 0 14M19 5a11 11 0 0 1 0 14M8.5 8.5a5.5 5.5 0 0 0 0 7M15.5 8.5a5.5 5.5 0 0 1 0 7"/></svg>
-        <h3>No live sports feed connected</h3>
-        <p>No live-sports data source is wired up in this build.</p>
-      </div>
+      <div class="chip-row" id="sportsLeagueChips" style="margin-bottom:22px;"></div>
+      <div id="sportsGrid"></div>
+      <div class="section-note">Data from TheSportsDB — shows each league's next scheduled fixtures, or its most recent results in the off-season.</div>
     </section>
   </div>
 </div>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
-<script src="js/static-page.js"></script>
+<script src="js/live.js"></script>
 </body>
 </html>

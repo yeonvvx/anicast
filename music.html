@@ -97,17 +97,22 @@
       <div class="topbar-tag" id="apiStatusTag">checking TMDB key…</div>
     </div>
     <section class="grid-view">
-      <div class="grid-header"><div class="grid-title">Music</div></div>
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
-        <h3>No music catalog connected</h3>
-        <p>No streaming or music-metadata API is wired up in this build.</p>
+      <div class="grid-header">
+        <div class="grid-title">Music</div>
+        <div class="inline-search">
+          <form id="musicSearchForm">
+            <input id="musicSearchInput" type="text" placeholder="Search songs or artists…" autocomplete="off" />
+          </form>
+        </div>
       </div>
+      <div class="chip-row" id="musicGenreChips" style="margin-bottom:22px;"></div>
+      <div id="musicGrid" class="poster-grid"></div>
+      <div class="section-note">Data from the iTunes Search API — tap a track to play its 30-second preview.</div>
     </section>
   </div>
 </div>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
-<script src="js/static-page.js"></script>
+<script src="js/music.js"></script>
 </body>
 </html>
