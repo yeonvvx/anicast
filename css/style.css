@@ -566,3 +566,98 @@ a:focus-visible, button:focus-visible, input:focus-visible, .card:focus-visible 
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* =================================================================
+   New sections — Manga / Music / Live Sports
+================================================================= */
+
+/* -------- Inline search (manga / music pages) -------- */
+.inline-search { max-width: 320px; flex: 1; min-width: 200px; }
+.inline-search form { display: flex; gap: 8px; }
+.inline-search input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.inline-search input:focus { border-color: var(--accent); background: var(--surface-hover); }
+
+/* -------- Music page: mini player -------- */
+.music-card { cursor: pointer; }
+.music-card .card-play { opacity: 0; }
+.music-card:hover .card-play, .music-card.playing .card-play { opacity: 1; }
+.music-card.playing .card-poster { border-color: var(--accent); }
+
+.mini-player {
+  position: fixed;
+  left: var(--sidebar-w);
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 24px;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+}
+.mini-player.open { display: flex; }
+.mini-player img {
+  width: 44px; height: 44px; border-radius: var(--radius-s);
+  object-fit: cover; background: var(--surface-2); flex-shrink: 0;
+}
+.mp-meta { min-width: 0; margin-right: auto; }
+.mp-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-artist { font-size: 11.5px; color: var(--text-faint); font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: var(--text); color: #0a0a0f;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.mp-btn svg { width: 15px; height: 15px; }
+.mp-link {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.mp-link:hover { color: var(--text); border-color: var(--text-faint); }
+.mp-close {
+  width: 28px; height: 28px; border-radius: 50%; border: none;
+  background: transparent; color: var(--text-faint); font-size: 14px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.mp-close:hover { color: var(--text); background: var(--surface-hover); }
+
+/* -------- Live sports: fixture list -------- */
+.fixture-list { display: flex; flex-direction: column; gap: 10px; }
+.fixture-card {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 16px 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  transition: border-color 0.15s var(--ease);
+}
+.fixture-card:hover { border-color: var(--text-faint); }
+.fixture-teams { display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 500; flex-wrap: wrap; }
+.fixture-team { min-width: 0; }
+.fixture-vs {
+  font-family: var(--font-mono); font-size: 12px; color: var(--accent);
+  border: 1px solid var(--accent-soft); background: var(--accent-soft);
+  padding: 3px 10px; border-radius: 999px; flex-shrink: 0;
+}
+.fixture-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
+.league-note { padding: 0 0 14px; }
+
+@media (max-width: 900px) {
+  .mini-player { left: 0; bottom: 58px; padding: 10px 14px; z-index: 55; }
+}
+
+@media (max-width: 640px) {
+  .fixture-card { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
