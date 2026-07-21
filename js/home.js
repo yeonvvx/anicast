@@ -36,7 +36,7 @@ async function buildHero() {
         <div class="hero-actions">
           <a class="btn btn-primary" id="heroPlayBtn" href="watch.html?type=movie&id=${picks[0].id}">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>
-            Play Trailer
+            Watch
           </a>
           <button class="btn btn-ghost" id="heroWatchlistBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg>
