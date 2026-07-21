@@ -7,13 +7,26 @@
 const CV = (() => {
   "use strict";
 
-  const { apiKey, apiBase, imgBase, animeGenreId } = config;
+  const {
+  apiKey,
+  apiBase,
+  imgBase,
+  posterSize,
+  backdropSize,
+  profileSize,
+  animeGenreId,
+   } = CONFIG;
 
-  const IMG = {
-    poster: (p, size = "w342") => (p ? `${imgBase}/${size}${p}` : null),
-    backdrop: (p, size = "w1280") => (p ? `${imgBase}/${size}${p}` : null),
-    profile: (p, size = "w185") => (p ? `${imgBase}/${size}${p}` : null),
-  };
+   const IMG = {
+     poster: (p, size = posterSize) =>
+       p ? `${imgBase}/${size}${p}` : null,
+
+     backdrop: (p, size = backdropSize) =>
+       p ? `${imgBase}/${size}${p}` : null,
+
+     profile: (p, size = profileSize) =>
+       p ? `${imgBase}/${size}${p}` : null,
+   };
 
   const PLACEHOLDER_POSTER =
     "data:image/svg+xml;utf8," +
