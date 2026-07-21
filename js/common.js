@@ -60,8 +60,8 @@ const CV = (() => {
   /* ---------------- API key check (runs once per page) ---------------- */
    function keyIsSet() {
      return (
-       apiKey &&
-       apiKey !== "f1df4f14cd29615aba9945cd4630b823"
+       typeof apiKey === "string" &&
+       apiKey.trim().length > 0
      );
    }
    console.log("API Key:", apiKey);
