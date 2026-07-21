@@ -46,7 +46,7 @@ const CV = (() => {
 
   /* ---------------- API key check (runs once per page) ---------------- */
   function keyIsSet() {
-    return !!apiKey && apiKey !== "YOUR_TMDB_API_KEY_HERE";
+    return !!apiKey && apiKey !== "f1df4f14cd29615aba9945cd4630b823";
   }
 
   async function checkApiKey() {
