@@ -20,10 +20,10 @@ const CONFIG = {
 const DEFAULT_SOURCE = "videasy";
 
 const SOURCE_PRIORITY = [
-  "videasy",
   "xpass",
   "vidcore",
-  "vidsrc"
+  "vidsrc",
+  "videasy"
 ];
 
 // ==========================================
