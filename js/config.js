@@ -9,6 +9,8 @@ const CONFIG = {
   animeGenreId: 16,
 };
 
+const SOURCE_PRIORITY = ["videasy", "vidcore", "xpass", "vidsrc"];
+
 const STREAMING_SOURCES = {
   xpass: {
     name: "XPass",
@@ -39,6 +41,3 @@ const STREAMING_SOURCES = {
     features: ["4k", "anime"]
   }
 };
-
-// Priority order for auto-select
-const SOURCE_PRIORITY = ["videasy", "vidcore", "xpass", "vidsrc"];
