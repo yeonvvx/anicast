@@ -49,7 +49,7 @@ const STREAMING_SOURCES = {
   },
 
   xpass: {
-    name: "XPass",
+    name: "AniCast",
     enabled: true,
     supports: "tmdb",
 
