@@ -64,7 +64,9 @@ const CV = (() => {
        apiKey !== "f1df4f14cd29615aba9945cd4630b823"
      );
    }
-
+   console.log("API Key:", apiKey);
+   console.log("Key Set:", keyIsSet());
+   
   async function checkApiKey() {
     const tag = document.getElementById("apiStatusTag");
     if (!keyIsSet()) {
