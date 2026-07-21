@@ -7,7 +7,7 @@
 const CV = (() => {
   "use strict";
 
-  const { apiKey, apiBase, imgBase, animeGenreId } = CONFIG;
+  const { apiKey, apiBase, imgBase, animeGenreId } = config;
 
   const IMG = {
     poster: (p, size = "w342") => (p ? `${imgBase}/${size}${p}` : null),
