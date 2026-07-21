@@ -1,4 +1,14 @@
 // js/config.js — ADD THIS BELOW THE EXISTING CONFIG
+const TMDB_API_KEY = "f1df4f14cd29615aba9945cd4630b823";
+
+const CONFIG = {
+  apiKey: TMDB_API_KEY,
+  apiBase: "https://api.themoviedb.org/3",
+  imgBase: "https://image.tmdb.org/t/p",
+  // Anime = animation genre (16) restricted to Japanese origin.
+  animeGenreId: 16,
+};
+
 const STREAMING_SOURCES = {
   xpass: {
     name: "XPass",
