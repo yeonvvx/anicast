@@ -324,6 +324,7 @@ function enableDragScroll(element){
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
+  let moved = false;
   let velocity = 0;
   let animationFrame;
 
@@ -331,6 +332,7 @@ function enableDragScroll(element){
   element.addEventListener("mousedown", (e)=>{
 
     isDown = true;
+    moved = false;
 
     element.classList.add("dragging");
 
@@ -349,8 +351,6 @@ function enableDragScroll(element){
     cancelAnimationFrame(animationFrame);
 
 
-    e.preventDefault();
-
   });
 
 
@@ -362,55 +362,62 @@ function enableDragScroll(element){
 
     isDown = false;
 
-    element.classList.remove("dragging");
-
-
-    startMomentum();
-
-  });
-
-
-
-  element.addEventListener("mouseleave", ()=>{
-
-    if(!isDown) return;
-
-
-    isDown = false;
 
     element.classList.remove("dragging");
 
 
     startMomentum();
 
+
+    // allow click only if user didn't drag
+    setTimeout(()=>{
+
+      moved = false;
+
+    },50);
+
+
   });
 
 
 
-  element.addEventListener("mousemove", (e)=>{
+  element.addEventListener("mousemove",(e)=>{
 
     if(!isDown) return;
-
-
-    e.preventDefault();
 
 
     const x =
       e.pageX - element.offsetLeft;
 
 
-    const walk =
+    const distance =
       x - startX;
 
 
-    velocity =
-      walk * -0.8;
+
+    // ignore tiny movements
+    if(Math.abs(distance) > 5){
+
+      moved = true;
+
+      e.preventDefault();
+
+    }
 
 
+
+    // slower smoother movement
     element.scrollLeft =
-      scrollLeft - walk * 1.5;
+      scrollLeft - distance * 0.55;
+
+
+
+    velocity =
+      -distance * 0.15;
+
 
   });
+
 
 
 
@@ -419,10 +426,11 @@ function enableDragScroll(element){
     element.scrollLeft += velocity;
 
 
-    velocity *= 0.92;
+    velocity *= 0.90;
 
 
-    if(Math.abs(velocity) > 0.5){
+
+    if(Math.abs(velocity) > 0.2){
 
       animationFrame =
       requestAnimationFrame(
@@ -432,6 +440,33 @@ function enableDragScroll(element){
     }
 
   }
+
+
+
+
+  // prevent accidental card clicks
+  element.querySelectorAll("a, button")
+  .forEach(card=>{
+
+
+    card.addEventListener(
+      "click",
+      (e)=>{
+
+        if(moved){
+
+          e.preventDefault();
+
+          e.stopImmediatePropagation();
+
+        }
+
+      },
+      true
+    );
+
+
+  });
 
 
 
