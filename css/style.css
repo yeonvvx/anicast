@@ -440,7 +440,20 @@ img { display: block; max-width: 100%; }
   backdrop-filter: blur(4px);
 }
 
-.card-title { margin-top: 9px; font-size: 13px; font-weight: 500; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-title {
+  margin-top: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 34px;
+}
 .card-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); margin-top: 2px; }
 
 /* -------- Grid (search / browse / movies / tv / anime / watchlist / history) -------- */
