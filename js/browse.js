@@ -1,57 +1,301 @@
 let browseType = "movie";
 let browseGenre = null;
 
+let currentPage = 1;
+let totalPages = 1;
+let loading = false;
+
+
 document.addEventListener("DOMContentLoaded", async () => {
+
   CV.initTopSearch();
+
   const ready = await CV.checkApiKey();
+
   if (!ready) {
-    document.getElementById("browseGrid").innerHTML = CV.configNoticeHTML();
+    document.getElementById("browseGrid").innerHTML =
+      CV.configNoticeHTML();
     return;
   }
 
-  document.querySelectorAll("#browseTypeChips .chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
+
+  document.querySelectorAll("#browseTypeChips .chip")
+  .forEach((chip)=>{
+
+    chip.addEventListener("click",()=>{
+
       browseType = chip.dataset.type;
-      document.querySelectorAll("#browseTypeChips .chip").forEach((c) => c.classList.remove("active"));
+
+      document
+      .querySelectorAll("#browseTypeChips .chip")
+      .forEach(c=>c.classList.remove("active"));
+
       chip.classList.add("active");
+
+
       loadGenres();
+
     });
+
   });
 
+
+  createInfiniteObserver();
+
   loadGenres();
+
 });
 
-async function loadGenres() {
-  const chipRow = document.getElementById("browseGenreChips");
-  chipRow.innerHTML = `<div class="section-note" style="padding:0;">loading genres…</div>`;
-  try {
-    const data = await CV.tmdb(`/genre/${browseType}/list`);
-    browseGenre = data.genres[0].id;
-    chipRow.innerHTML = data.genres
-      .map((g, i) => `<button class="chip ${i === 0 ? "active" : ""}" data-genre="${g.id}">${g.name}</button>`)
-      .join("");
-    chipRow.querySelectorAll(".chip").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        browseGenre = +chip.dataset.genre;
-        chipRow.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-        chip.classList.add("active");
-        loadGrid();
-      });
-    });
-    loadGrid();
-  } catch (e) {
-    chipRow.innerHTML = "";
-    document.getElementById("browseGrid").innerHTML = CV.emptyStateHTML("Couldn't load genres", "Check your connection or TMDB key and refresh.");
-  }
+
+
+
+
+async function loadGenres(){
+
+const chipRow =
+document.getElementById("browseGenreChips");
+
+
+chipRow.innerHTML =
+`
+<div class="section-note" style="padding:0;">
+loading genres…
+</div>
+`;
+
+
+try {
+
+
+const data =
+await CV.tmdb(`/genre/${browseType}/list`);
+
+
+browseGenre =
+data.genres[0].id;
+
+
+
+chipRow.innerHTML =
+data.genres.map((g,i)=>`
+
+<button class="chip ${i===0?"active":""}"
+data-genre="${g.id}">
+
+${g.name}
+
+</button>
+
+`).join("");
+
+
+
+
+chipRow.querySelectorAll(".chip")
+.forEach(chip=>{
+
+
+chip.addEventListener("click",()=>{
+
+
+browseGenre =
+Number(chip.dataset.genre);
+
+
+chipRow
+.querySelectorAll(".chip")
+.forEach(c=>c.classList.remove("active"));
+
+
+chip.classList.add("active");
+
+
+resetGrid();
+
+
+loadGrid();
+
+
+});
+
+
+});
+
+
+
+resetGrid();
+
+loadGrid();
+
+
 }
 
-async function loadGrid() {
-  const grid = document.getElementById("browseGrid");
-  grid.innerHTML = CV.skeletonHTML(18);
-  try {
-    const data = await CV.tmdb(`/discover/${browseType}`, { with_genres: browseGenre, sort_by: "popularity.desc" });
-    grid.innerHTML = data.results.length ? data.results.map(CV.cardHTML).join("") : CV.emptyStateHTML("Nothing here", "Try a different genre.");
-  } catch (e) {
-    grid.innerHTML = CV.emptyStateHTML("Couldn't load results", "Check your connection or TMDB key and refresh.");
-  }
+catch(e){
+
+chipRow.innerHTML="";
+
+document.getElementById("browseGrid").innerHTML =
+CV.emptyStateHTML(
+"Couldn't load genres",
+"Check your connection or TMDB key."
+);
+
+}
+
+}
+
+
+
+
+
+function resetGrid(){
+
+const grid =
+document.getElementById("browseGrid");
+
+
+grid.innerHTML =
+CV.skeletonHTML(18);
+
+
+currentPage = 1;
+totalPages = 1;
+
+}
+
+
+
+
+async function loadGrid(){
+
+
+const grid =
+document.getElementById("browseGrid");
+
+
+
+if(
+loading ||
+currentPage > totalPages
+)
+return;
+
+
+
+loading=true;
+
+
+
+try {
+
+
+const data =
+await CV.tmdb(
+`/discover/${browseType}`,
+{
+page: currentPage,
+with_genres:browseGenre,
+sort_by:"popularity.desc"
+}
+);
+
+
+
+totalPages =
+data.total_pages;
+
+
+
+const html =
+data.results
+.map(CV.cardHTML)
+.join("");
+
+
+
+if(currentPage===1){
+
+grid.innerHTML = html;
+
+}
+else{
+
+grid.insertAdjacentHTML(
+"beforeend",
+html
+);
+
+}
+
+
+
+currentPage++;
+
+
+}
+
+catch(e){
+
+console.error(e);
+
+}
+
+finally{
+
+loading=false;
+
+}
+
+
+}
+
+
+
+
+
+function createInfiniteObserver(){
+
+
+const trigger =
+document.createElement("div");
+
+
+trigger.id="infiniteTrigger";
+
+
+trigger.style.height="80px";
+
+
+document
+.getElementById("browseGrid")
+.parentElement
+.appendChild(trigger);
+
+
+
+
+const observer =
+new IntersectionObserver(
+(entries)=>{
+
+
+if(entries[0].isIntersecting){
+
+loadGrid();
+
+}
+
+
+},
+{
+rootMargin:"500px"
+}
+
+);
+
+
+
+observer.observe(trigger);
+
+
 }
