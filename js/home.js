@@ -49,7 +49,6 @@ async function buildHero() {
       `).join("")}
 
 
-
       <div class="hero-scrim"></div>
 
 
@@ -136,7 +135,6 @@ async function buildHero() {
 
 
 
-
       <div class="hero-dots">
 
         ${picks.map((_,i)=>`
@@ -149,7 +147,6 @@ async function buildHero() {
 
       </div>
 
-
     `;
 
 
@@ -159,7 +156,6 @@ async function buildHero() {
 
 
     function setActive(i){
-
 
       activeIdx = i;
 
@@ -191,7 +187,6 @@ async function buildHero() {
 
       const movie =
       picks[i];
-
 
 
       document.getElementById("heroTitle")
@@ -231,8 +226,9 @@ async function buildHero() {
       .href =
       `watch.html?type=movie&id=${movie.id}`;
 
-
     }
+
+
 
 
 
@@ -297,13 +293,10 @@ async function buildHero() {
         );
 
 
-        e.currentTarget
-        .lastChild
-        .textContent =
+        e.currentTarget.innerHTML =
         inList ?
-        " In Watchlist" :
-        " Watchlist";
-
+        "✓ In Watchlist" :
+        "Watchlist";
 
       }
     );
@@ -331,19 +324,48 @@ function enableDragScroll(element){
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
+  let velocity = 0;
+  let animationFrame;
 
 
   element.addEventListener("mousedown", (e)=>{
 
     isDown = true;
 
-    element.style.cursor = "grabbing";
+    element.classList.add("dragging");
+
 
     startX =
       e.pageX - element.offsetLeft;
 
+
     scrollLeft =
       element.scrollLeft;
+
+
+    velocity = 0;
+
+
+    cancelAnimationFrame(animationFrame);
+
+
+    e.preventDefault();
+
+  });
+
+
+
+  document.addEventListener("mouseup", ()=>{
+
+    if(!isDown) return;
+
+
+    isDown = false;
+
+    element.classList.remove("dragging");
+
+
+    startMomentum();
 
   });
 
@@ -351,19 +373,15 @@ function enableDragScroll(element){
 
   element.addEventListener("mouseleave", ()=>{
 
-    isDown = false;
+    if(!isDown) return;
 
-    element.style.cursor = "grab";
-
-  });
-
-
-
-  element.addEventListener("mouseup", ()=>{
 
     isDown = false;
 
-    element.style.cursor = "grab";
+    element.classList.remove("dragging");
+
+
+    startMomentum();
 
   });
 
@@ -382,15 +400,49 @@ function enableDragScroll(element){
 
 
     const walk =
-      (x - startX) * 2;
+      x - startX;
+
+
+    velocity =
+      walk * -0.8;
 
 
     element.scrollLeft =
-      scrollLeft - walk;
+      scrollLeft - walk * 1.5;
 
   });
 
+
+
+  function startMomentum(){
+
+    element.scrollLeft += velocity;
+
+
+    velocity *= 0.92;
+
+
+    if(Math.abs(velocity) > 0.5){
+
+      animationFrame =
+      requestAnimationFrame(
+        startMomentum
+      );
+
+    }
+
+  }
+
+
+
+  element.addEventListener(
+    "dragstart",
+    e=>e.preventDefault()
+  );
+
 }
+
+
 
 
 
@@ -406,15 +458,15 @@ function buildShelfInto(
 ){
 
   const id =
-    "shelf-" +
-    Math.random()
-    .toString(36)
-    .slice(2,8);
+  "shelf-" +
+  Math.random()
+  .toString(36)
+  .slice(2,8);
 
 
 
   const wrap =
-    document.createElement("div");
+  document.createElement("div");
 
 
   wrap.className = "shelf";
@@ -443,13 +495,12 @@ function buildShelfInto(
   `;
 
 
-
   container.appendChild(wrap);
 
 
 
   const track =
-    document.getElementById(id);
+  document.getElementById(id);
 
 
 
@@ -458,6 +509,7 @@ function buildShelfInto(
   let totalPages = Infinity;
 
   let loading = false;
+
 
 
 
@@ -472,7 +524,6 @@ function buildShelfInto(
       return;
 
     }
-
 
 
     loading = true;
@@ -524,7 +575,7 @@ function buildShelfInto(
     catch(e){
 
       console.error(
-        "Shelf error:",
+        "Shelf loading error:",
         e
       );
 
@@ -542,17 +593,17 @@ function buildShelfInto(
 
 
 
-  // initial cards
+  // first batch
   loadMore();
 
 
 
-  // drag scrolling
+  // mouse drag scrolling
   enableDragScroll(track);
 
 
 
-  // load more near the end
+  // infinite loading
   track.addEventListener(
     "scroll",
     ()=>{
@@ -572,6 +623,7 @@ function buildShelfInto(
     }
   );
 
+
 }
 
 
@@ -585,7 +637,7 @@ function buildShelfInto(
 async function buildShelves(){
 
   const container =
-    document.getElementById("homeShelves");
+  document.getElementById("homeShelves");
 
 
   container.innerHTML = "";
