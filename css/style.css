@@ -761,3 +761,25 @@ a:focus-visible, button:focus-visible, input:focus-visible, .card:focus-visible 
   font-size: 0.8rem;
   font-weight: 700;
 }
+#infiniteTrigger {
+  height: 80px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#infiniteTrigger::after {
+  content:"";
+  width:28px;
+  height:28px;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform:rotate(360deg);
+  }
+}
