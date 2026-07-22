@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-
   CV.initTopSearch();
 
   const ready = await CV.checkApiKey();
@@ -12,27 +11,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await buildHero();
   await buildShelves();
-
 });
 
 
 
-
-
 async function buildHero() {
-
-  const hero =
-  document.getElementById("hero");
-
+  const hero = document.getElementById("hero");
 
   try {
 
     const trending =
-    await CV.tmdb("/trending/movie/week");
-
+      await CV.tmdb("/trending/movie/week");
 
     const picks =
-    trending.results.slice(0,5);
+      trending.results.slice(0, 5);
 
 
     hero.innerHTML = `
@@ -48,13 +40,12 @@ async function buildHero() {
       <div class="hero-body">
 
         <div class="hero-eyebrow">
-        TRENDING THIS WEEK
+          TRENDING THIS WEEK
         </div>
 
         <h1 class="hero-title" id="heroTitle">
-        ${CV.titleOf(picks[0])}
+          ${CV.titleOf(picks[0])}
         </h1>
-
 
         <div class="hero-meta" id="heroMeta">
           <span class="badge rating">
@@ -70,26 +61,23 @@ async function buildHero() {
           </span>
         </div>
 
-
         <p class="hero-overview" id="heroOverview">
-        ${picks[0].overview || ""}
+          ${picks[0].overview || ""}
         </p>
-
 
         <div class="hero-actions">
 
-        <a class="btn btn-primary"
-        id="heroPlayBtn"
-        href="watch.html?type=movie&id=${picks[0].id}">
-        Watch
-        </a>
+          <a class="btn btn-primary"
+          id="heroPlayBtn"
+          href="watch.html?type=movie&id=${picks[0].id}">
+            Watch
+          </a>
 
 
-        <button class="btn btn-ghost"
-        id="heroWatchlistBtn">
-        Watchlist
-        </button>
-
+          <button class="btn btn-ghost"
+          id="heroWatchlistBtn">
+            Watchlist
+          </button>
 
         </div>
 
@@ -97,85 +85,137 @@ async function buildHero() {
 
 
       <div class="hero-dots">
-      ${picks.map((_,i)=>`
-        <div class="hero-dot ${i===0?"active":""}"
-        data-i="${i}">
-        </div>
-      `).join("")}
+        ${picks.map((_,i)=>`
+          <div class="hero-dot ${i===0?"active":""}"
+          data-i="${i}">
+          </div>
+        `).join("")}
       </div>
     `;
 
 
 
-    let active = 0;
+    let activeIdx = 0;
 
 
     function setActive(i){
 
-      active=i;
+      activeIdx = i;
+
 
       hero.querySelectorAll(".hero-slide")
-      .forEach(s=>
+      .forEach(s =>
         s.classList.toggle(
           "active",
-          +s.dataset.i===i
+          +s.dataset.i === i
         )
       );
 
 
       hero.querySelectorAll(".hero-dot")
-      .forEach(d=>
+      .forEach(d =>
         d.classList.toggle(
           "active",
-          +d.dataset.i===i
+          +d.dataset.i === i
         )
       );
 
 
-      const m=picks[i];
+      const m = picks[i];
 
 
       document.getElementById("heroTitle")
-      .textContent=CV.titleOf(m);
+      .textContent = CV.titleOf(m);
 
 
       document.getElementById("heroOverview")
-      .textContent=m.overview || "";
+      .textContent = m.overview || "";
+
+
+      document.getElementById("heroMeta")
+      .innerHTML = `
+        <span class="badge rating">
+        ★ ${m.vote_average.toFixed(1)}
+        </span>
+
+        <span class="badge">
+        ${CV.yearOf(m)}
+        </span>
+
+        <span class="badge">
+        Movie
+        </span>
+      `;
 
 
       document.getElementById("heroPlayBtn")
-      .href=`watch.html?type=movie&id=${m.id}`;
+      .href =
+      `watch.html?type=movie&id=${m.id}`;
 
     }
 
 
 
     hero.querySelectorAll(".hero-dot")
-    .forEach(dot=>{
+    .forEach(dot => {
 
-      dot.onclick=()=>setActive(+dot.dataset.i);
+      dot.addEventListener(
+        "click",
+        ()=>setActive(+dot.dataset.i)
+      );
 
     });
 
 
 
-    let timer=setInterval(
-      ()=>setActive((active+1)%picks.length),
+    let timer =
+    setInterval(
+      ()=>setActive((activeIdx+1)%picks.length),
       7000
     );
 
 
+    hero.addEventListener(
+      "mouseenter",
+      ()=>clearInterval(timer)
+    );
 
-    hero.onmouseenter=()=>clearInterval(timer);
 
-    hero.onmouseleave=()=>{
+    hero.addEventListener(
+      "mouseleave",
+      ()=>{
 
-      timer=setInterval(
-        ()=>setActive((active+1)%picks.length),
-        7000
-      );
+        timer =
+        setInterval(
+          ()=>setActive((activeIdx+1)%picks.length),
+          7000
+        );
 
-    };
+      }
+    );
+
+
+
+    document
+    .getElementById("heroWatchlistBtn")
+    .addEventListener(
+      "click",
+      e=>{
+
+        const inList =
+        CV.toggleWatchlist(
+          picks[activeIdx],
+          "movie"
+        );
+
+
+        e.currentTarget.textContent =
+        inList ?
+        "In Watchlist" :
+        "Watchlist";
+
+      }
+    );
 
 
   }
@@ -186,7 +226,7 @@ async function buildHero() {
     hero.innerHTML =
     CV.emptyStateHTML(
       "Couldn't load trending titles",
-      "Check your TMDB key."
+      "Check your connection or TMDB key and refresh."
     );
 
   }
@@ -198,171 +238,171 @@ async function buildHero() {
 
 
 
-
-
-function createShelfInfinite(
-container,
-title,
-label,
-endpoint,
-extra={}
+function buildShelfInto(
+  container,
+  title,
+  countLabel,
+  endpoint,
+  params={}
 ){
 
 
-let page=1;
-let totalPages=Infinity;
-let loading=false;
-
-
-const id =
-"shelf-"+Math.random()
-.toString(36)
-.slice(2,8);
-
-
-const trigger =
-id+"-trigger";
+  const id =
+  "shelf-" +
+  Math.random()
+  .toString(36)
+  .slice(2,8);
 
 
 
-const wrap =
-document.createElement("div");
+  const wrap =
+  document.createElement("div");
 
 
-wrap.className="shelf";
+  wrap.className="shelf";
 
 
-wrap.innerHTML=`
+  wrap.innerHTML = `
 
-<div class="shelf-head">
+    <div class="shelf-head">
 
-<div class="shelf-title">
-${title}
-</div>
+      <div class="shelf-title">
+      ${title}
+      </div>
 
-<div class="shelf-count">
-${label}
-</div>
+      <div class="shelf-count">
+      ${countLabel}
+      </div>
 
-</div>
-
-
-<div class="shelf-track" id="${id}">
-${CV.skeletonHTML(8)}
-</div>
+    </div>
 
 
-<div id="${trigger}"
-style="height:80px">
-</div>
+    <div class="shelf-track" id="${id}">
+      ${CV.skeletonHTML(8)}
+    </div>
 
-`;
+  `;
 
 
 
-container.appendChild(wrap);
+  container.appendChild(wrap);
 
 
 
-const grid =
-document.getElementById(id);
+  const track =
+  document.getElementById(id);
 
 
 
-async function load(){
+  let page = 1;
+  let totalPages = Infinity;
+  let loading = false;
 
 
-if(
-loading ||
-page>totalPages
-)
-return;
+
+  async function loadMore(){
 
 
-loading=true;
+    if(
+      loading ||
+      page > totalPages
+    )
+    return;
 
 
-try{
+
+    loading=true;
 
 
-const data =
-await CV.tmdb(
-endpoint,
-{
-page,
-...extra
+
+    try{
+
+
+      const data =
+      await CV.tmdb(
+        endpoint,
+        {
+          page,
+          ...params
+        }
+      );
+
+
+
+      totalPages =
+      data.total_pages;
+
+
+
+      if(page===1){
+
+        track.innerHTML="";
+
+      }
+
+
+
+      track.insertAdjacentHTML(
+        "beforeend",
+        data.results
+        .map(CV.cardHTML)
+        .join("")
+      );
+
+
+
+      page++;
+
+
+    }
+
+
+    catch(e){
+
+      console.error(
+        "Shelf error:",
+        e
+      );
+
+    }
+
+
+    finally{
+
+      loading=false;
+
+    }
+
+
+  }
+
+
+
+
+  loadMore();
+
+
+
+  track.addEventListener(
+    "scroll",
+    ()=>{
+
+
+      if(
+        track.scrollLeft +
+        track.clientWidth >=
+        track.scrollWidth - 250
+      ){
+
+        loadMore();
+
+      }
+
+
+    }
+  );
+
 }
-);
-
-
-totalPages=data.total_pages;
-
-
-
-grid.insertAdjacentHTML(
-"beforeend",
-data.results
-.map(CV.cardHTML)
-.join("")
-);
-
-
-
-page++;
-
-
-}
-
-catch(e){
-
-console.error(e);
-
-}
-
-
-finally{
-
-loading=false;
-
-}
-
-
-}
-
-
-
-
-const observer =
-new IntersectionObserver(
-(entries)=>{
-
-if(entries[0].isIntersecting){
-
-load();
-
-}
-
-},
-{
-rootMargin:"600px"
-}
-);
-
-
-
-observer.observe(
-document.getElementById(trigger)
-);
-
-
-
-load();
-
-
-}
-
-
-
 
 
 
@@ -372,61 +412,56 @@ load();
 
 async function buildShelves(){
 
-const container =
-document.getElementById("homeShelves");
+  const container =
+  document.getElementById("homeShelves");
 
 
-container.innerHTML="";
-
-
-
-createShelfInfinite(
-container,
-"Popular Movies",
-"TMDB · popular",
-"/movie/popular"
-);
+  container.innerHTML="";
 
 
 
-createShelfInfinite(
-container,
-"Popular TV Shows",
-"TMDB · popular",
-"/tv/popular"
-);
+  buildShelfInto(
+    container,
+    "Popular Movies",
+    "TMDB · popular",
+    "/movie/popular"
+  );
 
 
-
-createShelfInfinite(
-container,
-"Anime",
-"animation · JP",
-"/discover/tv",
-{
-with_genres:CV.animeGenreId,
-with_origin_country:"JP",
-sort_by:"popularity.desc"
-}
-);
+  buildShelfInto(
+    container,
+    "Popular TV Shows",
+    "TMDB · popular",
+    "/tv/popular"
+  );
 
 
+  buildShelfInto(
+    container,
+    "Anime",
+    "animation · JP",
+    "/discover/tv",
+    {
+      with_genres:CV.animeGenreId,
+      with_origin_country:"JP",
+      sort_by:"popularity.desc"
+    }
+  );
 
-createShelfInfinite(
-container,
-"Top Rated Movies",
-"TMDB · top rated",
-"/movie/top_rated"
-);
+
+  buildShelfInto(
+    container,
+    "Top Rated Movies",
+    "TMDB · top rated",
+    "/movie/top_rated"
+  );
 
 
-
-createShelfInfinite(
-container,
-"Upcoming",
-"in theaters soon",
-"/movie/upcoming"
-);
-
+  buildShelfInto(
+    container,
+    "Upcoming",
+    "in theaters soon",
+    "/movie/upcoming"
+  );
 
 }
