@@ -5,7 +5,6 @@ let currentPage = 1;
 let totalPages = 1;
 let loading = false;
 
-
 document.addEventListener("DOMContentLoaded", async () => {
 
   CV.initTopSearch();
@@ -32,13 +31,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       chip.classList.add("active");
 
-
       loadGenres();
-
     });
 
   });
-
 
   createInfiniteObserver();
 
@@ -124,14 +120,10 @@ loadGrid();
 
 
 resetGrid();
-
 loadGrid();
 
-
 }
-
 catch(e){
-
 chipRow.innerHTML="";
 
 document.getElementById("browseGrid").innerHTML =
@@ -145,34 +137,21 @@ CV.emptyStateHTML(
 }
 
 
-
-
-
 function resetGrid(){
-
 const grid =
 document.getElementById("browseGrid");
-
-
 grid.innerHTML =
 CV.skeletonHTML(18);
 
 
 currentPage = 1;
 totalPages = 1;
-
 }
 
 
-
-
 async function loadGrid(){
-
-
 const grid =
 document.getElementById("browseGrid");
-
-
 
 if(
 loading ||
@@ -184,10 +163,7 @@ return;
 
 loading=true;
 
-
-
 try {
-
 
 const data =
 await CV.tmdb(
@@ -199,12 +175,8 @@ sort_by:"popularity.desc"
 }
 );
 
-
-
 totalPages =
 data.total_pages;
-
-
 
 const html =
 data.results
@@ -227,75 +199,44 @@ html
 
 }
 
-
-
 currentPage++;
-
 
 }
 
 catch(e){
 
 console.error(e);
-
 }
-
 finally{
-
 loading=false;
-
 }
-
-
 }
-
-
-
-
 
 function createInfiniteObserver(){
-
 
 const trigger =
 document.createElement("div");
 
-
 trigger.id="infiniteTrigger";
 
-
 trigger.style.height="80px";
-
 
 document
 .getElementById("browseGrid")
 .parentElement
 .appendChild(trigger);
 
-
-
-
 const observer =
 new IntersectionObserver(
 (entries)=>{
-
-
 if(entries[0].isIntersecting){
-
 loadGrid();
-
 }
-
-
 },
 {
 rootMargin:"500px"
 }
-
 );
-
-
-
 observer.observe(trigger);
-
 
 }
