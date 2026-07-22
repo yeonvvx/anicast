@@ -783,3 +783,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, .card:focus-visible 
     transform:rotate(360deg);
   }
 }
+.shelf-track {
+  cursor: grab;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.shelf-track.dragging {
+  cursor: grabbing;
+}
+
+.shelf-track * {
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.shelf-track::-webkit-scrollbar {
+  display:none;
+}
