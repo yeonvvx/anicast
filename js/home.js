@@ -479,6 +479,41 @@ function enableDragScroll(element){
 
 
 
+// Left/right nudge buttons for a shelf-track. Kept separate from
+// enableDragScroll so drag-to-scroll keeps working exactly as before —
+// these just call scrollBy() on the same element.
+function enableShelfArrows(track, prevBtn, nextBtn){
+
+  function amount(){
+    // scroll by roughly one screen's worth of cards
+    return Math.max(track.clientWidth * 0.9, 240);
+  }
+
+  function updateDisabled(){
+    const max = track.scrollWidth - track.clientWidth - 2;
+    prevBtn.disabled = track.scrollLeft <= 2;
+    nextBtn.disabled = track.scrollLeft >= max;
+  }
+
+  prevBtn.addEventListener("click", ()=>{
+    track.scrollBy({ left: -amount(), behavior: "smooth" });
+  });
+
+  nextBtn.addEventListener("click", ()=>{
+    track.scrollBy({ left: amount(), behavior: "smooth" });
+  });
+
+  track.addEventListener("scroll", updateDisabled);
+
+  // re-check once cards have actually loaded in (widths are 0 before that)
+  const ro = new ResizeObserver(updateDisabled);
+  ro.observe(track);
+
+  updateDisabled();
+}
+
+
+
 
 
 
@@ -516,8 +551,21 @@ function buildShelfInto(
       </div>
 
 
-      <div class="shelf-count">
-        ${countLabel}
+      <div class="shelf-head-right">
+
+        <div class="shelf-count">
+          ${countLabel}
+        </div>
+
+        <div class="shelf-arrows">
+          <button type="button" class="shelf-arrow-btn" data-dir="prev" aria-label="Scroll ${title} left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="shelf-arrow-btn" data-dir="next" aria-label="Scroll ${title} right">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+
       </div>
 
     </div>
@@ -635,6 +683,15 @@ function buildShelfInto(
 
   // mouse drag scrolling
   enableDragScroll(track);
+
+
+
+  // left/right arrow buttons
+  enableShelfArrows(
+    track,
+    wrap.querySelector('.shelf-arrow-btn[data-dir="prev"]'),
+    wrap.querySelector('.shelf-arrow-btn[data-dir="next"]')
+  );
 
 
 
