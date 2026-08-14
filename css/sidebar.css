@@ -142,19 +142,35 @@
    it would size .content to whatever track was meant for the
    sidebar. Take over sizing explicitly instead. */
 .app-shell {
-  display: block;
+  display: block !important;
 }
 
 .content {
-  display: block;
-  width: auto;
-  margin-left: var(--sidebar-w);
+  display: block !important;
+  width: auto !important;
+  margin-left: var(--sidebar-w) !important;
   transition: margin-left 0.25s ease;
 }
 
 /* Collapsed state, toggled via JS on .app-shell */
 .app-shell.sidebar-collapsed .sidebar { width: var(--sidebar-w-collapsed); padding: 28px 10px 12px; }
-.app-shell.sidebar-collapsed .content { width: auto; margin-left: var(--sidebar-w-collapsed); }
+.app-shell.sidebar-collapsed .content { width: auto !important; margin-left: var(--sidebar-w-collapsed) !important; }
+
+/* .search-icon was sizing itself off .search-box's width, which the
+   block-layout override above changed — pin it explicitly instead of
+   relying on an ancestor constraint from the real style.css. */
+.search-box {
+  position: relative !important;
+}
+.search-box .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px !important;
+  height: 18px !important;
+  pointer-events: none;
+}
 .app-shell.sidebar-collapsed .sidebar .logo-text,
 .app-shell.sidebar-collapsed .sidebar .nav-text,
 .app-shell.sidebar-collapsed .sidebar .nav-label,
