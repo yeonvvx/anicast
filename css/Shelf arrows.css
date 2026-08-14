@@ -1,0 +1,43 @@
+/* Scroll arrows for shelf rows (Continue Watching, Trending Movies, etc).
+   .shelf-head layout is forced here since the real rule in style.css is
+   unknown — title on the left, count + arrows grouped on the right. */
+.shelf-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px;
+}
+
+.shelf-head-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.shelf-arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.shelf-arrow-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  flex-shrink: 0;
+}
+.shelf-arrow-btn svg { width: 16px; height: 16px; }
+.shelf-arrow-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.18); }
+.shelf-arrow-btn:disabled { opacity: 0.3; cursor: default; }
+
+@media (max-width: 640px) {
+  .shelf-arrows { display: none; } /* touch scroll covers this on phones */
+}
