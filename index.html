@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
 <title>CineVault — Discover Movies, TV Shows & Anime</title>
 <meta name="description" content="Browse trending movies, TV shows, and anime and watch official trailers. Powered by TMDB." />
 <meta name="theme-color" content="#0a0a0f" />
@@ -10,80 +10,82 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<!-- New: glass-panel sidebar + mobile bottom nav, layered on top of the existing stylesheet -->
+<link rel="stylesheet" href="css/sidebar.css" />
 </head>
 <body>
 <div class="app-shell">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <a href="index.html" class="logo">
       <span class="logo-mark">
         <svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5Z" fill="#0a0a0f"/></svg>
       </span>
-      CineVault
+      <span class="logo-text">CineVault</span>
     </a>
 
-    <nav class="nav-group">
-      <a href="index.html" class="nav-link active" data-nav="home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
-        Home
-      </a>
-      <a href="search.html" class="nav-link" data-nav="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        Search
-      </a>
-      <a href="browse.html" class="nav-link" data-nav="browse">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-        Browse
-      </a>
-    </nav>
-
-    <div class="nav-group">
-      <div class="nav-label">MEDIA</div>
-      <a href="movies.html" class="nav-link" data-nav="movies">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5M16 4v5"/></svg>
-        Movies
-      </a>
-      <a href="tv.html" class="nav-link" data-nav="tv">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 21h8M12 19v2"/></svg>
-        TV Shows
-      </a>
-      <a href="anime.html" class="nav-link" data-nav="anime">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 8v8l8 5 8-5V8l-8-5Z"/><path d="M4 8l8 5 8-5"/></svg>
-        Anime
-      </a>
-      <a href="manga.html" class="nav-link" data-nav="manga">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17.5A2.5 2.5 0 0 1 17.5 22H6.5A2.5 2.5 0 0 1 4 19.5v-15Z"/><path d="M4 17h16"/></svg>
-        Manga
-      </a>
-      <a href="music.html" class="nav-link" data-nav="music">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
-        Music
-      </a>
-      <a href="live.html" class="nav-link" data-nav="live">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M5 5a11 11 0 0 0 0 14M19 5a11 11 0 0 1 0 14M8.5 8.5a5.5 5.5 0 0 0 0 7M15.5 8.5a5.5 5.5 0 0 1 0 7"/></svg>
-        Live Sports
-      </a>
-      <a href="watchlist.html" class="nav-link" data-nav="watchlist">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg>
-        Watchlist
-      </a>
-      <a href="history.html" class="nav-link" data-nav="history">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-        History
-      </a>
+    <!-- Primary nav, grouped in its own glass panel -->
+    <div class="nav-panel">
+      <nav class="nav-group">
+        <a href="index.html" class="nav-link active" data-nav="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+          <span class="nav-text">Home</span>
+        </a>
+        <a href="search.html" class="nav-link" data-nav="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <span class="nav-text">Search</span>
+        </a>
+        <a href="browse.html" class="nav-link" data-nav="browse">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span class="nav-text">Browse</span>
+        </a>
+      </nav>
     </div>
 
-    <div class="nav-group">
-      <div class="nav-label">MORE</div>
-      <a href="legal.html" class="nav-link" data-nav="legal">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 8l-3 6a3.5 3.5 0 0 0 7 0l-3-6h6l-3 6a3.5 3.5 0 0 0 7 0l-3-6M5 8h14M9 3h6"/></svg>
-        Legal/DMCA
-      </a>
+    <!-- Media + More nav, grouped in one scrollable glass panel -->
+    <div class="nav-panel nav-panel-scroll">
+      <div class="nav-group">
+        <div class="nav-label">MEDIA</div>
+        <a href="movies.html" class="nav-link" data-nav="movies">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5M16 4v5"/></svg>
+          <span class="nav-text">Movies</span>
+        </a>
+        <a href="tv.html" class="nav-link" data-nav="tv">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 21h8M12 19v2"/></svg>
+          <span class="nav-text">TV Shows</span>
+        </a>
+        <a href="anime.html" class="nav-link" data-nav="anime">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 8v8l8 5 8-5V8l-8-5Z"/><path d="M4 8l8 5 8-5"/></svg>
+          <span class="nav-text">Anime</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">MORE</div>
+        <a href="watchlist.html" class="nav-link" data-nav="watchlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v17l-6-4-6 4V4Z"/></svg>
+          <span class="nav-text">Watchlist</span>
+        </a>
+        <a href="history.html" class="nav-link" data-nav="history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+          <span class="nav-text">History</span>
+        </a>
+        <a href="legal.html" class="nav-link" data-nav="legal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 8l-3 6a3.5 3.5 0 0 0 7 0l-3-6h6l-3 6a3.5 3.5 0 0 0 7 0l-3-6M5 8h14M9 3h6"/></svg>
+          <span class="nav-text">Legal/DMCA</span>
+        </a>
+      </div>
     </div>
 
     <div class="sidebar-footer">
       <strong>Trailers only.</strong> No video is hosted here — every play button opens an official trailer from YouTube via TMDB.
     </div>
   </aside>
+
+  <!-- Collapse toggle, matches the floating rail button on the reference layout -->
+  <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 19 8 12l7-7"/></svg>
+  </button>
+
   <div class="content">
     <div class="topbar">
       <div class="search-box">
@@ -100,8 +102,44 @@
     <div id="homeShelves"></div>
   </div>
 </div>
+
+<!-- Mobile bottom nav: Home / Search / Browse / More (More opens the sheet below) -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html" class="mobile-nav-link active" data-nav="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+    <span>Home</span>
+  </a>
+  <a href="search.html" class="mobile-nav-link" data-nav="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <span>Search</span>
+  </a>
+  <a href="browse.html" class="mobile-nav-link" data-nav="browse">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <span>Browse</span>
+  </a>
+  <button class="mobile-nav-link" id="mobileMoreBtn" aria-haspopup="true" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.75" cy="12" r="1.25"/><circle cx="12" cy="12" r="1.25"/><circle cx="17.25" cy="12" r="1.25"/></svg>
+    <span>More</span>
+  </button>
+</nav>
+
+<!-- Sheet that "More" opens on mobile, mirrors the MEDIA/MORE groups from the sidebar -->
+<div class="mobile-sheet-backdrop" id="mobileSheetBackdrop"></div>
+<div class="mobile-sheet" id="mobileSheet">
+  <div class="mobile-sheet-handle"></div>
+  <div class="nav-label">MEDIA</div>
+  <a href="movies.html" class="mobile-sheet-link">Movies</a>
+  <a href="tv.html" class="mobile-sheet-link">TV Shows</a>
+  <a href="anime.html" class="mobile-sheet-link">Anime</a>
+  <div class="nav-label">MORE</div>
+  <a href="watchlist.html" class="mobile-sheet-link">Watchlist</a>
+  <a href="history.html" class="mobile-sheet-link">History</a>
+  <a href="legal.html" class="mobile-sheet-link">Legal/DMCA</a>
+</div>
+
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script src="js/home.js"></script>
+<script src="js/sidebar-nav.js"></script>
 </body>
 </html>
