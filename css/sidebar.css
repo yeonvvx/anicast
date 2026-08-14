@@ -137,14 +137,24 @@
 .sidebar-collapse-btn:hover { background: rgba(45, 45, 55, 0.95); color: #fff; }
 .sidebar-collapse-btn svg { width: 14px; height: 14px; transition: transform 0.25s ease; }
 
+/* .sidebar is position:fixed (out of flow), so don't let the old
+   grid/flex column system on .app-shell decide .content's width —
+   it would size .content to whatever track was meant for the
+   sidebar. Take over sizing explicitly instead. */
+.app-shell {
+  display: block;
+}
+
 .content {
+  display: block;
+  width: auto;
   margin-left: var(--sidebar-w);
   transition: margin-left 0.25s ease;
 }
 
 /* Collapsed state, toggled via JS on .app-shell */
 .app-shell.sidebar-collapsed .sidebar { width: var(--sidebar-w-collapsed); padding: 28px 10px 12px; }
-.app-shell.sidebar-collapsed .content { margin-left: var(--sidebar-w-collapsed); }
+.app-shell.sidebar-collapsed .content { width: auto; margin-left: var(--sidebar-w-collapsed); }
 .app-shell.sidebar-collapsed .sidebar .logo-text,
 .app-shell.sidebar-collapsed .sidebar .nav-text,
 .app-shell.sidebar-collapsed .sidebar .nav-label,
