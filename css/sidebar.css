@@ -1,0 +1,223 @@
+/* ===========================================================
+   Sidebar glass-panel layer
+   Adds grouped, frosted panels + a collapse rail + mobile nav
+   on top of the existing CineVault stylesheet. Doesn't touch
+   #hero, #homeShelves, .search-box, etc. — those stay owned
+   by style.css / home.js / common.js.
+   =========================================================== */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 264px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  padding: 28px 12px 12px;
+  gap: 20px;
+  background: rgba(10, 10, 15, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  transition: width 0.25s ease, padding 0.25s ease;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 0 4px 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #fff;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #fff;
+  flex-shrink: 0;
+}
+.logo-mark svg { width: 16px; height: 16px; }
+
+/* Grouped translucent containers, the StreameX-style "panels" */
+.nav-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.nav-panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  gap: 16px;
+  scrollbar-width: thin;
+}
+.nav-panel-scroll::-webkit-scrollbar { width: 6px; }
+.nav-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.nav-group { display: flex; flex-direction: column; gap: 4px; }
+
+.nav-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 6px 8px 2px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+.nav-link:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.nav-link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
+.nav-link svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+.sidebar-footer {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 10px 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+.sidebar-footer strong { color: rgba(255, 255, 255, 0.65); }
+
+/* Collapse rail button, floats on the sidebar edge */
+.sidebar-collapse-btn {
+  position: fixed;
+  top: 50%;
+  left: 264px;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 56px;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  background: rgba(30, 30, 38, 0.9);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 51;
+  transition: left 0.25s ease, background 0.15s ease;
+}
+.sidebar-collapse-btn:hover { background: rgba(45, 45, 55, 0.95); color: #fff; }
+.sidebar-collapse-btn svg { width: 14px; height: 14px; transition: transform 0.25s ease; }
+
+.content { transition: margin-left 0.25s ease; }
+
+/* Collapsed state, toggled via JS on .app-shell */
+.app-shell.sidebar-collapsed .sidebar { width: 76px; padding: 28px 10px 12px; }
+.app-shell.sidebar-collapsed .sidebar .logo-text,
+.app-shell.sidebar-collapsed .sidebar .nav-text,
+.app-shell.sidebar-collapsed .sidebar .nav-label,
+.app-shell.sidebar-collapsed .sidebar .sidebar-footer { display: none; }
+.app-shell.sidebar-collapsed .sidebar .nav-link { justify-content: center; }
+.app-shell.sidebar-collapsed .sidebar-collapse-btn { left: 76px; }
+.app-shell.sidebar-collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+
+/* Mobile bottom nav, hidden on desktop */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+  justify-content: space-around;
+}
+.mobile-nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.68rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.mobile-nav-link svg { width: 22px; height: 22px; }
+.mobile-nav-link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
+
+.mobile-sheet-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 65;
+}
+.mobile-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  background: #14141a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px 18px 0 0;
+  padding: 10px 14px calc(18px + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+}
+.mobile-sheet.open { transform: translateY(0); }
+.mobile-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 4px auto 10px;
+}
+.mobile-sheet-link {
+  padding: 10px 8px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.mobile-sheet-link:hover { background: rgba(255, 255, 255, 0.06); }
+
+@media (max-width: 1023px) {
+  .sidebar, .sidebar-collapse-btn { display: none; }
+  .content { margin-left: 0 !important; padding-bottom: 78px; }
+  .mobile-nav { display: flex; }
+}
