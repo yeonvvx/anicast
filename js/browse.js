@@ -2,11 +2,16 @@ let browseType = "movie";
 let browseGenre = null;
 
 let currentPage = 1;
-let totalPages = Infinity;
+let totalPages = 1;
 let loading = false;
 
 let infiniteObserver = null;
+let infiniteTrigger = null;
 
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -14,52 +19,71 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const ready = await CV.checkApiKey();
 
+  const grid = document.getElementById("browseGrid");
+
   if (!ready) {
 
-    document.getElementById("browseGrid").innerHTML =
-      CV.configNoticeHTML();
+    if (grid) {
+      grid.innerHTML = CV.configNoticeHTML();
+    }
 
     return;
-
   }
 
 
-  document.querySelectorAll("#browseTypeChips .chip")
-  .forEach((chip)=>{
+  /* -----------------------------------------
+     MOVIE / TV TYPE CHIPS
+     ----------------------------------------- */
 
-    chip.addEventListener("click",()=>{
+  document
+    .querySelectorAll("#browseTypeChips .chip")
+    .forEach((chip) => {
 
-      browseType = chip.dataset.type;
+      chip.addEventListener("click", async () => {
+
+        const newType = chip.dataset.type;
+
+        if (!newType || newType === browseType) {
+          return;
+        }
+
+        browseType = newType;
+
+        browseGenre = null;
 
 
-      document
-      .querySelectorAll("#browseTypeChips .chip")
-      .forEach(c=>c.classList.remove("active"));
+        document
+          .querySelectorAll("#browseTypeChips .chip")
+          .forEach((c) => {
+            c.classList.remove("active");
+          });
 
 
-      chip.classList.add("active");
+        chip.classList.add("active");
 
 
-      loadGenres();
+        await loadGenres();
+
+      });
 
     });
 
-  });
 
-
-  loadGenres();
-
+  await loadGenres();
 
 });
 
 
+/* =========================================================
+   LOAD GENRES
+   ========================================================= */
 
-
-
-async function loadGenres(){
+async function loadGenres() {
 
   const chipRow =
-  document.getElementById("browseGenreChips");
+    document.getElementById("browseGenreChips");
+
+  if (!chipRow) return;
 
 
   chipRow.innerHTML = `
@@ -71,179 +95,301 @@ async function loadGenres(){
 
   try {
 
-
     const data =
-    await CV.tmdb(`/genre/${browseType}/list`);
+      await CV.tmdb(`/genre/${browseType}/list`);
 
 
-    browseGenre =
-    data.genres[0].id;
+    if (!data || !Array.isArray(data.genres)) {
+      throw new Error("Invalid genre response");
+    }
 
 
+    /*
+     * Don't assume the first genre exists.
+     * "All" is represented by null.
+     */
 
-    chipRow.innerHTML =
-    data.genres.map((g,i)=>`
+    browseGenre = null;
 
-      <button class="chip ${i===0?"active":""}"
-      data-genre="${g.id}">
 
-      ${g.name}
-
+    chipRow.innerHTML = `
+      <button
+        class="chip active"
+        data-genre=""
+      >
+        All
       </button>
 
-    `).join("");
+      ${data.genres.map((g) => `
+        <button
+          class="chip"
+          data-genre="${g.id}"
+        >
+          ${escapeHTML(g.name)}
+        </button>
+      `).join("")}
+    `;
 
 
+    chipRow
+      .querySelectorAll(".chip")
+      .forEach((chip) => {
+
+        chip.addEventListener("click", async () => {
+
+          const value =
+            chip.dataset.genre;
 
 
-    chipRow.querySelectorAll(".chip")
-    .forEach(chip=>{
+          browseGenre =
+            value === ""
+              ? null
+              : Number(value);
 
 
-      chip.addEventListener("click",()=>{
+          chipRow
+            .querySelectorAll(".chip")
+            .forEach((c) => {
+              c.classList.remove("active");
+            });
 
 
-        browseGenre =
-        Number(chip.dataset.genre);
+          chip.classList.add("active");
 
 
+          resetGrid();
 
-        chipRow
-        .querySelectorAll(".chip")
-        .forEach(c=>c.classList.remove("active"));
+          await loadGrid();
 
-
-
-        chip.classList.add("active");
-
-
-        resetGrid();
-
-        loadGrid();
-
+        });
 
       });
 
 
-    });
-
-
+    /*
+     * Initial load
+     */
 
     resetGrid();
 
-    loadGrid();
-
+    await loadGrid();
 
   }
 
-  catch(e){
+  catch (error) {
 
-    console.error(e);
+    console.error(
+      "Genre loading error:",
+      error
+    );
 
 
     chipRow.innerHTML = "";
 
 
-    document.getElementById("browseGrid").innerHTML =
-    CV.emptyStateHTML(
-      "Couldn't load genres",
-      "Check your connection or TMDB key."
-    );
+    const grid =
+      document.getElementById("browseGrid");
+
+
+    if (grid) {
+
+      grid.innerHTML =
+        CV.emptyStateHTML(
+          "Couldn't load genres",
+          "Check your connection or TMDB key."
+        );
+
+    }
 
   }
 
 }
 
 
+/* =========================================================
+   RESET BROWSE
+   ========================================================= */
 
-
-
-
-
-function resetGrid(){
+function resetGrid() {
 
   const grid =
-  document.getElementById("browseGrid");
+    document.getElementById("browseGrid");
+
+  if (!grid) return;
 
 
-  grid.innerHTML =
-  CV.skeletonHTML(18);
+  /*
+   * Stop the old observer before resetting anything.
+   */
+
+  if (infiniteObserver) {
+
+    infiniteObserver.disconnect();
+
+    infiniteObserver = null;
+
+  }
 
 
+  /*
+   * Reset pagination completely.
+   */
 
   currentPage = 1;
+  totalPages = 1;
+  loading = false;
 
-  totalPages = Infinity;
+
+  /*
+   * Remove the old trigger.
+   */
+
+  if (infiniteTrigger) {
+
+    infiniteTrigger.remove();
+
+    infiniteTrigger = null;
+
+  }
 
 
+  const oldTrigger =
+    document.getElementById("infiniteTrigger");
+
+  if (oldTrigger) {
+    oldTrigger.remove();
+  }
+
+
+  /*
+   * Show loading skeletons.
+   */
+
+  grid.innerHTML =
+    CV.skeletonHTML(18);
+
+
+  /*
+   * Create a fresh trigger after the grid.
+   */
 
   createInfiniteObserver();
 
 }
 
 
+/* =========================================================
+   LOAD GRID
+   ========================================================= */
 
-
-
-
-
-
-async function loadGrid(){
+async function loadGrid() {
 
   const grid =
-  document.getElementById("browseGrid");
+    document.getElementById("browseGrid");
+
+  if (!grid) return;
 
 
-  if(
-    loading ||
-    currentPage > totalPages
-  ){
+  /*
+   * Never allow two page requests at once.
+   */
+
+  if (loading) {
+    return;
+  }
+
+
+  /*
+   * We've reached the end.
+   */
+
+  if (currentPage > totalPages) {
+
+    hideInfiniteTrigger();
 
     return;
 
   }
 
 
-
   loading = true;
 
+  showInfiniteTrigger();
+
+
+  const pageBeingLoaded =
+    currentPage;
 
 
   try {
 
-
-    const data =
-    await CV.tmdb(
-      `/discover/${browseType}`,
-      {
-        page: currentPage,
-        with_genres: browseGenre,
-        sort_by:"popularity.desc"
-      }
-    );
+    const params = {
+      page: pageBeingLoaded,
+      sort_by: "popularity.desc"
+    };
 
 
+    /*
+     * Only send with_genres when a genre
+     * has actually been selected.
+     */
 
-    totalPages =
-    data.total_pages;
+    if (browseGenre !== null) {
 
-
-
-    const html =
-    data.results
-    .map(CV.cardHTML)
-    .join("");
-
-
-
-
-    if(currentPage === 1){
-
-      grid.innerHTML = html;
+      params.with_genres =
+        browseGenre;
 
     }
 
-    else{
+
+    const data =
+      await CV.tmdb(
+        `/discover/${browseType}`,
+        params
+      );
+
+
+    if (!data || !Array.isArray(data.results)) {
+
+      throw new Error(
+        "Invalid TMDB discover response"
+      );
+
+    }
+
+
+    /*
+     * Update total pages immediately.
+     */
+
+    totalPages =
+      Number(data.total_pages) || 1;
+
+
+    const html =
+      data.results
+        .map((item) => CV.cardHTML(item))
+        .join("");
+
+
+    /*
+     * Page 1 replaces the skeleton.
+     * Every later page appends.
+     */
+
+    if (pageBeingLoaded === 1) {
+
+      grid.innerHTML =
+        html || `
+          ${CV.emptyStateHTML(
+            "Nothing found",
+            "There aren't any results for this filter."
+          )}
+        `;
+
+    }
+
+    else if (html) {
 
       grid.insertAdjacentHTML(
         "beforeend",
@@ -253,25 +399,86 @@ async function loadGrid(){
     }
 
 
+    /*
+     * Only advance the page after a
+     * successful request.
+     */
 
-    currentPage++;
+    currentPage =
+      pageBeingLoaded + 1;
 
 
+    /*
+     * Hide the spinner when there are
+     * no more pages.
+     */
+
+    if (
+      currentPage > totalPages ||
+      data.results.length === 0
+    ) {
+
+      hideInfiniteTrigger();
+
+    }
+
+
+    /*
+     * If the first page isn't tall enough
+     * to reach the observer, immediately
+     * request another page.
+     */
+
+    requestAnimationFrame(() => {
+
+      if (
+        !loading &&
+        currentPage <= totalPages &&
+        infiniteTrigger
+      ) {
+
+        const rect =
+          infiniteTrigger.getBoundingClientRect();
+
+
+        if (rect.top <= window.innerHeight + 800) {
+
+          loadGrid();
+
+        }
+
+      }
+
+    });
 
   }
 
-
-  catch(e){
+  catch (error) {
 
     console.error(
-      "Grid loading error:",
-      e
+      "Browse grid loading error:",
+      error
     );
+
+
+    /*
+     * Don't advance currentPage on failure.
+     * This allows the same page to retry.
+     */
+
+    if (pageBeingLoaded === 1) {
+
+      grid.innerHTML =
+        CV.emptyStateHTML(
+          "Couldn't load movies",
+          "Check your connection and try again."
+        );
+
+    }
 
   }
 
-
-  finally{
+  finally {
 
     loading = false;
 
@@ -280,93 +487,153 @@ async function loadGrid(){
 }
 
 
+/* =========================================================
+   INFINITE SCROLL TRIGGER
+   ========================================================= */
 
-
-
-
-
-
-
-function createInfiniteObserver(){
-
+function createInfiniteObserver() {
 
   const grid =
-  document.getElementById("browseGrid");
+    document.getElementById("browseGrid");
+
+  if (!grid) return;
 
 
-  if(!grid) return;
+  /*
+   * Remove any old trigger.
+   */
 
+  if (infiniteTrigger) {
 
-
-  let trigger =
-  document.getElementById("infiniteTrigger");
-
-
-
-  if(!trigger){
-
-
-    trigger =
-    document.createElement("div");
-
-
-    trigger.id =
-    "infiniteTrigger";
-
-
-    trigger.style.height =
-    "100px";
-
-
-    trigger.style.width =
-    "100%";
-
-
-
-    grid.parentElement.appendChild(trigger);
-
+    infiniteTrigger.remove();
 
   }
 
 
+  /*
+   * Create the trigger OUTSIDE the grid.
+   *
+   * This is important because the grid is a
+   * CSS grid. Putting the observer inside it
+   * can interfere with the grid layout.
+   */
 
-  if(infiniteObserver){
+  infiniteTrigger =
+    document.createElement("div");
+
+
+  infiniteTrigger.id =
+    "infiniteTrigger";
+
+
+  grid.insertAdjacentElement(
+    "afterend",
+    infiniteTrigger
+  );
+
+
+  /*
+   * Disconnect previous observer.
+   */
+
+  if (infiniteObserver) {
 
     infiniteObserver.disconnect();
 
   }
 
 
-
+  /*
+   * Create a new observer.
+   */
 
   infiniteObserver =
-  new IntersectionObserver(
-    (entries)=>{
+    new IntersectionObserver(
+      (entries) => {
+
+        const entry =
+          entries[0];
+
+        if (!entry || !entry.isIntersecting) {
+          return;
+        }
 
 
-      if(
-        entries[0].isIntersecting &&
-        !loading &&
-        currentPage <= totalPages
-      ){
+        if (loading) {
+          return;
+        }
+
+
+        if (currentPage > totalPages) {
+
+          hideInfiniteTrigger();
+
+          return;
+
+        }
+
 
         loadGrid();
 
+      },
+      {
+        root: null,
+
+        /*
+         * Start loading well before the
+         * user actually reaches the bottom.
+         */
+
+        rootMargin:
+          "1000px 0px 1000px 0px",
+
+        threshold: 0
       }
+    );
 
 
-    },
-    {
-
-      rootMargin:"800px"
-
-    }
-
+  infiniteObserver.observe(
+    infiniteTrigger
   );
 
+}
 
 
-  infiniteObserver.observe(trigger);
+/* =========================================================
+   TRIGGER HELPERS
+   ========================================================= */
 
+function showInfiniteTrigger() {
+
+  if (!infiniteTrigger) return;
+
+  infiniteTrigger.style.display =
+    "flex";
+
+}
+
+
+function hideInfiniteTrigger() {
+
+  if (!infiniteTrigger) return;
+
+  infiniteTrigger.style.display =
+    "none";
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
