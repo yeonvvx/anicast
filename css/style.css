@@ -1841,3 +1841,157 @@ svg {
     background: rgba(19, 19, 25, .97);
   }
 }
+/* =========================================================
+   CINEVAULT HERO FIX
+   ========================================================= */
+
+/* Keep the hero itself contained */
+.hero {
+  position: relative !important;
+  width: 100% !important;
+  height: 500px !important;
+  min-height: 500px !important;
+  max-height: 500px !important;
+
+  overflow: hidden !important;
+
+  border-radius: var(--radius-xl);
+  background: #0a0a0f;
+}
+
+/* Any hero background/image/video must stay inside hero */
+.hero img,
+.hero picture,
+.hero video,
+.hero-media,
+.hero-image,
+.hero-backdrop,
+.hero-bg,
+.hero-background {
+  position: absolute !important;
+
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none !important;
+
+  object-fit: cover !important;
+
+  margin: 0 !important;
+}
+
+/* Make sure picture itself doesn't create layout height */
+.hero picture {
+  display: block !important;
+}
+
+/* Hero overlay */
+.hero::after {
+  content: "";
+
+  position: absolute !important;
+
+  inset: 0 !important;
+
+  z-index: 1 !important;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(10, 10, 15, .96) 0%,
+      rgba(10, 10, 15, .72) 38%,
+      rgba(10, 10, 15, .22) 72%,
+      rgba(10, 10, 15, .52) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(10, 10, 15, .9) 0%,
+      transparent 55%
+    );
+}
+
+/* Content stays above the image */
+.hero-content {
+  position: absolute !important;
+
+  z-index: 2 !important;
+
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-height: 0 !important;
+
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  justify-content: flex-end !important;
+
+  padding: 55px !important;
+}
+
+/* Hero dots stay above everything */
+.hero-dots {
+  z-index: 5 !important;
+}
+
+
+/* =========================================================
+   DESKTOP HERO SIZE
+   ========================================================= */
+
+@media (min-width: 901px) {
+
+  .hero {
+    height: 500px !important;
+    min-height: 500px !important;
+    max-height: 500px !important;
+  }
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .hero {
+    height: 460px !important;
+    min-height: 460px !important;
+    max-height: 460px !important;
+  }
+
+  .hero-content {
+    padding: 36px !important;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+  .hero {
+    height: 430px !important;
+    min-height: 430px !important;
+    max-height: 430px !important;
+
+    border-radius: var(--radius-lg);
+  }
+
+  .hero-content {
+    padding: 24px !important;
+  }
+
+}
