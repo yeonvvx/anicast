@@ -6,10 +6,15 @@
    by style.css / home.js / common.js.
    =========================================================== */
 
+:root {
+  --sidebar-w: 264px;
+  --sidebar-w-collapsed: 76px;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: 264px;
+  width: var(--sidebar-w);
   height: 100vh;
   position: fixed;
   left: 0;
@@ -114,7 +119,7 @@
 .sidebar-collapse-btn {
   position: fixed;
   top: 50%;
-  left: 264px;
+  left: var(--sidebar-w);
   transform: translate(-50%, -50%);
   width: 22px;
   height: 56px;
@@ -132,16 +137,20 @@
 .sidebar-collapse-btn:hover { background: rgba(45, 45, 55, 0.95); color: #fff; }
 .sidebar-collapse-btn svg { width: 14px; height: 14px; transition: transform 0.25s ease; }
 
-.content { transition: margin-left 0.25s ease; }
+.content {
+  margin-left: var(--sidebar-w);
+  transition: margin-left 0.25s ease;
+}
 
 /* Collapsed state, toggled via JS on .app-shell */
-.app-shell.sidebar-collapsed .sidebar { width: 76px; padding: 28px 10px 12px; }
+.app-shell.sidebar-collapsed .sidebar { width: var(--sidebar-w-collapsed); padding: 28px 10px 12px; }
+.app-shell.sidebar-collapsed .content { margin-left: var(--sidebar-w-collapsed); }
 .app-shell.sidebar-collapsed .sidebar .logo-text,
 .app-shell.sidebar-collapsed .sidebar .nav-text,
 .app-shell.sidebar-collapsed .sidebar .nav-label,
 .app-shell.sidebar-collapsed .sidebar .sidebar-footer { display: none; }
 .app-shell.sidebar-collapsed .sidebar .nav-link { justify-content: center; }
-.app-shell.sidebar-collapsed .sidebar-collapse-btn { left: 76px; }
+.app-shell.sidebar-collapsed .sidebar-collapse-btn { left: var(--sidebar-w-collapsed); }
 .app-shell.sidebar-collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
 
 /* Mobile bottom nav, hidden on desktop */
