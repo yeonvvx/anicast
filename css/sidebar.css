@@ -1,9 +1,30 @@
 /* ===========================================================
-   Sidebar glass-panel layer
-   Adds grouped, frosted panels + a collapse rail + mobile nav
-   on top of the existing CineVault stylesheet. Doesn't touch
-   #hero, #homeShelves, .search-box, etc. — those stay owned
-   by style.css / home.js / common.js.
+   CINEVAULT — SIDEBAR + SHELF ARROWS
+   Theme-safe version
+   -----------------------------------------------------------
+   IMPORTANT:
+   - Does NOT redefine :root theme variables.
+   - Uses the existing CineVault theme variables:
+       --bg
+       --surface
+       --surface-2
+       --surface-hover
+       --border
+       --text
+       --text-muted
+       --text-faint
+       --accent
+       --accent-soft
+       --glass-bg
+       --glass-bg-strong
+       --glass-border
+   - Sidebar remains independently collapsible.
+   - Shelf arrows remain theme-aware.
+   =========================================================== */
+
+
+/* ===========================================================
+   1. SIDEBAR DIMENSIONS
    =========================================================== */
 
 :root {
@@ -11,35 +32,65 @@
   --sidebar-w-collapsed: 76px;
 }
 
+
+/* ===========================================================
+   2. SIDEBAR
+   =========================================================== */
+
 .sidebar {
   display: flex;
   flex-direction: column;
+
   width: var(--sidebar-w);
   height: 100vh;
+
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 50;
+
+  z-index: 1000;
+
   padding: 28px 12px 12px;
   gap: 20px;
-  background: rgba(10, 10, 15, 0.55);
+
+  /* Theme-aware */
+  background: var(--glass-bg-strong);
+
+  border-right: 1px solid var(--border);
+
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  transition: width 0.25s ease, padding 0.25s ease;
+
+  transition:
+    width 0.25s ease,
+    padding 0.25s ease;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
+
+/* ===========================================================
+   3. LOGO
+   =========================================================== */
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
   justify-content: center;
+
+  gap: 10px;
+
   padding: 0 4px 4px;
-  font-family: 'Space Grotesk', sans-serif;
+
+  font-family: var(--font);
   font-weight: 700;
   font-size: 1.5rem;
-  color: #fff;
+
+  color: var(--text);
+
   text-decoration: none;
+
   flex-shrink: 0;
 }
 
@@ -47,212 +98,632 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 30px;
   height: 30px;
+
   border-radius: 8px;
-  background: #fff;
+
+  /*
+   * Use the site's accent instead of forcing white.
+   * This means purple/pink/blue/etc. themes continue
+   * to work.
+   */
+  background: var(--accent);
+
+  color: #fff;
+
   flex-shrink: 0;
 }
-.logo-mark svg { width: 16px; height: 16px; }
 
-/* Grouped translucent containers, the StreameX-style "panels" */
+.logo-mark svg {
+  width: 16px;
+  height: 16px;
+}
+
+
+/* ===========================================================
+   4. NAV PANELS
+   =========================================================== */
+
 .nav-panel {
   display: flex;
   flex-direction: column;
+
   gap: 6px;
+
   padding: 10px;
+
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
+
+  /*
+   * Theme-aware translucent surface.
+   */
+  background: var(--glass-bg);
+
+  border: 1px solid var(--glass-border);
+
   flex-shrink: 0;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .nav-panel-scroll {
   flex: 1;
+
   min-height: 0;
+
   overflow-y: auto;
+
   gap: 16px;
+
   scrollbar-width: thin;
 }
-.nav-panel-scroll::-webkit-scrollbar { width: 6px; }
+
+.nav-panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
 .nav-panel-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--border);
   border-radius: 999px;
 }
 
-.nav-group { display: flex; flex-direction: column; gap: 4px; }
+.nav-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-hover);
+}
+
+
+/* ===========================================================
+   5. NAV GROUPS
+   =========================================================== */
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
 
 .nav-label {
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.35);
   padding: 6px 8px 2px;
+
+  font-size: 0.7rem;
+
+  letter-spacing: 0.08em;
+
+  color: var(--text-faint);
+
+  white-space: nowrap;
 }
+
+
+/* ===========================================================
+   6. NAV LINKS
+   =========================================================== */
 
 .nav-link {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
   padding: 9px 10px;
+
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.7);
+
+  color: var(--text-muted);
+
   text-decoration: none;
+
   font-size: 0.92rem;
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
   white-space: nowrap;
 }
-.nav-link:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
-.nav-link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
-.nav-link svg { width: 20px; height: 20px; flex-shrink: 0; }
 
-.sidebar-footer {
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.4);
-  padding: 10px 8px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+.nav-link:hover {
+  color: var(--text);
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-link.active {
+  color: #fff;
+
+  /*
+   * This is the important part:
+   * active navigation follows the site's accent.
+   */
+  background: var(--accent-soft);
+}
+
+.nav-link svg {
+  width: 20px;
+  height: 20px;
+
   flex-shrink: 0;
 }
-.sidebar-footer strong { color: rgba(255, 255, 255, 0.65); }
 
-/* Collapse rail button, floats on the sidebar edge */
+
+/* ===========================================================
+   7. SIDEBAR FOOTER
+   =========================================================== */
+
+.sidebar-footer {
+  padding: 10px 8px 0;
+
+  border-top: 1px solid var(--border);
+
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  color: var(--text-faint);
+
+  flex-shrink: 0;
+}
+
+.sidebar-footer strong {
+  color: var(--text-muted);
+}
+
+
+/* ===========================================================
+   8. COLLAPSE BUTTON
+   =========================================================== */
+
 .sidebar-collapse-btn {
   position: fixed;
+
   top: 50%;
   left: var(--sidebar-w);
+
   transform: translate(-50%, -50%);
+
   width: 22px;
   height: 56px;
+
   border: none;
+
   border-radius: 0 8px 8px 0;
-  background: rgba(30, 30, 38, 0.9);
-  color: rgba(255, 255, 255, 0.7);
+
+  /*
+   * Theme-aware instead of hardcoded dark gray.
+   */
+  background: var(--surface-2);
+
+  color: var(--text-muted);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 51;
-  transition: left 0.25s ease, background 0.15s ease;
-}
-.sidebar-collapse-btn:hover { background: rgba(45, 45, 55, 0.95); color: #fff; }
-.sidebar-collapse-btn svg { width: 14px; height: 14px; transition: transform 0.25s ease; }
 
-/* .sidebar is position:fixed (out of flow), so don't let the old
-   grid/flex column system on .app-shell decide .content's width —
-   it would size .content to whatever track was meant for the
-   sidebar. Take over sizing explicitly instead. */
+  cursor: pointer;
+
+  z-index: 1001;
+
+  transition:
+    left 0.25s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.sidebar-collapse-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.sidebar-collapse-btn svg {
+  width: 14px;
+  height: 14px;
+
+  transition: transform 0.25s ease;
+}
+
+
+/* ===========================================================
+   9. APP / CONTENT LAYOUT
+   =========================================================== */
+
+/*
+ * The sidebar is fixed, so the shell itself should not
+ * reserve another grid/flex column for it.
+ */
+
 .app-shell {
   display: block !important;
+
+  width: 100%;
+  min-height: 100vh;
 }
 
 .content {
   display: block !important;
+
   width: auto !important;
+
   margin-left: var(--sidebar-w) !important;
+
   transition: margin-left 0.25s ease;
 }
 
-/* Collapsed state, toggled via JS on .app-shell */
-.app-shell.sidebar-collapsed .sidebar { width: var(--sidebar-w-collapsed); padding: 28px 10px 12px; }
-.app-shell.sidebar-collapsed .content { width: auto !important; margin-left: var(--sidebar-w-collapsed) !important; }
 
-/* .search-icon was sizing itself off .search-box's width, which the
-   block-layout override above changed — pin it explicitly instead of
-   relying on an ancestor constraint from the real style.css. */
-.search-box {
-  position: relative !important;
+/* ===========================================================
+   10. COLLAPSED SIDEBAR
+   =========================================================== */
+
+.app-shell.sidebar-collapsed .sidebar {
+  width: var(--sidebar-w-collapsed);
+
+  padding: 28px 10px 12px;
 }
-.search-box .search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px !important;
-  height: 18px !important;
-  pointer-events: none;
+
+.app-shell.sidebar-collapsed .content {
+  width: auto !important;
+
+  margin-left: var(--sidebar-w-collapsed) !important;
 }
+
 .app-shell.sidebar-collapsed .sidebar .logo-text,
 .app-shell.sidebar-collapsed .sidebar .nav-text,
 .app-shell.sidebar-collapsed .sidebar .nav-label,
-.app-shell.sidebar-collapsed .sidebar .sidebar-footer { display: none; }
-.app-shell.sidebar-collapsed .sidebar .nav-link { justify-content: center; }
-.app-shell.sidebar-collapsed .sidebar-collapse-btn { left: var(--sidebar-w-collapsed); }
-.app-shell.sidebar-collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+.app-shell.sidebar-collapsed .sidebar .sidebar-footer {
+  display: none;
+}
 
-/* Mobile bottom nav, hidden on desktop */
+.app-shell.sidebar-collapsed .sidebar .nav-link {
+  justify-content: center;
+}
+
+.app-shell.sidebar-collapsed .sidebar-collapse-btn {
+  left: var(--sidebar-w-collapsed);
+}
+
+.app-shell.sidebar-collapsed .sidebar-collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+
+/* ===========================================================
+   11. COLLAPSED NAV PANELS
+   =========================================================== */
+
+.app-shell.sidebar-collapsed .sidebar .nav-panel {
+  padding: 8px 6px;
+}
+
+.app-shell.sidebar-collapsed .sidebar .nav-link {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+
+/* ===========================================================
+   12. SEARCH
+   =========================================================== */
+
+.search-box {
+  position: relative !important;
+}
+
+.search-box .search-icon {
+  position: absolute;
+
+  left: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 18px !important;
+  height: 18px !important;
+
+  pointer-events: none;
+}
+
+
+/* ===========================================================
+   13. MOBILE NAV
+   =========================================================== */
+
 .mobile-nav {
   display: none;
+
   position: fixed;
+
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 60;
-  background: rgba(10, 10, 15, 0.85);
+
+  z-index: 2000;
+
+  /*
+   * Theme-aware mobile navigation.
+   */
+  background: var(--glass-bg-strong);
+
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+
+  border-top: 1px solid var(--border);
+
+  padding:
+    8px
+    6px
+    calc(8px + env(safe-area-inset-bottom));
+
   justify-content: space-around;
 }
+
 .mobile-nav-link {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   gap: 3px;
+
   padding: 6px 14px;
+
   border-radius: 12px;
+
   border: none;
+
   background: transparent;
-  color: rgba(255, 255, 255, 0.6);
+
+  color: var(--text-muted);
+
   font-size: 0.68rem;
+
   text-decoration: none;
+
   cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
-.mobile-nav-link svg { width: 22px; height: 22px; }
-.mobile-nav-link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
+
+.mobile-nav-link svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mobile-nav-link:hover {
+  color: var(--text);
+}
+
+.mobile-nav-link.active {
+  color: #fff;
+
+  background: var(--accent-soft);
+}
+
+
+/* ===========================================================
+   14. MOBILE SHEET
+   =========================================================== */
 
 .mobile-sheet-backdrop {
   display: none;
+
   position: fixed;
+
   inset: 0;
+
   background: rgba(0, 0, 0, 0.5);
-  z-index: 65;
+
+  z-index: 2100;
 }
+
 .mobile-sheet {
   display: flex;
   flex-direction: column;
+
   gap: 4px;
+
   position: fixed;
+
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 70;
-  background: #14141a;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  z-index: 2200;
+
+  /*
+   * Theme-aware.
+   */
+  background: var(--surface);
+
+  border-top: 1px solid var(--border);
+
   border-radius: 18px 18px 0 0;
-  padding: 10px 14px calc(18px + env(safe-area-inset-bottom));
+
+  padding:
+    10px
+    14px
+    calc(18px + env(safe-area-inset-bottom));
+
   transform: translateY(100%);
+
   transition: transform 0.25s ease;
 }
-.mobile-sheet.open { transform: translateY(0); }
+
+.mobile-sheet.open {
+  transform: translateY(0);
+}
+
 .mobile-sheet-handle {
   width: 36px;
   height: 4px;
+
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+
+  background: var(--text-faint);
+
   margin: 4px auto 10px;
 }
+
 .mobile-sheet-link {
   padding: 10px 8px;
+
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.8);
+
+  color: var(--text-muted);
+
   text-decoration: none;
+
   font-size: 0.95rem;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
-.mobile-sheet-link:hover { background: rgba(255, 255, 255, 0.06); }
+
+.mobile-sheet-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+
+  color: var(--text);
+}
+
+
+/* ===========================================================
+   15. SHELF HEAD
+   =========================================================== */
+
+.shelf-head {
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: space-between !important;
+
+  gap: 12px;
+}
+
+.shelf-head-right {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  flex-shrink: 0;
+}
+
+
+/* ===========================================================
+   16. SHELF ARROWS
+   =========================================================== */
+
+.shelf-arrows {
+  display: flex;
+
+  gap: 8px;
+}
+
+.shelf-arrow-btn {
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+
+  border-radius: 999px;
+
+  border: none;
+
+  /*
+   * Theme-aware.
+   */
+  background: var(--surface-2);
+
+  color: var(--text);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+
+  flex-shrink: 0;
+}
+
+.shelf-arrow-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.shelf-arrow-btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+
+  color: #fff;
+}
+
+.shelf-arrow-btn:disabled {
+  opacity: 0.3;
+
+  cursor: default;
+}
+
+
+/* ===========================================================
+   17. MOBILE
+   =========================================================== */
 
 @media (max-width: 1023px) {
-  .sidebar, .sidebar-collapse-btn { display: none; }
-  .content { margin-left: 0 !important; padding-bottom: 78px; }
-  .mobile-nav { display: flex; }
+
+  .sidebar,
+  .sidebar-collapse-btn {
+    display: none;
+  }
+
+  .content {
+    margin-left: 0 !important;
+
+    padding-bottom: 78px;
+  }
+
+  .mobile-nav {
+    display: flex;
+  }
+}
+
+
+/* ===========================================================
+   18. SMALL MOBILE
+   =========================================================== */
+
+@media (max-width: 640px) {
+
+  .shelf-arrows {
+    display: none;
+  }
+
+}
+
+
+/* ===========================================================
+   19. REDUCED MOTION
+   =========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .sidebar,
+  .content,
+  .sidebar-collapse-btn,
+  .sidebar-collapse-btn svg,
+  .shelf-arrow-btn,
+  .mobile-nav-link,
+  .mobile-sheet {
+    transition: none !important;
+  }
+
 }
