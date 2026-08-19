@@ -6,23 +6,31 @@
    1. ROOT / VARIABLES
    ========================================================= */
 
+/*
+ * Theme-safe defaults.
+ *
+ * The public theme variables (--bg, --surface, --accent, etc.) are
+ * intentionally NOT defined here. That allows each site's theme CSS
+ * or JavaScript to provide them without this stylesheet overwriting it.
+ * The rest of this file uses var(--public-token, var(--cv-default)).
+ */
 :root {
-  --bg: #0a0a0f;
-  --surface: #131319;
-  --surface-2: #1a1a24;
-  --surface-hover: #22222f;
+  --cv-bg: #0a0a0f;
+  --cv-surface: #131319;
+  --cv-surface-2: #1a1a24;
+  --cv-surface-hover: #22222f;
 
-  --border: #26262f;
+  --cv-border: #26262f;
 
-  --text: #f2f2f6;
-  --text-muted: #90909f;
-  --text-faint: #5b5b6b;
+  --cv-text: #f2f2f6;
+  --cv-text-muted: #90909f;
+  --cv-text-faint: #5b5b6b;
 
-  --accent: #7b5cff;
-  --accent-2: #ff4d94;
-  --accent-soft: rgba(123, 92, 255, 0.14);
+  --cv-accent: #7b5cff;
+  --cv-accent-2: #ff4d94;
+  --cv-accent-soft: rgba(123, 92, 255, .14);
 
-  --gold: #ffc94d;
+  --cv-gold: #ffc94d;
 
   --sidebar-width: 236px;
   --topbar-height: 68px;
@@ -32,25 +40,18 @@
   --radius-lg: 18px;
   --radius-xl: 24px;
 
-  --font: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+  --cv-font: Inter, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
 
   --ease: cubic-bezier(.22, .61, .36, 1);
 
-  /* Glass */
-  --glass-bg: rgba(19, 19, 25, .72);
-  --glass-bg-strong: rgba(19, 19, 25, .9);
-  --glass-bg-active: rgba(123, 92, 255, .14);
+  --cv-glass-blur: 18px;
 
-  --glass-border: rgba(255, 255, 255, .07);
-  --glass-border-active: rgba(123, 92, 255, .28);
-
-  --glass-blur: 18px;
-
-  --shadow-sm: 0 8px 24px rgba(0, 0, 0, .18);
-  --shadow-md: 0 16px 40px rgba(0, 0, 0, .28);
-  --shadow-lg: 0 24px 70px rgba(0, 0, 0, .4);
+  --cv-shadow-sm: 0 8px 24px rgba(0, 0, 0, .18);
+  --cv-shadow-md: 0 16px 40px rgba(0, 0, 0, .28);
+  --cv-shadow-lg: 0 24px 70px rgba(0, 0, 0, .4);
 }
+
 
 
 /* =========================================================
@@ -66,7 +67,7 @@
 html {
   width: 100%;
   min-height: 100%;
-  background: var(--bg);
+  background: var(--bg, var(--cv-bg));
   color-scheme: dark;
   scroll-behavior: smooth;
 }
@@ -79,18 +80,18 @@ body {
   background:
     radial-gradient(
       circle at 15% 0%,
-      rgba(123, 92, 255, .08),
+      color-mix(in srgb, var(--accent, var(--cv-accent)) 8%, transparent),
       transparent 32%
     ),
     radial-gradient(
       circle at 85% 15%,
-      rgba(255, 77, 148, .045),
+      color-mix(in srgb, var(--accent-2, var(--cv-accent-2)) 4.5%, transparent),
       transparent 28%
     ),
-    var(--bg);
+    var(--bg, var(--cv-bg));
 
-  color: var(--text);
-  font-family: var(--font);
+  color: var(--text, var(--cv-text));
+  font-family: var(--font, var(--cv-font));
   font-size: 14px;
   line-height: 1.5;
 
@@ -128,7 +129,7 @@ svg {
 }
 
 ::selection {
-  background: rgba(123, 92, 255, .35);
+  background: color-mix(in srgb, var(--accent, var(--cv-accent)) 35%, transparent);
   color: #fff;
 }
 
@@ -139,7 +140,7 @@ svg {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #30303b transparent;
+  scrollbar-color: color-mix(in srgb, var(--surface-2, var(--cv-surface-2)) 75%, white) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -152,12 +153,12 @@ svg {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #30303b;
+  background: color-mix(in srgb, var(--surface-2, var(--cv-surface-2)) 75%, white);
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #41414f;
+  background: color-mix(in srgb, var(--surface-hover, var(--cv-surface-hover)) 80%, white);
 }
 
 
@@ -166,22 +167,22 @@ svg {
    ========================================================= */
 
 .glass {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: var(--glass-bg, color-mix(in srgb, var(--surface, var(--cv-surface)) 72%, transparent));
+  border: 1px solid var(--glass-border, color-mix(in srgb, var(--text, var(--cv-text)) 7%, transparent));
+  backdrop-filter: blur(var(--glass-blur, var(--cv-glass-blur)));
+  -webkit-backdrop-filter: blur(var(--glass-blur, var(--cv-glass-blur)));
 }
 
 .glass-strong {
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong, color-mix(in srgb, var(--surface, var(--cv-surface)) 90%, transparent));
+  border: 1px solid var(--glass-border, color-mix(in srgb, var(--text, var(--cv-text)) 7%, transparent));
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
 
 .glass-active {
-  background: var(--glass-bg-active);
-  border-color: var(--glass-border-active);
+  background: var(--glass-bg-active, var(--accent-soft, var(--cv-accent-soft)));
+  border-color: var(--glass-border-active, color-mix(in srgb, var(--accent, var(--cv-accent)) 28%, transparent));
 }
 
 
@@ -201,7 +202,7 @@ svg {
 
 .main {
   min-height: 100vh;
-  margin-left: var(--sidebar-width);
+  margin-left: var(--sidebar-w, var(--sidebar-width));
   padding-top: var(--topbar-height);
 }
 
@@ -218,12 +219,12 @@ svg {
   left: 0;
   bottom: 0;
 
-  width: var(--sidebar-width);
+  width: var(--sidebar-w, var(--sidebar-width));
 
   padding: 20px 14px;
 
-  background: rgba(10, 10, 15, .88);
-  border-right: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg, var(--cv-bg)) 88%, transparent);
+  border-right: 1px solid var(--border, var(--cv-border));
 
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -257,12 +258,12 @@ svg {
 
   background: linear-gradient(
     135deg,
-    var(--accent),
-    var(--accent-2)
+    var(--accent, var(--cv-accent)),
+    var(--accent-2, var(--cv-accent-2))
   );
 
   color: white;
-  box-shadow: 0 8px 24px rgba(123, 92, 255, .25);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent, var(--cv-accent)) 25%, transparent);
 }
 
 .sidebar-section {
@@ -273,7 +274,7 @@ svg {
   padding: 0 10px;
   margin-bottom: 8px;
 
-  color: var(--text-faint);
+  color: var(--text-faint, var(--cv-text-faint));
 
   font-size: 10px;
   font-weight: 700;
@@ -297,7 +298,7 @@ svg {
 
   border-radius: var(--radius-md);
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   transition:
     background .18s var(--ease),
@@ -306,12 +307,12 @@ svg {
 }
 
 .sidebar-link:hover {
-  background: rgba(255, 255, 255, .045);
-  color: var(--text);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 4.5%, transparent);
+  color: var(--text, var(--cv-text));
 }
 
 .sidebar-link.active {
-  background: var(--accent-soft);
+  background: var(--accent-soft, var(--cv-accent-soft));
   color: #fff;
 }
 
@@ -337,7 +338,7 @@ svg {
 
   top: 0;
   right: 0;
-  left: var(--sidebar-width);
+  left: var(--sidebar-w, var(--sidebar-width));
 
   height: var(--topbar-height);
 
@@ -347,8 +348,8 @@ svg {
 
   padding: 0 26px;
 
-  background: rgba(10, 10, 15, .72);
-  border-bottom: 1px solid rgba(255, 255, 255, .05);
+  background: color-mix(in srgb, var(--bg, var(--cv-bg)) 72%, transparent);
+  border-bottom: 1px solid var(--border, var(--cv-border));
 
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -385,7 +386,7 @@ svg {
   width: 17px;
   height: 17px;
 
-  color: var(--text-faint);
+  color: var(--text-faint, var(--cv-text-faint));
 
   transform: translateY(-50%);
   pointer-events: none;
@@ -397,13 +398,13 @@ svg {
 
   padding: 0 15px 0 40px;
 
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, var(--cv-border));
   border-radius: 999px;
 
   outline: none;
 
-  background: rgba(255, 255, 255, .035);
-  color: var(--text);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 3.5%, transparent);
+  color: var(--text, var(--cv-text));
 
   transition:
     border-color .18s ease,
@@ -412,13 +413,13 @@ svg {
 }
 
 .search input::placeholder {
-  color: var(--text-faint);
+  color: var(--text-faint, var(--cv-text-faint));
 }
 
 .search input:focus {
-  border-color: rgba(123, 92, 255, .5);
-  background: rgba(255, 255, 255, .05);
-  box-shadow: 0 0 0 3px rgba(123, 92, 255, .08);
+  border-color: color-mix(in srgb, var(--accent, var(--cv-accent)) 50%, transparent);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 5%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--cv-accent)) 8%, transparent);
 }
 
 
@@ -449,7 +450,7 @@ svg {
 .page-subtitle {
   margin: 7px 0 0;
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 }
 
 
@@ -465,7 +466,7 @@ svg {
   overflow: hidden;
 
   border-radius: var(--radius-xl);
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 }
 
 .hero-media,
@@ -488,14 +489,14 @@ svg {
   background:
     linear-gradient(
       90deg,
-      rgba(10, 10, 15, .95) 0%,
-      rgba(10, 10, 15, .75) 38%,
-      rgba(10, 10, 15, .2) 72%,
-      rgba(10, 10, 15, .55) 100%
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 95%, transparent) 0%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 75%, transparent) 38%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 20%, transparent) 72%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 55%, transparent) 100%
     ),
     linear-gradient(
       0deg,
-      rgba(10, 10, 15, .85),
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 85%, transparent),
       transparent 45%
     );
 
@@ -533,7 +534,7 @@ svg {
 
   margin: 18px 0 0;
 
-  color: rgba(255, 255, 255, .7);
+  color: color-mix(in srgb, var(--text, var(--cv-text)) 70%, transparent);
 
   font-size: 15px;
 }
@@ -610,21 +611,21 @@ svg {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--accent, var(--cv-accent));
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #896dff;
+  background: color-mix(in srgb, var(--accent, var(--cv-accent)) 85%, white);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, .08);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 8%, transparent);
   color: #fff;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, .13);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 13%, transparent);
 }
 
 
@@ -667,13 +668,13 @@ svg {
 }
 
 .shelf-link {
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
   font-size: 12px;
   font-weight: 650;
 }
 
 .shelf-link:hover {
-  color: var(--text);
+  color: var(--text, var(--cv-text));
 }
 
 
@@ -698,8 +699,8 @@ svg {
 
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, .08);
-  color: rgba(255, 255, 255, .85);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 8%, transparent);
+  color: color-mix(in srgb, var(--text, var(--cv-text)) 85%, transparent);
 
   cursor: pointer;
 
@@ -714,7 +715,7 @@ svg {
 }
 
 .shelf-arrow-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, .18);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 18%, transparent);
 }
 
 .shelf-arrow-btn:disabled {
@@ -781,7 +782,7 @@ svg {
 
   border-radius: var(--radius-md);
 
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 
   cursor: pointer;
 
@@ -793,8 +794,8 @@ svg {
 
 .card:hover {
   transform: translateY(-5px);
-  background: var(--surface-2);
-  box-shadow: var(--shadow-md);
+  background: var(--surface-2, var(--cv-surface-2));
+  box-shadow: var(--shadow-md, var(--cv-shadow-md));
 }
 
 .card-poster {
@@ -804,7 +805,7 @@ svg {
 
   overflow: hidden;
 
-  background: var(--surface-2);
+  background: var(--surface-2, var(--cv-surface-2));
 }
 
 .card-poster img {
@@ -831,7 +832,7 @@ svg {
 
   overflow: hidden;
 
-  color: var(--text);
+  color: var(--text, var(--cv-text));
 
   font-size: 13px;
   font-weight: 700;
@@ -849,13 +850,13 @@ svg {
 
   margin-top: 5px;
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   font-size: 11px;
 }
 
 .card-rating {
-  color: var(--gold);
+  color: var(--gold, var(--cv-gold));
 }
 
 .card-badge {
@@ -932,12 +933,12 @@ svg {
 
   padding: 0 13px;
 
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, var(--cv-border));
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, .035);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 3.5%, transparent);
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   cursor: pointer;
 
@@ -952,13 +953,13 @@ svg {
 
 .chip:hover {
   background: rgba(255, 255, 255, .07);
-  color: var(--text);
+  color: var(--text, var(--cv-text));
 }
 
 .chip.active {
-  border-color: rgba(123, 92, 255, .35);
+  border-color: color-mix(in srgb, var(--accent, var(--cv-accent)) 35%, transparent);
 
-  background: var(--accent-soft);
+  background: var(--accent-soft, var(--cv-accent-soft));
 
   color: #fff;
 }
@@ -985,8 +986,8 @@ svg {
   width: 28px;
   height: 28px;
 
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
+  border: 3px solid var(--border, var(--cv-border));
+  border-top-color: var(--accent, var(--cv-accent));
 
   border-radius: 50%;
 
@@ -1013,7 +1014,7 @@ svg {
 
   overflow: hidden;
 
-  background: var(--surface-2);
+  background: var(--surface-2, var(--cv-surface-2));
 }
 
 .skeleton::after {
@@ -1065,7 +1066,7 @@ svg {
    ========================================================= */
 
 .section-note {
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
   font-size: 13px;
 }
 
@@ -1093,7 +1094,7 @@ svg {
 
   margin: 8px 0 0;
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 }
 
 
@@ -1108,7 +1109,7 @@ svg {
 
   border-radius: var(--radius-xl);
 
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 }
 
 .detail-backdrop {
@@ -1132,13 +1133,13 @@ svg {
   background:
     linear-gradient(
       90deg,
-      var(--bg) 0%,
-      rgba(10, 10, 15, .84) 38%,
-      rgba(10, 10, 15, .3) 100%
+      var(--bg, var(--cv-bg)) 0%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 84%, transparent) 38%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 30%, transparent) 100%
     ),
     linear-gradient(
       0deg,
-      var(--bg),
+      var(--bg, var(--cv-bg)),
       transparent 55%
     );
 }
@@ -1189,7 +1190,7 @@ svg {
 
   margin: 18px 0 0;
 
-  color: rgba(255, 255, 255, .7);
+  color: color-mix(in srgb, var(--text, var(--cv-text)) 70%, transparent);
 }
 
 .detail-meta {
@@ -1199,7 +1200,7 @@ svg {
 
   margin-top: 15px;
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 }
 
 
@@ -1229,7 +1230,7 @@ svg {
 
   background: #000;
 
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg, var(--cv-shadow-lg));
 }
 
 #playerWrap iframe,
@@ -1265,12 +1266,12 @@ svg {
 
   padding: 12px;
 
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, var(--cv-border));
   border-radius: var(--radius-md);
 
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   cursor: pointer;
 
@@ -1281,13 +1282,13 @@ svg {
 }
 
 .ep-card:hover {
-  background: var(--surface-hover);
-  color: var(--text);
+  background: var(--surface-hover, var(--cv-surface-hover));
+  color: var(--text, var(--cv-text));
 }
 
 .ep-card.active {
-  border-color: rgba(123, 92, 255, .4);
-  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent, var(--cv-accent)) 40%, transparent);
+  background: var(--accent-soft, var(--cv-accent-soft));
   color: #fff;
 }
 
@@ -1310,24 +1311,24 @@ svg {
 
   padding: 0 13px;
 
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, var(--cv-border));
   border-radius: 9px;
 
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   cursor: pointer;
 }
 
 .source-tab:hover {
-  color: var(--text);
-  background: var(--surface-hover);
+  color: var(--text, var(--cv-text));
+  background: var(--surface-hover, var(--cv-surface-hover));
 }
 
 .source-tab.active {
-  border-color: rgba(123, 92, 255, .35);
-  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent, var(--cv-accent)) 35%, transparent);
+  background: var(--accent-soft, var(--cv-accent-soft));
   color: #fff;
 }
 
@@ -1350,9 +1351,9 @@ svg {
 
   border-radius: var(--radius-lg);
 
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, var(--cv-border));
 }
 
 .music-cover {
@@ -1381,7 +1382,7 @@ svg {
 .music-artist {
   margin-top: 4px;
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   font-size: 12px;
 }
@@ -1397,7 +1398,7 @@ svg {
 
   right: 18px;
   bottom: 18px;
-  left: calc(var(--sidebar-width) + 18px);
+  left: calc(var(--sidebar-w, var(--sidebar-width)) + 18px);
 
   min-height: 68px;
 
@@ -1407,15 +1408,15 @@ svg {
 
   padding: 10px 14px;
 
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-border, color-mix(in srgb, var(--text, var(--cv-text)) 7%, transparent));
   border-radius: var(--radius-lg);
 
-  background: var(--glass-bg-strong);
+  background: var(--glass-bg-strong, color-mix(in srgb, var(--surface, var(--cv-surface)) 90%, transparent));
 
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg, var(--cv-shadow-lg));
 }
 
 .music-player-cover {
@@ -1443,7 +1444,7 @@ svg {
 }
 
 .music-player-artist {
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 
   font-size: 11px;
 }
@@ -1465,10 +1466,10 @@ svg {
 .live-card {
   padding: 18px;
 
-  border: 1px solid var(--border);
+  border: 1px solid var(--border, var(--cv-border));
   border-radius: var(--radius-lg);
 
-  background: var(--surface);
+  background: var(--surface, var(--cv-surface));
 }
 
 .live-status {
@@ -1526,12 +1527,12 @@ svg {
 
   padding: 24px;
 
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-border, color-mix(in srgb, var(--text, var(--cv-text)) 7%, transparent));
   border-radius: var(--radius-xl);
 
-  background: var(--glass-bg-strong);
+  background: var(--glass-bg-strong, color-mix(in srgb, var(--surface, var(--cv-surface)) 90%, transparent));
 
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg, var(--cv-shadow-lg));
 }
 
 
@@ -1547,11 +1548,11 @@ svg {
 
   background: rgba(255, 201, 77, .05);
 
-  color: var(--text-muted);
+  color: var(--text-muted, var(--cv-text-muted));
 }
 
 .config-notice strong {
-  color: var(--gold);
+  color: var(--gold, var(--cv-gold));
 }
 
 
@@ -1562,7 +1563,7 @@ svg {
 .footer {
   padding: 40px 28px;
 
-  color: var(--text-faint);
+  color: var(--text-faint, var(--cv-text-faint));
 
   text-align: center;
 
@@ -1570,7 +1571,7 @@ svg {
 }
 
 .footer a:hover {
-  color: var(--text);
+  color: var(--text, var(--cv-text));
 }
 
 
@@ -1589,9 +1590,9 @@ svg {
 
   border-radius: 10px;
 
-  background: rgba(255, 255, 255, .05);
+  background: color-mix(in srgb, var(--text, var(--cv-text)) 5%, transparent);
 
-  color: var(--text);
+  color: var(--text, var(--cv-text));
 
   cursor: pointer;
 }
@@ -1614,7 +1615,7 @@ svg {
 
     transition: transform .25s var(--ease);
 
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg, var(--cv-shadow-lg));
   }
 
   .sidebar.open {
@@ -1838,7 +1839,7 @@ svg {
   .glass-strong,
   .modal-overlay,
   .music-player {
-    background: rgba(19, 19, 25, .97);
+    background: color-mix(in srgb, var(--surface, var(--cv-surface)) 97%, transparent);
   }
 }
 /* =========================================================
@@ -1856,7 +1857,7 @@ svg {
   overflow: hidden !important;
 
   border-radius: var(--radius-xl);
-  background: #0a0a0f;
+  background: var(--bg, var(--cv-bg));
 }
 
 /* Any hero background/image/video must stay inside hero */
@@ -1902,14 +1903,14 @@ svg {
   background:
     linear-gradient(
       90deg,
-      rgba(10, 10, 15, .96) 0%,
-      rgba(10, 10, 15, .72) 38%,
-      rgba(10, 10, 15, .22) 72%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 96%, transparent) 0%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 72%, transparent) 38%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 22%, transparent) 72%,
       rgba(10, 10, 15, .52) 100%
     ),
     linear-gradient(
       0deg,
-      rgba(10, 10, 15, .9) 0%,
+      color-mix(in srgb, var(--bg, var(--cv-bg)) 90%, transparent) 0%,
       transparent 55%
     );
 }
@@ -1994,4 +1995,63 @@ svg {
     padding: 24px !important;
   }
 
+}
+
+/* =========================================================
+   37. THEME COMPATIBILITY / FINAL OVERRIDES
+   ---------------------------------------------------------
+   The sidebar is owned by sidebar.css. These final rules only make
+   legacy CineVault selectors consume the active site's theme tokens.
+   ========================================================= */
+
+html,
+body {
+  background-color: var(--bg, var(--cv-bg));
+  color: var(--text, var(--cv-text));
+}
+
+.topbar {
+  background: color-mix(in srgb, var(--bg, var(--cv-bg)) 72%, transparent);
+  border-bottom-color: var(--border, var(--cv-border));
+}
+
+.hero {
+  background: var(--surface, var(--cv-surface));
+}
+
+.card,
+.detail,
+.ep-card,
+.source-tab,
+.music-card,
+.live-card {
+  background: var(--surface, var(--cv-surface));
+}
+
+.card:hover,
+.ep-card:hover,
+.source-tab:hover {
+  background: var(--surface-hover, var(--cv-surface-hover));
+}
+
+.btn-primary {
+  background: var(--accent, var(--cv-accent));
+}
+
+.chip.active,
+.ep-card.active,
+.source-tab.active,
+.sidebar-link.active {
+  background: var(--accent-soft, var(--cv-accent-soft));
+}
+
+#infiniteTrigger::after {
+  border-top-color: var(--accent, var(--cv-accent));
+}
+
+@supports not (color: color-mix(in srgb, white 50%, black)) {
+  /* Safe fallback for older browsers. Theme variables still win. */
+  body {
+    background: var(--bg, var(--cv-bg));
+  }
 }
